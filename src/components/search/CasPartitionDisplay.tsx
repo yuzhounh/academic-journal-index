@@ -44,7 +44,7 @@ const PartitionBadge = ({ partition }: { partition: string }) => {
     const variant = getPartitionBadgeVariant(main);
   
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-end gap-2">
         <Badge variant={variant}>
             {mainPartitionText}
         </Badge>
@@ -152,8 +152,8 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
       <div>
         <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t('cas.majorCategory')}</h4>
         <div className="p-3 bg-secondary/50 rounded-lg">
-            <div className="flex justify-between items-center">
-                <p className="font-semibold flex-1 truncate pr-2">{getMajorCategoryName(journal.majorCategory, locale)}</p>
+            <div className="grid grid-cols-[1fr_auto] items-center gap-2">
+                <p className="font-semibold truncate">{getMajorCategoryName(journal.majorCategory, locale)}</p>
                 <div className="flex items-center gap-2">
                     {journal.top === "是" && <Badge variant="default" className="bg-amber-500 text-white">Top</Badge>}
                     <PartitionBadge partition={journal.majorCategoryPartition} />
@@ -168,8 +168,8 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
             <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t('cas.minorCategories')}</h4>
             <div className="space-y-3 p-3 bg-secondary/50 rounded-lg">
             {journal.minorCategories.map((category, index) => (
-                <div key={index} className="flex justify-between items-center text-sm">
-                    <p className="font-medium flex-1 truncate pr-2">{getMinorCategoryName(category.name, locale)}</p>
+                <div key={index} className="grid grid-cols-[1fr_auto] items-center gap-2 text-sm">
+                    <p className="font-medium truncate">{getMinorCategoryName(category.name, locale)}</p>
                     <PartitionBadge partition={category.partition} />
                 </div>
             ))}

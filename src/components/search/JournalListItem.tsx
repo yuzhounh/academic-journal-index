@@ -76,8 +76,7 @@ const formatIssn = (issn: string) => {
     if (parts.length > 1) {
         return (
             <>
-                <span className="inline-block">{parts[0]}</span>
-                <span className="inline-block">/{parts.slice(1).join('/')}</span>
+                <span className="inline-block">{parts[0]}</span>/<wbr/><span className="inline-block">{parts.slice(1).join('/')}</span>
             </>
         );
     }
@@ -110,15 +109,17 @@ export default function JournalListItem({ journal, onClick }: JournalListItemPro
       <CardContent className="p-6 grid grid-cols-12 items-start gap-4">
         <div className="col-span-7">
           <p className="font-headline text-lg font-semibold truncate">{journal.journalName}</p>
-          <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm text-muted-foreground font-mono w-[150px]">{formatIssn(journal.issn)}</p>
-            <AuthorityBadge level={journal.authorityJournal} />
-            {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
+          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+            <p className="font-mono w-[9.5rem] shrink-0">{formatIssn(journal.issn)}</p>
+            <div className="flex items-center gap-2">
+                <AuthorityBadge level={journal.authorityJournal} />
+                {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
+            </div>
           </div>
         </div>
         <div className="col-span-2 text-center">
           <p className="text-xs text-muted-foreground font-semibold">{t('journal.impactFactor')}</p>
-          <p className="font-medium text-lg">{formatImpactFactor(journal.impactFactor)}</p>
+          <p className="font-medium text-base">{formatImpactFactor(journal.impactFactor)}</p>
         </div>
         <div className="col-span-3 flex flex-col items-center justify-center text-center">
           <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>

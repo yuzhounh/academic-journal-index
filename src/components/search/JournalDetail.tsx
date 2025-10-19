@@ -45,7 +45,12 @@ interface JournalDetailProps {
   journal: Journal;
   onBack: () => void;
   onJournalSelect: (journalName: string) => void;
+  isHistoryRoot: boolean;
 }
+
+type SummaryCache = {
+  [journalIssn: string]: JournalSummaryInfo;
+};
 
 const formatImpactFactor = (factor: number | string) => {
     const num = Number(factor);
@@ -101,9 +106,9 @@ const formatIssn = (issn: string) => {
     return issn;
 };
 
-export default function JournalDetail({ journal, onBack, onJournalSelect }: JournalDetailProps) {
+export default function JournalDetail({ journal, onBack, onJournalSelect, isHistoryRoot }: JournalDetailProps) {
   const [showAiAnalysis, setShowAiAnalysis] = useState<boolean>(false);
-  const [summaryInfo, setSummaryInfo] = useState<JournalSummaryInfo | null>(null);
+  const [summaryCache, setSummaryCache] = useState<SummaryCache>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { user, firestore } = useFirebase();
@@ -111,6 +116,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect }: Jour
   const [isFavoritesDialogOpen, setIsFavoritesDialogOpen] = useState(false);
 
   const journalId = journal.issn.split('/')[0];
+  const summaryInfo = summaryCache[journal.issn];
 
   const favoritesQuery = useMemoFirebase(
     () =>
@@ -127,22 +133,25 @@ export default function JournalDetail({ journal, onBack, onJournalSelect }: Jour
 
   const isFavorited = favoriteEntries ? favoriteEntries.length > 0 : false;
 
-  // Reset AI state when journal changes
   useEffect(() => {
+    // This effect now only resets the visibility of the AI section
+    // when the journal changes, but doesn't clear the data itself.
     setShowAiAnalysis(false);
-    setSummaryInfo(null);
-    setIsLoading(false);
-    setError(null);
   }, [journal]);
 
   const handleGenerateSummary = async () => {
     if (!journal) return;
+    if (summaryCache[journal.issn]) {
+      setShowAiAnalysis(true);
+      return;
+    }
+
     setShowAiAnalysis(true);
     setIsLoading(true);
     setError(null);
     try {
       const result: JournalSummaryInfo = await getSummary(journal, locale);
-      setSummaryInfo(result);
+      setSummaryCache(prev => ({...prev, [journal.issn]: result }));
     } catch (e) {
       setError(t('journal.summaryError'));
       console.error(e);
@@ -163,7 +172,14 @@ export default function JournalDetail({ journal, onBack, onJournalSelect }: Jour
   return (
     <div className="space-y-6 animate-in fade-in-50 duration-300">
       <div className="flex items-center gap-4">
-        <Button variant="outline" size="icon" onClick={onBack} aria-label={t('journal.back')}>
+        <Button 
+          variant="outline" 
+          size="icon" 
+          onClick={onBack} 
+          aria-label={t('journal.back')}
+          disabled={isHistoryRoot}
+          className={isHistoryRoot ? "opacity-50 cursor-not-allowed" : ""}
+        >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-grow flex items-center gap-4 justify-between">
@@ -246,7 +262,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect }: Jour
             </CardHeader>
             {showAiAnalysis && (
               <CardContent>
-                  {isLoading && (
+                  {isLoading && !summaryInfo && (
                     <div className="space-y-4">
                         <Skeleton className="h-4 w-3/4" />
                         <Skeleton className="h-4 w-full" />
@@ -273,7 +289,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect }: Jour
                 <CardContent>
                     <RelatedJournals
                         relatedJournals={summaryInfo?.relatedJournals ?? null}
-                        isLoading={isLoading}
+                        isLoading={isLoading && !summaryInfo}
                         error={error}
                         onJournalSelect={onJournalSelect}
                     />

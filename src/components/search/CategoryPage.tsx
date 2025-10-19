@@ -281,7 +281,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   };
 
   const handleBackFromDetail = () => {
-     setJournalHistory(prev => prev.slice(0, -1));
+    if (journalHistory.length > 1) {
+        setJournalHistory(prev => prev.slice(0, -1));
+    } else {
+        setJournalHistory([]);
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -585,14 +589,16 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       <main className="flex-grow">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="py-12 md:py-16">
-                <div className="flex flex-col items-center text-center mb-8">
-                    <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">
-                    {t('header.title')}
-                    </h1>
-                    <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
-                    {t('header.subtitle')}
-                    </p>
-                </div>
+                {journalHistory.length === 0 && (
+                    <div className="flex flex-col items-center text-center mb-8">
+                        <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">
+                        {t('header.title')}
+                        </h1>
+                        <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
+                        {t('header.subtitle')}
+                        </p>
+                    </div>
+                )}
                 {renderContent()}
             </div>
         </div>

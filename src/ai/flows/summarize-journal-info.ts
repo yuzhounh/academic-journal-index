@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -23,16 +24,16 @@ export type SummarizeJournalInfoInput = z.infer<
 
 const ContentBlockSchema = z.discriminatedUnion("type", [
   z.object({
-    type: z.literal("heading"),
+    type: z.enum(["heading"]),
     level: z.number().min(1).max(3).describe("The heading level (e.g., 2 for ##)."),
     content: z.string().describe("The text content of the heading."),
   }),
   z.object({
-    type: z.literal("paragraph"),
+    type: z.enum(["paragraph"]),
     content: z.string().describe("The text content of the paragraph."),
   }),
   z.object({
-    type: z.literal("list"),
+    type: z.enum(["list"]),
     items: z.array(z.string()).describe("An array of strings, where each string is a list item."),
   }),
 ]);

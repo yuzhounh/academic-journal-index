@@ -43,6 +43,7 @@ import { useCollection, WithId } from "@/firebase/firestore/use-collection";
 import { collection, query } from "firebase/firestore";
 import { useMemoFirebase } from "@/firebase/provider";
 import LoginDialog from "../auth/LoginDialog";
+import { getJournals, Journal as JournalType } from '@/data/journals';
 
 const JOURNALS_PER_PAGE = 20;
 
@@ -711,17 +712,19 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           </div>
         </div>
       </header>
-      <div className="py-4 md:py-8">
-        <div className="flex flex-col items-center text-center mb-8">
-          <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">
-            {t('header.title')}
-          </h1>
-          <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
-            {t('header.subtitle')}
-          </p>
+      <main className="flex-grow">
+        <div className="py-12 md:py-16">
+          <div className="flex flex-col items-center text-center mb-8">
+            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">
+              {t('header.title')}
+            </h1>
+            <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
+              {t('header.subtitle')}
+            </p>
+          </div>
+          {renderContent()}
         </div>
-        {renderContent()}
-      </div>
+      </main>
       <footer className="text-center text-sm text-muted-foreground py-4 border-t">
         © 2025 Jing Wang. All Rights Reserved.
       </footer>

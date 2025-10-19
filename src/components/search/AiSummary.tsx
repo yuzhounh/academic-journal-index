@@ -7,9 +7,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { JournalSummaryInfo } from "@/app/actions";
 import { useTranslation } from "@/i18n/provider";
 import { BookCopy } from "lucide-react";
-import { marked } from "marked";
 import JournalListItem from "./JournalListItem";
 import { journals } from "@/data/journals";
+import ContentBlockRenderer from "./ContentBlockRenderer";
 
 interface AiSummaryProps {
   journal: Journal;
@@ -66,16 +66,6 @@ export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) 
     return <p className="text-destructive">{error}</p>;
   }
 
-  const getSanitizedHtml = (markdown: string) => {
-    try {
-        // Configure marked to be safe
-        return marked.parse(markdown, { gfm: true, breaks: true, async: false });
-    } catch (e) {
-        console.error("Error parsing markdown:", e);
-        return "Error parsing summary.";
-    }
-  };
-  
   const relatedJournalsMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
   const fullRelatedJournals = (summaryInfo?.relatedJournals || [])
     .map(rj => relatedJournalsMap.get(rj.issn.split('/')[0]))
@@ -85,10 +75,7 @@ export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) 
   return (
     <div className="space-y-6">
       {summaryInfo?.summary && (
-        <div
-            className="prose dark:prose-invert prose-headings:font-headline prose-headings:text-foreground max-w-none text-base text-foreground/90 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: getSanitizedHtml(summaryInfo.summary) as string }}
-        />
+        <ContentBlockRenderer blocks={summaryInfo.summary} />
       )}
 
       {fullRelatedJournals.length > 0 && (

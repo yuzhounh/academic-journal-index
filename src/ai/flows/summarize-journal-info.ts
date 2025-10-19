@@ -9,8 +9,8 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import { findJournalsTool } from '../tools/find-journals';
+import {z} from 'zod';
+import { journals } from '@/data/journals';
 
 const SummarizeJournalInfoInputSchema = z.object({
   journalName: z.string().describe('The name of the journal.'),
@@ -25,7 +25,7 @@ const SummarizeJournalInfoOutputSchema = z.object({
   relatedJournals: z.array(z.object({
     journalName: z.string().describe("The name of the related journal."),
     issn: z.string().describe("The ISSN of the related journal."),
-  })).describe("A list of 3-5 journals related to the current one based on its main category.")
+  })).describe("A list of 3-5 journals related to the current one based on its main category, drawn from your general knowledge.")
 });
 export type SummarizeJournalInfoOutput = z.infer<
   typeof SummarizeJournalInfoOutputSchema
@@ -41,7 +41,6 @@ const summarizeJournalInfoPrompt = ai.definePrompt({
   name: 'summarizeJournalInfoPrompt',
   input: {schema: SummarizeJournalInfoInputSchema},
   output: {schema: SummarizeJournalInfoOutputSchema},
-  tools: [findJournalsTool],
   prompt: `
     You are a professional academic journal analyst.
     Your task is to generate a detailed analysis report for the following journal.
@@ -63,7 +62,7 @@ const summarizeJournalInfoPrompt = ai.definePrompt({
     3. Status in the Field
        [Analyze the journal's position in its academic field, combining its academic reputation, common metrics, and influence]
 
-    Additionally, use the findJournalsTool to find and list 3-5 related journals based on the current journal's core subject category, and populate them into the 'relatedJournals' field.
+    Additionally, based on your own knowledge, recommend 3-5 related journals based on the current journal's core subject category. Populate these recommendations into the 'relatedJournals' field, including their names and ISSNs.
   `,
 });
 
@@ -75,6 +74,21 @@ const summarizeJournalInfoFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await summarizeJournalInfoPrompt(input);
-    return output!;
+    if (!output) {
+      return { summary: '', relatedJournals: [] };
+    }
+
+    // After getting AI suggestions, filter them to ensure they exist in our local data.
+    const allKnownIssns = new Set(journals.map(j => j.issn.split('/')[0]));
+    
+    const validatedRelatedJournals = output.relatedJournals.filter(suggestedJournal => {
+      const suggestedIssn = suggestedJournal.issn.split('/')[0];
+      return allKnownIssns.has(suggestedIssn);
+    });
+
+    return {
+      summary: output.summary,
+      relatedJournals: validatedRelatedJournals,
+    };
   }
 );

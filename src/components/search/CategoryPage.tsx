@@ -24,6 +24,9 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ArrowLeft, BookText, BookOpen, Menu, Folder } from "lucide-react";
@@ -557,6 +560,12 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="pr-0">
+                      <SheetHeader>
+                        <SheetTitle className="sr-only">Menu</SheetTitle>
+                        <SheetDescription className="sr-only">
+                          Main navigation menu
+                        </SheetDescription>
+                      </SheetHeader>
                       <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline mb-6">
                         <BookOpen className="h-5 w-5 text-primary" />
                         <span>AJI</span>

@@ -68,8 +68,8 @@ export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) 
 
   const getSanitizedHtml = (markdown: string) => {
     try {
-        // Configure marked to sanitize HTML
-        return marked.parse(markdown, { gfm: true, breaks: true });
+        // Configure marked to be safe
+        return marked.parse(markdown, { gfm: true, breaks: true, async: false });
     } catch (e) {
         console.error("Error parsing markdown:", e);
         return "Error parsing summary.";
@@ -87,7 +87,7 @@ export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) 
       {summaryInfo?.summary && (
         <div
             className="prose dark:prose-invert prose-headings:font-headline prose-headings:text-foreground max-w-none text-base text-foreground/90 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: getSanitizedHtml(summaryInfo.summary) }}
+            dangerouslySetInnerHTML={{ __html: getSanitizedHtml(summaryInfo.summary) as string }}
         />
       )}
 

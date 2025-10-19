@@ -134,10 +134,14 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
   const isFavorited = favoriteEntries ? favoriteEntries.length > 0 : false;
 
   useEffect(() => {
-    // This effect now only resets the visibility of the AI section
-    // when the journal changes, but doesn't clear the data itself.
-    setShowAiAnalysis(false);
-  }, [journal]);
+    // When the journal changes, check if we have a cached summary.
+    // If we do, automatically show the analysis section.
+    if (summaryCache[journal.issn]) {
+      setShowAiAnalysis(true);
+    } else {
+      setShowAiAnalysis(false);
+    }
+  }, [journal, summaryCache]);
 
   const handleGenerateSummary = async () => {
     if (!journal) return;

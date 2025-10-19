@@ -4,10 +4,11 @@ import { useState, useEffect } from "react";
 import type { Journal } from "@/data/journals";
 import { getSummary } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BookCopy } from "lucide-react";
 import type { JournalSummaryInfo } from "@/app/actions";
 import { useTranslation } from "@/i18n/provider";
+import { BookCopy } from "lucide-react";
+import { marked } from "marked";
+import JournalListItem from "./JournalListItem";
 
 interface AiSummaryProps {
   journal: Journal;
@@ -20,8 +21,7 @@ type RelatedJournal = {
 };
 
 export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) {
-  const [summary, setSummary] = useState<string>("");
-  const [relatedJournals, setRelatedJournals] = useState<RelatedJournal[]>([]);
+  const [summaryInfo, setSummaryInfo] = useState<JournalSummaryInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const { locale, t } = useTranslation();
@@ -32,8 +32,7 @@ export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) 
       setError(null);
       try {
         const result: JournalSummaryInfo = await getSummary(journal, locale);
-        setSummary(result.summary);
-        setRelatedJournals(result.relatedJournals || []);
+        setSummaryInfo(result);
       } catch (e) {
         setError(t('journal.summaryError'));
         console.error(e);
@@ -49,55 +48,67 @@ export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) 
 
   if (isLoading) {
     return (
-        <div className="space-y-4">
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-full" />
+      <div className="space-y-4">
+        <div className="space-y-2">
             <Skeleton className="h-4 w-3/4" />
-            <div className="pt-4 space-y-2">
-                <Skeleton className="h-5 w-48" />
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                </div>
-            </div>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
         </div>
+        <div className="pt-4 space-y-2">
+          <Skeleton className="h-5 w-48" />
+          <div className="space-y-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        </div>
+      </div>
     );
   }
 
   if (error) {
-    return <p className="text-destructive">{error}</p>
+    return <p className="text-destructive">{error}</p>;
   }
+
+  const getSanitizedHtml = (markdown: string) => {
+    try {
+        return marked.parse(markdown);
+    } catch (e) {
+        return "Error parsing summary.";
+    }
+  };
+  
+  const relatedJournalsMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
+  const fullRelatedJournals = (summaryInfo?.relatedJournals || [])
+    .map(rj => relatedJournalsMap.get(rj.issn.split('/')[0]))
+    .filter((j): j is Journal => !!j);
+
 
   return (
     <div className="space-y-6">
-      <p className="text-base text-foreground/90 leading-relaxed whitespace-pre-line">
-        {summary}
-      </p>
+      {summaryInfo?.summary && (
+        <div
+            className="prose dark:prose-invert prose-headings:font-headline prose-headings:text-foreground max-w-none text-base text-foreground/90 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: getSanitizedHtml(summaryInfo.summary) }}
+        />
+      )}
 
-      {relatedJournals.length > 0 && (
+      {fullRelatedJournals.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2 font-headline">
+            <BookCopy className="text-primary" />
+            {t('journal.relatedJournals')}
+          </h3>
           <div className="space-y-4">
-              <h3 className="text-lg font-semibold flex items-center gap-2">
-                <BookCopy className="text-primary"/>
-                {t('journal.relatedJournals')}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {relatedJournals.map((relatedJournal, index) => (
-                      <Card 
-                        key={index} 
-                        className="cursor-pointer hover:shadow-md transition-shadow flex flex-col"
-                        onClick={() => onJournalSelect(relatedJournal.journalName)}
-                      >
-                          <CardHeader className="p-4 pb-2">
-                              <CardTitle className="text-base font-medium leading-tight line-clamp-2">{relatedJournal.journalName}</CardTitle>
-                          </CardHeader>
-                          <CardContent className="p-4 pt-1">
-                            <p className="text-sm text-muted-foreground">{relatedJournal.issn}</p>
-                          </CardContent>
-                      </Card>
-                  ))}
-              </div>
+            {fullRelatedJournals.map((relatedJournal) => (
+                <JournalListItem
+                    key={relatedJournal.issn}
+                    journal={relatedJournal}
+                    onClick={() => onJournalSelect(relatedJournal.journalName)}
+                />
+            ))}
           </div>
+        </div>
       )}
     </div>
   );

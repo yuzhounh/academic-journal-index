@@ -158,7 +158,7 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
         <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t('cas.majorCategory')}</h4>
         <div className="p-3 bg-secondary/50 rounded-lg">
             <div className="grid grid-cols-[1fr_auto_80px] items-center gap-2">
-                <p className="font-semibold truncate">{getMajorCategoryName(journal.majorCategory, locale)}</p>
+                <p className="truncate">{getMajorCategoryName(journal.majorCategory, locale)}</p>
                 <div className="flex justify-end items-center gap-1">
                   {journal.top === "是" && <Badge variant="default" className="bg-amber-500 text-white">Top</Badge>}
                   <PartitionBadge partition={journal.majorCategoryPartition} />

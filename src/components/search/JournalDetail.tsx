@@ -181,8 +181,6 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
           size="icon" 
           onClick={onBack} 
           aria-label={t('journal.back')}
-          disabled={isHistoryRoot}
-          className={isHistoryRoot ? "opacity-50 cursor-not-allowed" : ""}
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>

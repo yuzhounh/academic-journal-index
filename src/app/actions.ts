@@ -5,6 +5,7 @@ import {
   summarizeJournalInfo,
   type SummarizeJournalInfoOutput,
 } from '@/ai/flows/summarize-journal-info';
+export type { ContentBlock } from '@/ai/flows/summarize-journal-info';
 
 export type JournalSummaryInfo = SummarizeJournalInfoOutput;
 

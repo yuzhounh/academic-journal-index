@@ -71,16 +71,9 @@ const formatImpactFactor = (factor: number | string) => {
     return factor;
 };
 
+// Simplified to just return the string, letting CSS handle breaks.
 const formatIssn = (issn: string) => {
-    const parts = issn.split('/');
-    if (parts.length > 1) {
-        return (
-            <>
-                <span className="inline-block">{parts[0]}</span>/<wbr/><span className="inline-block">{parts.slice(1).join('/')}</span>
-            </>
-        );
-    }
-    return <span className="inline-block">{issn}</span>;
+    return issn;
 };
 
 export default function JournalListItem({ journal, onClick }: JournalListItemProps) {
@@ -106,26 +99,34 @@ export default function JournalListItem({ journal, onClick }: JournalListItemPro
       className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-shadow"
       onClick={onClick}
     >
-      <CardContent className="p-6 grid grid-cols-12 items-start gap-4">
-        <div className="col-span-7">
-          <p className="font-headline text-lg font-semibold truncate">{journal.journalName}</p>
-          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-            <p className="font-mono w-[9.5rem] shrink-0">{formatIssn(journal.issn)}</p>
+      <CardContent className="p-4 md:p-6 flex flex-col md:grid md:grid-cols-12 md:items-start md:gap-4">
+        {/* Left side: Title and metadata */}
+        <div className="md:col-span-7">
+          <p className="font-headline text-lg font-semibold line-clamp-3 md:truncate">{journal.journalName}</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
+            <p className="font-mono whitespace-nowrap">{formatIssn(journal.issn)}</p>
             <div className="flex items-center gap-2">
                 <AuthorityBadge level={journal.authorityJournal} />
                 {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
             </div>
           </div>
         </div>
-        <div className="col-span-2 text-center">
-          <p className="text-xs text-muted-foreground font-semibold">{t('journal.impactFactor')}</p>
-          <p className="font-medium text-base">{formatImpactFactor(journal.impactFactor)}</p>
-        </div>
-        <div className="col-span-3 flex flex-col items-center justify-center text-center">
-          <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>
-          <div className={cn("flex items-center font-semibold text-base", getPartitionColorClass(journal.majorCategoryPartition))}>
-            <span className="ml-1">{getPartitionText(journal.majorCategoryPartition)}</span>
-          </div>
+
+        {/* Divider for mobile view */}
+        <div className="h-px bg-border my-3 md:hidden"></div>
+
+        {/* Right side: Stats */}
+        <div className="md:col-span-5 w-full flex justify-around md:justify-end items-start gap-4">
+            <div className="text-center md:w-1/2">
+                <p className="text-xs text-muted-foreground font-semibold">{t('journal.impactFactor')}</p>
+                <p className="font-medium text-base">{formatImpactFactor(journal.impactFactor)}</p>
+            </div>
+            <div className="text-center md:w-1/2">
+                <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>
+                <div className={cn("flex items-center justify-center font-semibold text-base", getPartitionColorClass(journal.majorCategoryPartition))}>
+                    <span className="ml-1">{getPartitionText(journal.majorCategoryPartition)}</span>
+                </div>
+            </div>
         </div>
       </CardContent>
     </Card>

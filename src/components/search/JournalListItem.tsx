@@ -106,7 +106,7 @@ export default function JournalListItem({ journal, onClick }: JournalListItemPro
         <div className="col-span-7">
           <p className="font-headline text-lg font-semibold truncate">{journal.journalName}</p>
           <div className="flex items-center gap-2 mt-1">
-            <p className="text-sm text-muted-foreground">{formatIssn(journal.issn)}</p>
+            <p className="text-sm text-muted-foreground font-mono">{formatIssn(journal.issn)}</p>
             <AuthorityBadge level={journal.authorityJournal} />
             {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
           </div>

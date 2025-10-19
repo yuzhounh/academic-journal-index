@@ -44,12 +44,12 @@ const PartitionBadge = ({ partition }: { partition: string }) => {
     const variant = getPartitionBadgeVariant(main);
   
     return (
-      <div className="flex items-center justify-end gap-2">
+      <>
         <Badge variant={variant}>
             {mainPartitionText}
         </Badge>
         {details && <span className="text-xs text-muted-foreground">{details.replace(/[\[\]]/g, '')}</span>}
-      </div>
+      </>
     );
 };
 
@@ -154,7 +154,7 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
         <div className="p-3 bg-secondary/50 rounded-lg">
             <div className="grid grid-cols-[1fr_auto] items-center gap-2">
                 <p className="font-semibold truncate">{getMajorCategoryName(journal.majorCategory, locale)}</p>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-end gap-2">
                     {journal.top === "是" && <Badge variant="default" className="bg-amber-500 text-white">Top</Badge>}
                     <PartitionBadge partition={journal.majorCategoryPartition} />
                 </div>
@@ -170,7 +170,9 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
             {journal.minorCategories.map((category, index) => (
                 <div key={index} className="grid grid-cols-[1fr_auto] items-center gap-2 text-sm">
                     <p className="font-medium truncate">{getMinorCategoryName(category.name, locale)}</p>
-                    <PartitionBadge partition={category.partition} />
+                    <div className="flex items-center justify-end gap-2">
+                      <PartitionBadge partition={category.partition} />
+                    </div>
                 </div>
             ))}
             </div>

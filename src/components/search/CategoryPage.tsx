@@ -26,11 +26,10 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ArrowLeft, BookText, Crown, Medal, Star, BookOpen, Menu, Folder } from "lucide-react";
+import { ArrowLeft, BookText, BookOpen, Menu, Folder } from "lucide-react";
 import JournalDetail from "./JournalDetail";
 import SearchPage from "./SearchPage";
 import CategoryStats from "./CategoryStats";
-import { cn } from "@/lib/utils";
 import UserAvatar from "../auth/UserAvatar";
 import { useFirebase } from "@/firebase";
 import FavoritesContent, { JournalList } from "../favorites/FavoritesContent";
@@ -43,58 +42,9 @@ import { useCollection, WithId } from "@/firebase/firestore/use-collection";
 import { collection, query } from "firebase/firestore";
 import { useMemoFirebase } from "@/firebase/provider";
 import LoginDialog from "../auth/LoginDialog";
-import { getJournals, Journal as JournalType } from '@/data/journals';
+import JournalListItem from "./JournalListItem";
 
 const JOURNALS_PER_PAGE = 20;
-
-const getPartitionColorClass = (partition: string): string => {
-  const mainPartition = partition.charAt(0);
-  switch (mainPartition) {
-    case "1":
-      return "text-red-500";
-    case "2":
-      return "text-orange-500";
-    case "3":
-      return "text-yellow-600";
-    case "4":
-      return "text-green-600";
-    default:
-      return "text-muted-foreground";
-  }
-};
-
-const AuthorityBadge = ({ level }: { level: string }) => {
-    const { t } = useTranslation();
-    let icon;
-    let variant: "authority1" | "authority2" | "authority3" | "secondary" = "secondary";
-    let levelText = level;
-    if (level === "一级") levelText = t('cas.authority.1');
-    if (level === "二级") levelText = t('cas.authority.2');
-    if (level === "三级") levelText = t('cas.authority.3');
-
-    switch (level) {
-        case "一级":
-            icon = <Crown className="h-3 w-3" />;
-            variant = "authority1";
-            break;
-        case "二级":
-            icon = <Medal className="h-3 w-3" />;
-            variant = "authority2";
-            break;
-        case "三级":
-            icon = <Star className="h-3 w-3" />;
-            variant = "authority3";
-            break;
-        default:
-            return null;
-    }
-    return (
-        <Badge variant={variant} className="gap-1 pl-1 pr-1.5">
-            {icon}
-            <span className="text-xs whitespace-nowrap">{levelText}</span>
-        </Badge>
-    )
-}
 
 // Helper function to generate pagination items
 const getPaginationItems = (
@@ -178,22 +128,6 @@ const extractRank = (partition: string): number => {
 interface CategoryPageProps {
   journals: Journal[];
 }
-
-const formatImpactFactor = (factor: number | string) => {
-  const num = Number(factor);
-  if (!isNaN(num) && String(factor).trim() !== "" && !String(factor).includes('<')) {
-    return num.toFixed(1);
-  }
-  return factor;
-};
-
-const formatIssn = (issn: string) => {
-    const parts = issn.split('/');
-    if (parts.length > 1) {
-        return <>{parts[0]}/<wbr/>{parts.slice(1).join('/')}</>;
-    }
-    return issn;
-};
 
 type FavoriteJournalEntry = {
   journalId: string;
@@ -362,21 +296,6 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     setMobileMenuOpen(false);
   }
 
-  const getPartitionText = (partition: string) => {
-    if (locale === 'zh') {
-        const mainPartition = partition.charAt(0);
-        switch (mainPartition) {
-            case '1': return t('cas.partitions.1');
-            case '2': return t('cas.partitions.2');
-            case '3': return t('cas.partitions.3');
-            case '4': return t('cas.partitions.4');
-            default: return partition;
-        }
-    }
-    const match = partition.match(/(\d+)/);
-    return match ? `Q${match[1]}` : partition;
-  };
-
   if (selectedJournal) {
     return (
       <div className="py-4 md:py-8">
@@ -414,32 +333,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
               {paginatedJournals.length > 0 ? (
                 <div className="space-y-4">
                   {paginatedJournals.map((journal) => (
-                    <Card
+                    <JournalListItem
                       key={journal.issn}
-                      className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-shadow"
+                      journal={journal}
                       onClick={() => handleJournalSelect(journal)}
-                    >
-                      <CardContent className="p-6 grid grid-cols-12 items-start gap-4">
-                        <div className="col-span-7">
-                          <p className="font-headline text-lg font-semibold truncate">{journal.journalName}</p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <p className="text-sm text-muted-foreground">{formatIssn(journal.issn)}</p>
-                            <AuthorityBadge level={journal.authorityJournal} />
-                            {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
-                          </div>
-                        </div>
-                        <div className="col-span-2 text-center">
-                          <p className="text-xs text-muted-foreground font-semibold">{t('journal.impactFactor')}</p>
-                          <p className="font-medium text-lg">{formatImpactFactor(journal.impactFactor)}</p>
-                        </div>
-                        <div className="col-span-3 flex flex-col items-center justify-center text-center">
-                          <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>
-                          <div className={cn("flex items-center font-semibold text-base", getPartitionColorClass(journal.majorCategoryPartition))}>
-                            <span className="ml-1">{getPartitionText(journal.majorCategoryPartition)}</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    />
                   ))}
                 </div>
               ) : (
@@ -481,51 +379,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
               </div>
               <div className="space-y-4">
                 {paginatedJournals.map((journal) => (
-                   <Card
-                    key={journal.issn}
-                    className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-shadow"
-                    onClick={() => handleJournalSelect(journal)}
-                  >
-                    <CardContent className="p-6 grid grid-cols-12 items-start gap-4">
-                      <div className="col-span-7">
-                        <p className="font-headline text-lg font-semibold truncate">
-                          {journal.journalName}
-                        </p>
-                         <div className="flex items-center gap-2 mt-1">
-                            <p className="text-sm text-muted-foreground">
-                            {formatIssn(journal.issn)}
-                            </p>
-                            <AuthorityBadge level={journal.authorityJournal} />
-                            {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
-                         </div>
-                      </div>
-                      <div className="col-span-2 text-center">
-                        <p className="text-xs text-muted-foreground font-semibold">
-                          {t('journal.impactFactor')}
-                        </p>
-                        <p className="font-medium text-lg">
-                          {formatImpactFactor(journal.impactFactor)}
-                        </p>
-                      </div>
-                      <div className="col-span-3 flex flex-col items-center justify-center text-center">
-                        <p className="text-xs text-muted-foreground font-semibold mb-1">
-                          {t('journal.casPartitionShort')}
-                        </p>
-                        <div
-                          className={cn(
-                            "flex items-center font-semibold text-base",
-                            getPartitionColorClass(
-                              journal.majorCategoryPartition
-                            )
-                          )}
-                        >
-                          <span className={cn("ml-1")}>
-                            {getPartitionText(journal.majorCategoryPartition)}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                   <JournalListItem
+                      key={journal.issn}
+                      journal={journal}
+                      onClick={() => handleJournalSelect(journal)}
+                    />
                 ))}
               </div>
 
@@ -713,20 +571,24 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         </div>
       </header>
       <main className="flex-grow">
-        <div className="py-12 md:py-16">
-          <div className="flex flex-col items-center text-center mb-8">
-            <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">
-              {t('header.title')}
-            </h1>
-            <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
-              {t('header.subtitle')}
-            </p>
-          </div>
-          {renderContent()}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="py-12 md:py-16">
+                <div className="flex flex-col items-center text-center mb-8">
+                    <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">
+                    {t('header.title')}
+                    </h1>
+                    <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
+                    {t('header.subtitle')}
+                    </p>
+                </div>
+                {renderContent()}
+            </div>
         </div>
       </main>
-      <footer className="text-center text-sm text-muted-foreground py-4 border-t">
-        © 2025 Jing Wang. All Rights Reserved.
+      <footer className="border-t">
+        <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
+          © 2025 Jing Wang. All Rights Reserved.
+        </div>
       </footer>
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
     </>

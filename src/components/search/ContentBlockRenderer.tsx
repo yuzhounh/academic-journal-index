@@ -8,7 +8,7 @@ interface ContentBlockRendererProps {
 
 const Heading = ({ level, content }: { level: number; content: string }) => {
   const Tag = `h${level + 1}` as keyof JSX.IntrinsicElements; // h1, h2, h3 -> h2, h3, h4
-  return <Tag className="font-headline text-xl font-bold mt-6 mb-2 text-foreground">{content}</Tag>;
+  return <Tag className="font-headline text-xl font-bold mt-6 mb-2 text-foreground first-of-type:mt-0">{content}</Tag>;
 };
 
 const Paragraph = ({ content }: { content: string }) => {

@@ -65,6 +65,7 @@ const summarizeJournalInfoPrompt = ai.definePrompt({
     You are a professional academic journal analyst.
     Your task is to generate a detailed analysis report for the following journal.
     The entire report MUST be written in the language of the provided locale: {{{locale}}}.
+    IMPORTANT: When generating the report, DO NOT translate the original 'Journal Name'. Keep it as provided.
     You MUST structure your output as a JSON object matching the provided schema.
 
     Journal Name: {{{journalName}}}

@@ -51,9 +51,10 @@ const PartitionBadge = ({ partition }: { partition: string }) => {
 };
 
 const getPartitionDetails = (partition: string): string => {
-    const match = partition.match(/\s*(.*)/);
+    // Regex to find content inside square brackets, e.g., "[312/5603]".
+    const match = partition.match(/\[(.*)\]/);
     if (!match || !match[1]) return '';
-    return match[1].replace(/[\[\]]/g, '');
+    return match[1];
 };
 
 
@@ -158,7 +159,7 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
         <div className="p-3 bg-secondary/50 rounded-lg">
             <div className="grid grid-cols-[1fr_auto_80px] items-center gap-2">
                 <p className="font-semibold truncate">{getMajorCategoryName(journal.majorCategory, locale)}</p>
-                <div className="flex justify-center">
+                <div className="flex justify-end items-center gap-1">
                   {journal.top === "是" && <Badge variant="default" className="bg-amber-500 text-white">Top</Badge>}
                   <PartitionBadge partition={journal.majorCategoryPartition} />
                 </div>
@@ -175,7 +176,7 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
             {journal.minorCategories.map((category, index) => (
                 <div key={index} className="grid grid-cols-[1fr_auto_80px] items-center gap-2 text-sm">
                     <p className="font-medium truncate">{getMinorCategoryName(category.name, locale)}</p>
-                    <div className="flex justify-center">
+                    <div className="flex justify-end">
                         <PartitionBadge partition={category.partition} />
                     </div>
                     <p className="text-sm text-muted-foreground text-left">{getPartitionDetails(category.partition)}</p>

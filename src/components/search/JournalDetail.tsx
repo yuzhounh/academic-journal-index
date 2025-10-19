@@ -31,7 +31,7 @@ import CasPartitionDisplay from "./CasPartitionDisplay";
 import { Badge } from "../ui/badge";
 import { getSummary } from "@/app/actions";
 import type { JournalSummaryInfo } from "@/app/actions";
-import AiSummaryContent from "./AiSummaryContent";
+import ContentBlockRenderer from "./ContentBlockRenderer";
 import RelatedJournals from "./RelatedJournals";
 import { useFirebase } from "@/firebase";
 import { useCollection } from "@/firebase/firestore/use-collection";
@@ -39,6 +39,7 @@ import { useMemoFirebase } from "@/firebase/provider";
 import { useTranslation } from "@/i18n/provider";
 import AddToFavoritesDialog from "../favorites/AddToFavoritesDialog";
 import { collection, query, where, or } from 'firebase/firestore';
+import { Skeleton } from "../ui/skeleton";
 
 interface JournalDetailProps {
   journal: Journal;
@@ -245,11 +246,17 @@ export default function JournalDetail({ journal, onBack, onJournalSelect }: Jour
             </CardHeader>
             {showAiAnalysis && (
               <CardContent>
-                  <AiSummaryContent 
-                      summary={summaryInfo?.summary ?? null}
-                      isLoading={isLoading}
-                      error={error}
-                  />
+                  {isLoading && (
+                    <div className="space-y-4">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                    </div>
+                  )}
+                  {error && <p className="text-destructive">{error}</p>}
+                  {!isLoading && !error && summaryInfo?.summary && (
+                    <ContentBlockRenderer blocks={summaryInfo.summary} />
+                  )}
               </CardContent>
             )}
         </Card>

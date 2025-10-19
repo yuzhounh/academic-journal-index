@@ -433,7 +433,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                         </div>
                         <div className="col-span-3 flex flex-col items-center justify-center text-center">
                           <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>
-                          <div className={cn("flex items-center font-semibold text-lg", getPartitionColorClass(journal.majorCategoryPartition))}>
+                          <div className={cn("flex items-center font-semibold text-base", getPartitionColorClass(journal.majorCategoryPartition))}>
                             <span className="ml-1">{getPartitionText(journal.majorCategoryPartition)}</span>
                           </div>
                         </div>
@@ -512,7 +512,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                         </p>
                         <div
                           className={cn(
-                            "flex items-center font-semibold text-lg",
+                            "flex items-center font-semibold text-base",
                             getPartitionColorClass(
                               journal.majorCategoryPartition
                             )

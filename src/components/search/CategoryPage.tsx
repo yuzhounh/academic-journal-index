@@ -139,7 +139,7 @@ type FavoriteJournalEntry = {
 
 export default function CategoryPage({ journals }: CategoryPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedJournal, setSelectedJournal] = useState<Journal | null>(null);
+  const [journalHistory, setJournalHistory] = useState<Journal[]>([]);
   const [selectedJournalList, setSelectedJournalList] = useState<WithId<JournalList> | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [view, setView] = useState<'search' | 'categories' | 'favorites' | 'about'>("search");
@@ -150,6 +150,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
 
+  const selectedJournal = journalHistory.length > 0 ? journalHistory[journalHistory.length - 1] : null;
 
   const categories = useMemo(() => {
     const categoryCounts: { [key: string]: number } = {};
@@ -244,7 +245,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
     setCurrentPage(1);
-    setSelectedJournal(null);
+    setJournalHistory([]);
     setSelectedJournalList(null);
   };
   
@@ -252,21 +253,21 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     setSelectedJournalList(list);
     setSelectedCategory(null);
     setCurrentPage(1);
-    setSelectedJournal(null);
+    setJournalHistory([]);
   }
 
   const handleJournalSelect = (journal: Journal, searchTerm: string = "") => {
     if (view === 'search') {
       setPreservedSearchTerm(searchTerm);
     }
-    setSelectedJournal(journal);
+    setJournalHistory([journal]);
   };
 
   const handleJournalSelectByName = useCallback(
     (journalName: string) => {
       const journal = journals.find((j) => j.journalName === journalName);
       if (journal) {
-        setSelectedJournal(journal);
+        setJournalHistory(prev => [...prev, journal]);
         window.scrollTo(0, 0);
       }
     },
@@ -275,12 +276,12 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
 
   const handleBackToList = () => {
     setSelectedCategory(null);
-    setSelectedJournal(null);
+    setJournalHistory([]);
     setSelectedJournalList(null);
   };
 
   const handleBackFromDetail = () => {
-    setSelectedJournal(null);
+     setJournalHistory(prev => prev.slice(0, -1));
   };
 
   const handlePageChange = (page: number) => {
@@ -293,7 +294,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   const handleViewChange = (newView: 'search' | 'categories' | 'favorites' | 'about') => {
     setView(newView);
     setSelectedCategory(null);
-    setSelectedJournal(null);
+    setJournalHistory([]);
     setSelectedJournalList(null);
     setPreservedSearchTerm("");
     setMobileMenuOpen(false);
@@ -303,9 +304,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     return (
       <div className="py-4 md:py-8">
         <JournalDetail
+          key={selectedJournal.issn} // Add key to force re-mount and state reset for child components
           journal={selectedJournal}
           onBack={handleBackFromDetail}
           onJournalSelect={handleJournalSelectByName}
+          isHistoryRoot={journalHistory.length <= 1}
         />
       </div>
     );

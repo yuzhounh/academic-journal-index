@@ -74,9 +74,14 @@ const formatImpactFactor = (factor: number | string) => {
 const formatIssn = (issn: string) => {
     const parts = issn.split('/');
     if (parts.length > 1) {
-        return <>{parts[0]}/<wbr/>{parts.slice(1).join('/')}</>;
+        return (
+            <>
+                <span className="inline-block">{parts[0]}</span>
+                <span className="inline-block">/{parts.slice(1).join('/')}</span>
+            </>
+        );
     }
-    return issn;
+    return <span className="inline-block">{issn}</span>;
 };
 
 export default function JournalListItem({ journal, onClick }: JournalListItemProps) {
@@ -125,4 +130,3 @@ export default function JournalListItem({ journal, onClick }: JournalListItemPro
     </Card>
   );
 }
-

@@ -68,8 +68,10 @@ export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) 
 
   const getSanitizedHtml = (markdown: string) => {
     try {
-        return marked.parse(markdown);
+        // Configure marked to sanitize HTML
+        return marked.parse(markdown, { gfm: true, breaks: true });
     } catch (e) {
+        console.error("Error parsing markdown:", e);
         return "Error parsing summary.";
     }
   };

@@ -92,19 +92,25 @@ const summarizeJournalInfoFlow = ai.defineFlow(
     }
 
     // After getting AI suggestions, filter them to ensure they exist in our local data.
-    const allKnownIssns = new Set(journals.map(j => j.issn.split('/')[0]));
-    const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
+    // This prevents showing related journals that the user can't navigate to.
+    const journalMapByIssn = new Map(journals.map(j => [j.issn.split('/')[0], j]));
     
     const validatedRelatedJournals = output.relatedJournals
       .map(suggestedJournal => {
-        const suggestedIssn = suggestedJournal.issn.split('/')[0];
-        if (allKnownIssns.has(suggestedIssn)) {
-          return journalMap.get(suggestedIssn);
+        // AI might return an ISSN with a slash or extra characters. We only care about the primary part.
+        const suggestedIssnPrefix = suggestedJournal.issn.split('/')[0];
+        const foundJournal = journalMapByIssn.get(suggestedIssnPrefix);
+        
+        // If we found a matching journal in our local data, use our data's name and full ISSN.
+        if (foundJournal) {
+          return {
+            journalName: foundJournal.journalName,
+            issn: foundJournal.issn,
+          };
         }
         return null;
       })
-      .filter((j): j is Journal => !!j)
-      .map(j => ({ journalName: j.journalName, issn: j.issn }));
+      .filter((j): j is { journalName: string; issn: string } => !!j);
 
     return {
       summary: output.summary,

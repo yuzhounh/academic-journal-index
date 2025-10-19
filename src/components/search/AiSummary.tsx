@@ -9,16 +9,12 @@ import { useTranslation } from "@/i18n/provider";
 import { BookCopy } from "lucide-react";
 import { marked } from "marked";
 import JournalListItem from "./JournalListItem";
+import { journals } from "@/data/journals";
 
 interface AiSummaryProps {
   journal: Journal;
   onJournalSelect: (journalName: string) => void;
 }
-
-type RelatedJournal = {
-  journalName: string;
-  issn: string;
-};
 
 export default function AiSummary({ journal, onJournalSelect }: AiSummaryProps) {
   const [summaryInfo, setSummaryInfo] = useState<JournalSummaryInfo | null>(null);

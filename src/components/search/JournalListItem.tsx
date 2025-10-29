@@ -111,7 +111,7 @@ export default function JournalListItem({ journal, onClick }: JournalListItemPro
       <CardContent className="p-4 md:p-6 flex flex-col md:grid md:grid-cols-12 md:items-start md:gap-4">
         {/* Left side: Title and metadata */}
         <div className="md:col-span-7">
-          <p className="font-headline text-lg font-semibold line-clamp-2">{journal.journalName}</p>
+          <p className="font-headline text-lg font-semibold">{journal.journalName}</p>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
             <p className="font-mono whitespace-nowrap">{formatIssn(journal.issn)}</p>
             <div className="flex items-center gap-2">

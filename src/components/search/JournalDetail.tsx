@@ -243,7 +243,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
         
         <Card>
             <CardHeader>
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center">
                     <CardTitle className="flex items-center gap-2 text-xl font-headline">
                         <Bot className="text-primary"/>
                         {t('journal.aiSummary')}
@@ -251,7 +251,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
                     {!showAiAnalysis && (
                         <Button
                           onClick={handleGenerateSummary}
-                          className="bg-primary/10 text-primary hover:bg-primary/20"
+                          className="bg-primary/10 text-primary hover:bg-primary/20 mt-4 md:mt-0"
                         >
                             <Sparkles className="mr-2 h-4 w-4" />
                             {t('journal.generateAnalysis')}

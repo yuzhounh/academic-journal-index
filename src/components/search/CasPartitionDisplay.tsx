@@ -157,13 +157,15 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
       <div>
         <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t('cas.majorCategory')}</h4>
         <div className="p-3 bg-secondary/50 rounded-lg">
-            <div className="grid grid-cols-[1fr_auto_80px] items-center gap-2">
-                <p className="truncate">{getMajorCategoryName(journal.majorCategory, locale)}</p>
-                <div className="flex justify-end items-center gap-1">
-                  {journal.top === "是" && <Badge variant="default" className="bg-amber-500 text-white">Top</Badge>}
-                  <PartitionBadge partition={journal.majorCategoryPartition} />
+            <div className="flex flex-col md:grid md:grid-cols-[1fr_auto_80px] md:items-center gap-2">
+                <p className="font-semibold">{getMajorCategoryName(journal.majorCategory, locale)}</p>
+                <div className="flex items-center gap-2 md:justify-end">
+                  <div className="flex justify-end items-center gap-1">
+                    {journal.top === "是" && <Badge variant="default" className="bg-amber-500 text-white">Top</Badge>}
+                    <PartitionBadge partition={journal.majorCategoryPartition} />
+                  </div>
+                  <p className="text-sm text-muted-foreground text-left w-[80px]">{getPartitionDetails(journal.majorCategoryPartition)}</p>
                 </div>
-                <p className="text-sm text-muted-foreground text-left">{getPartitionDetails(journal.majorCategoryPartition)}</p>
             </div>
         </div>
       </div>
@@ -174,12 +176,14 @@ export default function CasPartitionDisplay({ journal }: CasPartitionDisplayProp
             <h4 className="text-sm font-semibold text-muted-foreground mb-2">{t('cas.minorCategories')}</h4>
             <div className="space-y-3 p-3 bg-secondary/50 rounded-lg">
             {journal.minorCategories.map((category, index) => (
-                <div key={index} className="grid grid-cols-[1fr_auto_80px] items-center gap-2 text-sm">
-                    <p className="font-medium truncate">{getMinorCategoryName(category.name, locale)}</p>
-                    <div className="flex justify-end">
-                        <PartitionBadge partition={category.partition} />
+                <div key={index} className="flex flex-col md:grid md:grid-cols-[1fr_auto_80px] md:items-center gap-2 text-sm">
+                    <p className="font-medium">{getMinorCategoryName(category.name, locale)}</p>
+                    <div className="flex items-center gap-2 md:justify-end">
+                      <div className="flex justify-end">
+                          <PartitionBadge partition={category.partition} />
+                      </div>
+                      <p className="text-sm text-muted-foreground text-left w-[80px]">{getPartitionDetails(category.partition)}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground text-left">{getPartitionDetails(category.partition)}</p>
                 </div>
             ))}
             </div>

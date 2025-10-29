@@ -24,7 +24,9 @@
     },
     "pagination": {
         "previous": "Previous",
-        "next": "Next"
+        "next": "Next",
+        "total": "Total",
+        "pages": "pages"
     },
     "journal": {
         "back": "Back to list",
@@ -200,3 +202,5 @@
         "cancel": "Cancel"
     }
 }
+
+    

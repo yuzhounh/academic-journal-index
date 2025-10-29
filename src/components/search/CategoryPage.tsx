@@ -2,6 +2,7 @@
 
 "use client";
 
+import * as React from "react";
 import { useState, useMemo, useCallback } from "react";
 import type { Journal } from "@/data/journals";
 import { Button } from "@/components/ui/button";

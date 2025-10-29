@@ -2,6 +2,7 @@
 
 "use client";
 
+import * as React from "react";
 import { useState, useMemo, ChangeEvent, useEffect } from "react";
 import type { Journal } from "@/data/journals";
 import { Input } from "@/components/ui/input";

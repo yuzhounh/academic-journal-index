@@ -36,6 +36,7 @@ const getPaginationItems = (
   isMobile: boolean = false
 ) => {
   const range = (start: number, end: number) => {
+    if (start > end) return [];
     const length = end - start + 1;
     return Array.from({ length }, (_, i) => start + i);
   };
@@ -62,16 +63,19 @@ const getPaginationItems = (
     let startPage = Math.max(1, currentPage - 2);
     let endPage = Math.min(totalPages, currentPage + 2);
     if (currentPage <= 2) {
-      endPage = 5;
+        startPage = 1;
+        endPage = 5;
     }
-    if (currentPage > totalPages - 2) {
-      startPage = totalPages - 4;
+    if (currentPage > totalPages - 3) {
+        startPage = totalPages - 4;
+        endPage = totalPages;
     }
     return range(startPage, endPage).map(p => renderPage(p));
   }
 
-  const pages = [];
-  const pageLimit = 3;
+  const pages: React.ReactNode[] = [];
+  const pageLimit = 3; 
+  const middleLimit = 7; 
 
   const renderEllipsis = (key: string) => (
     <PaginationItem key={key}>
@@ -79,41 +83,41 @@ const getPaginationItems = (
     </PaginationItem>
   );
 
-  if (totalPages <= pageLimit * 2 + 1) {
-    // Show all pages if total is small enough
+  if (totalPages <= 2 * pageLimit + middleLimit - 2) {
     return range(1, totalPages).map((p) => renderPage(p));
   }
 
   // Start pages
   pages.push(...range(1, pageLimit).map((p) => renderPage(p)));
 
-  // Ellipsis after start
-  if (currentPage > pageLimit + 2) {
+  // Ellipsis or middle pages
+  const middleStart = Math.max(pageLimit + 1, currentPage - Math.floor((middleLimit - 1) / 2));
+  const middleEnd = Math.min(totalPages - pageLimit, currentPage + Math.floor((middleLimit - 1) / 2));
+
+  if (middleStart > pageLimit + 1) {
     pages.push(renderEllipsis("start-ellipsis"));
   }
 
-  // Middle pages
-  const middleStart = Math.max(pageLimit + 1, currentPage - 3);
-  const middleEnd = Math.min(totalPages - pageLimit, currentPage + 3);
-
-  if (middleStart > pageLimit + 1 && middleStart <= totalPages - pageLimit) {
-    pages.push(...range(middleStart, middleEnd).map((p) => renderPage(p)));
-  } else if (currentPage > pageLimit && currentPage <= totalPages - pageLimit) {
-    pages.push(...range(currentPage - 3, currentPage + 3).map((p) => renderPage(p)));
-  }
-
-  // Ellipsis before end
-  if (currentPage < totalPages - pageLimit - 2) {
-    pages.push(renderEllipsis("end-ellipsis"));
+  pages.push(...range(middleStart, middleEnd).map((p) => renderPage(p)));
+  
+  if (middleEnd < totalPages - pageLimit) {
+     pages.push(renderEllipsis("end-ellipsis"));
   }
 
   // End pages
   pages.push(...range(totalPages - pageLimit + 1, totalPages).map((p) => renderPage(p)));
 
   // De-duplicate pages
-  const uniquePages = pages.filter(
-    (item, index, self) => index === self.findIndex((t) => t.key === item.key)
-  );
+  const pageKeys = new Set();
+  const uniquePages = pages.filter(item => {
+    if (React.isValidElement(item)) {
+        if (!pageKeys.has(item.key)) {
+            pageKeys.add(item.key);
+            return true;
+        }
+    }
+    return false;
+  });
 
   return uniquePages;
 };

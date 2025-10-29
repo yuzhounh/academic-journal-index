@@ -46,6 +46,7 @@ import { collection, query } from "firebase/firestore";
 import { useMemoFirebase } from "@/firebase/provider";
 import LoginDialog from "../auth/LoginDialog";
 import JournalListItem from "./JournalListItem";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const JOURNALS_PER_PAGE = 20;
 
@@ -53,11 +54,9 @@ const JOURNALS_PER_PAGE = 20;
 const getPaginationItems = (
   currentPage: number,
   totalPages: number,
-  onPageChange: (page: number) => void
+  onPageChange: (page: number) => void,
+  isMobile: boolean = false
 ) => {
-  const pages = [];
-  const pageLimit = 5; // how many numbers to show around current page, start, and end
-
   const range = (start: number, end: number) => {
     const length = end - start + 1;
     return Array.from({ length }, (_, i) => start + i);
@@ -77,6 +76,24 @@ const getPaginationItems = (
       </PaginationLink>
     </PaginationItem>
   );
+
+  if (isMobile) {
+    if (totalPages <= 5) {
+      return range(1, totalPages).map(p => renderPage(p));
+    }
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPages, currentPage + 2);
+    if (currentPage <= 2) {
+      endPage = 5;
+    }
+    if (currentPage > totalPages - 2) {
+      startPage = totalPages - 4;
+    }
+    return range(startPage, endPage).map(p => renderPage(p));
+  }
+  
+  const pages = [];
+  const pageLimit = 3; 
 
   const renderEllipsis = (key: string) => (
     <PaginationItem key={key}>
@@ -98,17 +115,17 @@ const getPaginationItems = (
   }
 
   // Middle pages
-  const middleStart = Math.max(pageLimit + 1, currentPage - 2);
-  const middleEnd = Math.min(totalPages - pageLimit, currentPage + 2);
+  const middleStart = Math.max(pageLimit + 1, currentPage - 3);
+  const middleEnd = Math.min(totalPages - pageLimit, currentPage + 3);
 
   if (middleStart > pageLimit + 1 && middleStart <= totalPages - pageLimit) {
     pages.push(...range(middleStart, middleEnd).map((p) => renderPage(p)));
   } else if (currentPage > pageLimit && currentPage <= totalPages - pageLimit) {
-    pages.push(...range(currentPage - 2, currentPage + 2).map((p) => renderPage(p)));
+    pages.push(...range(currentPage - 3, currentPage + 3).map((p) => renderPage(p)));
   }
 
   // Ellipsis before end
-  if (currentPage < totalPages - pageLimit - 1) {
+  if (currentPage < totalPages - pageLimit - 2) {
     pages.push(renderEllipsis("end-ellipsis"));
   }
 
@@ -122,6 +139,7 @@ const getPaginationItems = (
 
   return uniquePages;
 };
+
 
 const extractRank = (partition: string): number => {
   const match = partition.match(/(\d+)\//);
@@ -149,6 +167,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   const [preservedSearchTerm, setPreservedSearchTerm] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoginDialogOpen, setIsLoginDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   const selectedJournal = journalHistory.length > 0 ? journalHistory[journalHistory.length - 1] : null;
 
@@ -312,7 +331,6 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           journal={selectedJournal}
           onBack={handleBackFromDetail}
           onJournalSelect={handleJournalSelectByName}
-          isHistoryRoot={journalHistory.length <= 1}
         />
       </div>
     );
@@ -399,45 +417,76 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
 
               {totalPages > 1 && (
                 <Pagination className="mt-8">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePageChange(currentPage - 1);
-                        }}
-                        aria-disabled={currentPage === 1}
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      >
-                        {t('pagination.previous')}
-                      </PaginationPrevious>
-                    </PaginationItem>
+                  {isMobile ? (
+                    <div className="w-full flex flex-col items-center gap-2">
+                       <p className="text-sm text-muted-foreground">
+                        {t('pagination.total')} {totalPages} {t('pagination.pages')}
+                      </p>
+                      <PaginationContent>
+                          <PaginationItem>
+                            <PaginationPrevious
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
+                                aria-disabled={currentPage === 1}
+                                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                            >
+                                {t('pagination.previous')}
+                            </PaginationPrevious>
+                          </PaginationItem>
+                          {getPaginationItems(currentPage, totalPages, handlePageChange, true)}
+                          <PaginationItem>
+                            <PaginationNext
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
+                                aria-disabled={currentPage === totalPages}
+                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                            >
+                                {t('pagination.next')}
+                            </PaginationNext>
+                          </PaginationItem>
+                      </PaginationContent>
+                    </div>
+                  ) : (
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(currentPage - 1);
+                          }}
+                          aria-disabled={currentPage === 1}
+                          className={
+                            currentPage === 1
+                              ? "pointer-events-none opacity-50"
+                              : ""
+                          }
+                        >
+                          {t('pagination.previous')}
+                        </PaginationPrevious>
+                      </PaginationItem>
 
-                    {getPaginationItems(currentPage, totalPages, handlePageChange)}
+                      {getPaginationItems(currentPage, totalPages, handlePageChange)}
 
-                    <PaginationItem>
-                      <PaginationNext
-                        href="#"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePageChange(currentPage + 1);
-                        }}
-                        aria-disabled={currentPage === totalPages}
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      >
-                         {t('pagination.next')}
-                      </PaginationNext>
-                    </PaginationItem>
-                  </PaginationContent>
+                      <PaginationItem>
+                        <PaginationNext
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(currentPage + 1);
+                          }}
+                          aria-disabled={currentPage === totalPages}
+                          className={
+                            currentPage === totalPages
+                              ? "pointer-events-none opacity-50"
+                              : ""
+                          }
+                        >
+                          {t('pagination.next')}
+                        </PaginationNext>
+                      </PaginationItem>
+                    </PaginationContent>
+                  )}
                 </Pagination>
               )}
             </div>
@@ -612,3 +661,5 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     </>
   );
 }
+
+    

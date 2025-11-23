@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -33,14 +34,22 @@ import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/provider";
 
-const formSchema = z.object({
+const formSchema = (isRegister: boolean, t: (key: string) => string) => z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." }),
+  confirmPassword: z.string().optional(),
+}).refine(data => {
+    if (!isRegister) return true; // Don't validate for login
+    return data.password === data.confirmPassword;
+}, {
+    message: t('auth.passwordsDoNotMatch'),
+    path: ["confirmPassword"],
 });
 
-type FormValues = z.infer<typeof formSchema>;
+
+type FormValues = z.infer<ReturnType<typeof formSchema>>;
 
 interface LoginDialogProps {
   open: boolean;
@@ -54,13 +63,27 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
 
+  const isRegister = activeTab === 'register';
+
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema(isRegister, t)),
     defaultValues: {
       email: "",
       password: "",
+      confirmPassword: "",
     },
+    // Re-validate when tab changes
+    context: { isRegister },
   });
+  
+  // Effect to clear confirm password error when switching to login tab
+  useEffect(() => {
+    if (activeTab === 'login') {
+      form.clearErrors('confirmPassword');
+    }
+    form.reset(); // Reset form values on tab change
+  }, [activeTab, form]);
+
 
   const handleGoogleSignIn = async () => {
     if (!auth) return;
@@ -122,10 +145,10 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               <TabsTrigger value="register">{t('auth.register')}</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
-              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.login')} />
+              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.login')} isRegister={false} />
             </TabsContent>
             <TabsContent value="register">
-              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.createAccount')} />
+              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.createAccount')} isRegister={true} />
             </TabsContent>
           </Tabs>
           <div className="relative my-4">
@@ -168,9 +191,10 @@ interface AuthFormProps {
     onSubmit: (data: FormValues) => Promise<void>;
     isLoading: boolean;
     buttonText: string;
+    isRegister: boolean;
 }
 
-function AuthForm({ form, onSubmit, isLoading, buttonText }: AuthFormProps) {
+function AuthForm({ form, onSubmit, isLoading, buttonText, isRegister }: AuthFormProps) {
   const { t } = useTranslation();
     return (
         <Form {...form}>
@@ -201,6 +225,21 @@ function AuthForm({ form, onSubmit, isLoading, buttonText }: AuthFormProps) {
               </FormItem>
             )}
           />
+          {isRegister && (
+            <FormField
+                control={form.control}
+                name="confirmPassword"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>{t('auth.confirmPassword')}</FormLabel>
+                    <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+          )}
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {buttonText}
@@ -209,3 +248,5 @@ function AuthForm({ form, onSubmit, isLoading, buttonText }: AuthFormProps) {
       </Form>
     )
 }
+
+    

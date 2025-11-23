@@ -423,67 +423,71 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     }
   };
 
-  const handleDeleteSelected = async () => {
+  const handleDeleteSelected = () => {
     if (!user || !firestore) return;
-    
-    let listIdToRemove = "";
-    if (selectedJournalList) {
-        listIdToRemove = selectedJournalList.id;
-    } else if (selectedCategory === 'Uncategorized') {
-        listIdToRemove = 'uncategorized';
-    } else {
-        return; // Should not be able to delete from browse/search
-    }
 
-    try {
-        const batch = writeBatch(firestore);
-        const favoritesColRef = collection(firestore, `users/${user.uid}/favorite_journals`);
-        
-        // Firestore 'in' query limit is 30. We need to batch the deletion query.
-        const journalIds = Array.from(selectedJournals);
-        const queryPromises = [];
-        for (let i = 0; i < journalIds.length; i += 30) {
-            const chunk = journalIds.slice(i, i + 30);
-            
-            const conditions = [where('journalId', 'in', chunk)];
-            if (listIdToRemove !== 'uncategorized') {
-                conditions.push(where('listId', '==', listIdToRemove));
-            } else {
-                conditions.push(where('listId', 'in', [null, '', 'uncategorized']));
-            }
-            
-            const q = query(favoritesColRef, ...conditions);
-            queryPromises.push(getDocs(q));
+    setIsDeleteDialogOpen(false);
+    setSelectedJournals(new Set());
+    setIsEditing(false);
+
+    // Show optimistic toast
+    const successDescription = selectedJournals.size === 1
+        ? t('batchEdit.remove.successDescription_one')
+        : t('batchEdit.remove.successDescription_other', {count: selectedJournals.size});
+    
+    toast({
+        title: t('batchEdit.remove.successTitle'),
+        description: successDescription,
+    });
+
+    const performDelete = async () => {
+        let listIdToRemove = "";
+        if (selectedJournalList) {
+            listIdToRemove = selectedJournalList.id;
+        } else if (selectedCategory === 'Uncategorized') {
+            listIdToRemove = 'uncategorized';
+        } else {
+            return; // Should not happen
         }
 
-        const snapshots = await Promise.all(queryPromises);
-        snapshots.forEach(snapshot => {
-            snapshot.forEach(doc => batch.delete(doc.ref));
-        });
+        try {
+            const batch = writeBatch(firestore);
+            const favoritesColRef = collection(firestore, `users/${user.uid}/favorite_journals`);
+            
+            const journalIds = Array.from(selectedJournals);
+            const queryPromises = [];
+            for (let i = 0; i < journalIds.length; i += 30) {
+                const chunk = journalIds.slice(i, i + 30);
+                
+                const conditions = [where('journalId', 'in', chunk)];
+                if (listIdToRemove !== 'uncategorized') {
+                    conditions.push(where('listId', '==', listIdToRemove));
+                } else {
+                    conditions.push(where('listId', 'in', [null, '', 'uncategorized']));
+                }
+                
+                const q = query(favoritesColRef, ...conditions);
+                queryPromises.push(getDocs(q));
+            }
 
-        await batch.commit();
-        
-        const successDescription = selectedJournals.size === 1
-            ? t('batchEdit.remove.successDescription_one')
-            : t('batchEdit.remove.successDescription_other', {count: selectedJournals.size});
+            const snapshots = await Promise.all(queryPromises);
+            snapshots.forEach(snapshot => {
+                snapshot.forEach(doc => batch.delete(doc.ref));
+            });
 
-        toast({
-            title: t('batchEdit.remove.successTitle'),
-            description: successDescription,
-        });
+            await batch.commit();
 
-    } catch(e) {
-        console.error("Error deleting journals: ", e);
-        toast({
-            variant: "destructive",
-            title: t('batchEdit.remove.errorTitle'),
-            description: t('batchEdit.remove.errorDescription')
-        });
-    } finally {
-        setIsDeleteDialogOpen(false);
-        setSelectedJournals(new Set());
-        setIsEditing(false);
-    }
+        } catch(e) {
+            console.error("Error deleting journals: ", e);
+            toast({
+                variant: "destructive",
+                title: t('batchEdit.remove.errorTitle'),
+                description: t('batchEdit.remove.errorDescription')
+            });
+        }
+    };
+    
+    performDelete();
   }
   
   const isAllSelected = journalsToDisplay.length > 0 && selectedJournals.size === journalsToDisplay.length;
@@ -796,6 +800,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         return t('batchEdit.remove.confirmTitle_other', {count: selectedJournals.size});
     };
 
+    const handleBatchSuccess = () => {
+      setSelectedJournals(new Set());
+      setIsEditing(false);
+    };
+
     const getBatchAddDialog = () => (
       <AddToFavoritesDialog
         open={isAddToFavoritesOpen}
@@ -803,10 +812,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         journal={journalsToProcess[0]}
         mode='add'
         batchJournals={journalsToProcess}
-        onSuccess={() => {
-            setSelectedJournals(new Set());
-            setIsEditing(false);
-        }}
+        onSuccess={handleBatchSuccess}
       />
     );
     
@@ -818,10 +824,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         mode='move'
         batchJournals={journalsToProcess}
         currentListId={selectedJournalList?.id}
-        onSuccess={() => {
-            setSelectedJournals(new Set());
-            setIsEditing(false);
-        }}
+        onSuccess={handleBatchSuccess}
       />
     );
 

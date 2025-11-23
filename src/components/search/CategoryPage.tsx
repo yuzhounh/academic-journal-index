@@ -30,7 +30,7 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ArrowLeft, BookText, BookOpen, Menu, Folder } from "lucide-react";
+import { ArrowLeft, BookText, BookOpen, Menu, Folder, Download } from "lucide-react";
 import JournalDetail from "./JournalDetail";
 import SearchPage from "./SearchPage";
 import CategoryStats from "./CategoryStats";
@@ -48,6 +48,7 @@ import { useMemoFirebase } from "@/firebase/provider";
 import LoginDialog from "../auth/LoginDialog";
 import JournalListItem from "./JournalListItem";
 import { useIsMobile } from "@/hooks/use-mobile";
+import Papa from "papaparse";
 
 const JOURNALS_PER_PAGE = 20;
 
@@ -159,6 +160,18 @@ type FavoriteJournalEntry = {
   journalId: string;
   listId?: string;
 };
+
+const triggerCsvDownload = (data: (string | number)[][], filename: string) => {
+  const csvContent = "data:text/csv;charset=utf-8," + Papa.unparse(data);
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link); // Required for FF
+  link.click();
+  document.body.removeChild(link);
+};
+
 
 export default function CategoryPage({ journals }: CategoryPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -328,6 +341,29 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     setMobileMenuOpen(false);
   }
 
+  const handleExport = () => {
+    if (journalsToDisplay.length === 0) return;
+
+    let filename = "journal-list.csv";
+    if (selectedJournalList) {
+      filename = `Favorites-${selectedJournalList.name.replace(/\s+/g, '_')}.csv`;
+    } else if (selectedCategory) {
+      filename = `Category-${selectedCategory.replace(/\s+/g, '_')}.csv`;
+    }
+
+    const headers = ["Journal Name", "ISSN/EISSN", "Impact Factor", "CAS Partition", "Authority Level", "Open Access"];
+    const data = journalsToDisplay.map(j => [
+        j.journalName,
+        j.issn,
+        j.impactFactor,
+        j.majorCategoryPartition,
+        j.authorityJournal,
+        j.openAccess
+    ]);
+
+    triggerCsvDownload([headers, ...data], filename);
+  };
+
   if (selectedJournal) {
     return (
       <div className="py-4 md:py-8">
@@ -353,12 +389,16 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 <Button variant="outline" size="icon" onClick={handleBackToList}>
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-grow">
                   <Folder className="h-6 w-6 text-primary" />
                   <h2 className="font-headline text-2xl md:text-3xl font-bold tracking-tight">
                     {selectedJournalList?.name || t('favorites.uncategorized')}
                   </h2>
                 </div>
+                 <Button variant="outline" onClick={handleExport} disabled={journalsToDisplay.length === 0}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {t('common.exportCsv')}
+                </Button>
               </div>
               <div className="mb-8">
                 <CategoryStats journals={journalsToDisplay} />
@@ -403,9 +443,13 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
-                <h2 className="font-headline text-2xl md:text-3xl font-bold tracking-tight">
+                <h2 className="font-headline text-2xl md:text-3xl font-bold tracking-tight flex-grow">
                   {selectedCategory === 'Uncategorized' ? t('favorites.uncategorized') : getMajorCategoryName(selectedCategory, locale)}
                 </h2>
+                <Button variant="outline" onClick={handleExport} disabled={journalsToDisplay.length === 0}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {t('common.exportCsv')}
+                </Button>
               </div>
               <div className="mb-8">
                 <CategoryStats journals={journalsToDisplay} />

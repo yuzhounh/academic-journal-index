@@ -107,7 +107,7 @@
         },
         "empty": {
             "title": "暂无收藏",
-            "description": "您还没有创建任何期刊列表。",
+            "description": "您还没有创建任何期刊列表。您可以从CSV文件导入列表。",
             "button": "查找期刊进行收藏"
         },
         "listEmpty": "该期刊列表为空。",
@@ -131,6 +131,13 @@
             "title": "重命名列表...",
             "errorTitle": "重命名列表时出错",
             "ariaLabel": "重命名列表 {{listName}}"
+        },
+        "importList": {
+            "button": "从 CSV 导入",
+            "successTitle": "导入成功",
+            "successDescription": "已创建新列表 '{{listName}}'，包含 {{count}} 本期刊。",
+            "errorTitle": "导入失败",
+            "errorDescription": "无法导入列表。请检查文件格式后重试。"
         }
     },
     "about": {
@@ -242,6 +249,7 @@
     "no": "否",
     "common": {
         "cancel": "取消",
-        "save": "保存"
+        "save": "保存",
+        "exportCsv": "导出为 CSV"
     }
 }

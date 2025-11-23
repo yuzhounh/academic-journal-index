@@ -107,7 +107,7 @@
         },
         "empty": {
             "title": "No Favorites Yet",
-            "description": "You haven't created any journal lists yet.",
+            "description": "You haven't created any journal lists yet. You can import a list from a CSV file.",
             "button": "Find Journals to Favorite"
         },
         "listEmpty": "This journal list is empty.",
@@ -131,6 +131,13 @@
             "title": "Rename list...",
             "errorTitle": "Error Renaming List",
             "ariaLabel": "Rename list {{listName}}"
+        },
+        "importList": {
+            "button": "Import from CSV",
+            "successTitle": "Import Successful",
+            "successDescription": "Created new list '{{listName}}' with {{count}} journals.",
+            "errorTitle": "Import Failed",
+            "errorDescription": "Could not import the list. Please check the file format and try again."
         }
     },
     "about": {
@@ -242,6 +249,7 @@
     "no": "No",
     "common": {
         "cancel": "Cancel",
-        "save": "Save"
+        "save": "Save",
+        "exportCsv": "Export as CSV"
     }
 }

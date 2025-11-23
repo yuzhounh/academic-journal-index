@@ -364,6 +364,85 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     triggerCsvDownload([headers, ...data], filename);
   };
 
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <Pagination className="mt-8">
+        {isMobile ? (
+          <div className="w-full flex flex-col items-center gap-2">
+              <p className="text-sm text-muted-foreground">
+              {t('pagination.total')} {totalPages} {t('pagination.pages')}
+            </p>
+            <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
+                      aria-disabled={currentPage === 1}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                  >
+                      {t('pagination.previous')}
+                  </PaginationPrevious>
+                </PaginationItem>
+                {getPaginationItems(currentPage, totalPages, handlePageChange, true)}
+                <PaginationItem>
+                  <PaginationNext
+                      href="#"
+                      onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
+                      aria-disabled={currentPage === totalPages}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                  >
+                      {t('pagination.next')}
+                  </PaginationNext>
+                </PaginationItem>
+            </PaginationContent>
+          </div>
+        ) : (
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handlePageChange(currentPage - 1);
+                }}
+                aria-disabled={currentPage === 1}
+                className={
+                  currentPage === 1
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              >
+                {t('pagination.previous')}
+              </PaginationPrevious>
+            </PaginationItem>
+
+            {getPaginationItems(currentPage, totalPages, handlePageChange)}
+
+            <PaginationItem>
+              <PaginationNext
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handlePageChange(currentPage + 1);
+                }}
+                aria-disabled={currentPage === totalPages}
+                className={
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : ""
+                }
+              >
+                {t('pagination.next')}
+              </PaginationNext>
+            </PaginationItem>
+          </PaginationContent>
+        )}
+      </Pagination>
+    );
+  }
+
   if (selectedJournal) {
     return (
       <div className="py-4 md:py-8">
@@ -372,6 +451,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           journal={selectedJournal}
           onBack={handleBackFromDetail}
           onJournalSelect={handleJournalSelectByName}
+          isHistoryRoot={journalHistory.length <= 1}
         />
       </div>
     );
@@ -418,6 +498,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                   <p className="text-muted-foreground">{t('favorites.listEmpty')}</p>
                 </div>
               )}
+              {renderPagination()}
             </div>
           );
         }
@@ -463,81 +544,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                     />
                 ))}
               </div>
-
-              {totalPages > 1 && (
-                <Pagination className="mt-8">
-                  {isMobile ? (
-                    <div className="w-full flex flex-col items-center gap-2">
-                       <p className="text-sm text-muted-foreground">
-                        {t('pagination.total')} {totalPages} {t('pagination.pages')}
-                      </p>
-                      <PaginationContent>
-                          <PaginationItem>
-                            <PaginationPrevious
-                                href="#"
-                                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage - 1); }}
-                                aria-disabled={currentPage === 1}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                            >
-                                {t('pagination.previous')}
-                            </PaginationPrevious>
-                          </PaginationItem>
-                          {getPaginationItems(currentPage, totalPages, handlePageChange, true)}
-                          <PaginationItem>
-                            <PaginationNext
-                                href="#"
-                                onClick={(e) => { e.preventDefault(); handlePageChange(currentPage + 1); }}
-                                aria-disabled={currentPage === totalPages}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                            >
-                                {t('pagination.next')}
-                            </PaginationNext>
-                          </PaginationItem>
-                      </PaginationContent>
-                    </div>
-                  ) : (
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(currentPage - 1);
-                          }}
-                          aria-disabled={currentPage === 1}
-                          className={
-                            currentPage === 1
-                              ? "pointer-events-none opacity-50"
-                              : ""
-                          }
-                        >
-                          {t('pagination.previous')}
-                        </PaginationPrevious>
-                      </PaginationItem>
-
-                      {getPaginationItems(currentPage, totalPages, handlePageChange)}
-
-                      <PaginationItem>
-                        <PaginationNext
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(currentPage + 1);
-                          }}
-                          aria-disabled={currentPage === totalPages}
-                          className={
-                            currentPage === totalPages
-                              ? "pointer-events-none opacity-50"
-                              : ""
-                          }
-                        >
-                          {t('pagination.next')}
-                        </PaginationNext>
-                      </PaginationItem>
-                    </PaginationContent>
-                  )}
-                </Pagination>
-              )}
+              {renderPagination()}
             </div>
           );
         } else {

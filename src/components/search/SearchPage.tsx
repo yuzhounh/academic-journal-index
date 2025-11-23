@@ -292,8 +292,8 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
               </span>
               <div className="flex items-center gap-2">
                 <Button variant="outline" size="sm" onClick={() => setIsAddToFavoritesOpen(true)}>
-                  <Heart className="mr-2" />
-                  {t('batchEdit.favorite.button')}
+                  <Heart className="mr-2 h-4 w-4" />
+                  {t('batchEdit.add.button')}
                 </Button>
               </div>
             </CardContent>
@@ -303,8 +303,8 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
           <AddToFavoritesDialog
             open={isAddToFavoritesOpen}
             onOpenChange={setIsAddToFavoritesOpen}
-            journal={journalsToFavorite[0]}
-            isBatchMove={true}
+            journal={journalsToFavorite[0]} // Pass a representative journal
+            mode='add'
             batchJournals={journalsToFavorite}
             onSuccess={() => {
                 setSelectedJournals(new Set());

@@ -322,7 +322,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     if (view === 'search') {
       setPreservedSearchTerm(searchTerm);
     }
-    setJournalHistory([journal]);
+    if (isEditing) {
+        handleSelectionChange(journal.issn.split('/')[0], !selectedJournals.has(journal.issn.split('/')[0]));
+    } else {
+        setJournalHistory([journal]);
+    }
   };
 
   const handleJournalSelectByName = useCallback(
@@ -589,7 +593,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
 
   const renderActionToolbar = () => {
     const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
-    const canEdit = user && (isFavoritesView || view === 'categories');
+    const canEdit = user && isFavoritesView;
     
     if (journalsToDisplay.length === 0) return null;
 
@@ -610,7 +614,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           {canEdit && (
               <Button variant="outline" onClick={toggleEditing}>
                   {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
-                  {isEditing ? t('common.cancel') : (isFavoritesView ? t('batchEdit.button') : t('batchEdit.favorite.editButton'))}
+                  {isEditing ? t('common.cancel') : t('batchEdit.button')}
               </Button>
           )}
           <Button variant="outline" onClick={handleExport} disabled={journalsToDisplay.length === 0}>
@@ -775,7 +779,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     if (!isEditing || !user || selectedJournals.size === 0) return null;
     
     const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
-    const isBrowseView = view === 'categories' && selectedCategory && selectedCategory !== 'Uncategorized';
+    const isBrowseOrSearch = (view === 'categories' && selectedCategory && selectedCategory !== 'Uncategorized') || view === 'search';
     const journalsToProcess = journalsToDisplay.filter(j => selectedJournals.has(j.issn.split('/')[0]));
     
     const getDeleteDialogTitle = () => {
@@ -784,6 +788,54 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         }
         return t('batchEdit.remove.confirmTitle_other', {count: selectedJournals.size});
     };
+
+    const getBatchAddDialog = () => (
+      <AddToFavoritesDialog
+        open={isAddToFavoritesOpen}
+        onOpenChange={setIsAddToFavoritesOpen}
+        journal={journalsToProcess[0]}
+        mode='add'
+        batchJournals={journalsToProcess}
+        onSuccess={() => {
+            setSelectedJournals(new Set());
+            setIsEditing(false);
+        }}
+      />
+    );
+    
+    const getBatchMoveDialog = () => (
+      <AddToFavoritesDialog
+        open={isMoveDialogOpen}
+        onOpenChange={setIsMoveDialogOpen}
+        journal={journalsToProcess[0]}
+        mode='move'
+        batchJournals={journalsToProcess}
+        currentListId={selectedJournalList?.id}
+        onSuccess={() => {
+            setSelectedJournals(new Set());
+            setIsEditing(false);
+        }}
+      />
+    );
+
+    const getBatchDeleteDialog = () => (
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{getDeleteDialogTitle()}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                    {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name || t('favorites.uncategorized') })}
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive hover:bg-destructive/90">
+                    {t('batchEdit.remove.button')}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+    );
 
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-12 duration-300">
@@ -796,19 +848,19 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
               <div className="flex items-center gap-2">
                 {isFavoritesView && (
                     <Button variant="outline" size="sm" onClick={() => setIsMoveDialogOpen(true)}>
-                        <FolderSync className="mr-2" />
+                        <FolderSync className="mr-2 h-4 w-4" />
                         {t('batchEdit.move.button')}
                     </Button>
                 )}
-                {isBrowseView && (
+                {isBrowseOrSearch && (
                     <Button variant="outline" size="sm" onClick={() => setIsAddToFavoritesOpen(true)}>
-                        <Heart className="mr-2" />
-                        {t('batchEdit.favorite.button')}
+                        <Heart className="mr-2 h-4 w-4" />
+                        {t('batchEdit.add.button')}
                     </Button>
                 )}
                 {isFavoritesView && (
                     <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
-                        <Trash2 className="mr-2" />
+                        <Trash2 className="mr-2 h-4 w-4" />
                         {t('batchEdit.remove.button')}
                     </Button>
                 )}
@@ -817,56 +869,9 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           </Card>
         </div>
         
-        {/* Dialog for Moving in Favorites */}
-        {isMoveDialogOpen && isFavoritesView && (
-          <AddToFavoritesDialog
-            open={isMoveDialogOpen}
-            onOpenChange={setIsMoveDialogOpen}
-            journal={journalsToProcess[0]}
-            isBatchMove={true}
-            batchJournals={journalsToProcess}
-            currentListId={selectedJournalList?.id}
-            onSuccess={() => {
-                setSelectedJournals(new Set());
-                setIsEditing(false);
-            }}
-          />
-        )}
-        
-        {/* Dialog for Adding to Favorites from Browse */}
-        {isAddToFavoritesOpen && isBrowseView && (
-             <AddToFavoritesDialog
-                open={isAddToFavoritesOpen}
-                onOpenChange={setIsAddToFavoritesOpen}
-                journal={journalsToProcess[0]}
-                isBatchMove={true}
-                batchJournals={journalsToProcess}
-                onSuccess={() => {
-                    setSelectedJournals(new Set());
-                    setIsEditing(false);
-                }}
-            />
-        )}
-
-        {/* Dialog for Deleting from Favorites */}
-        {isDeleteDialogOpen && isFavoritesView && (
-            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>{getDeleteDialogTitle()}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                        {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name || t('favorites.uncategorized') })}
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive hover:bg-destructive/90">
-                        {t('batchEdit.remove.button')}
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-        )}
+        {isMoveDialogOpen && isFavoritesView && getBatchMoveDialog()}
+        {isAddToFavoritesOpen && isBrowseOrSearch && getBatchAddDialog()}
+        {isDeleteDialogOpen && isFavoritesView && getBatchDeleteDialog()}
       </div>
     );
   };

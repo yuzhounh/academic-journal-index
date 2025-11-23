@@ -111,5 +111,3 @@ export default function ChangeEmailDialog({ open, onOpenChange, user }: ChangeEm
     </Dialog>
   );
 }
-
-    

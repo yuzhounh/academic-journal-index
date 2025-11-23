@@ -15,13 +15,17 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Search, Download } from "lucide-react";
+import { Search, Download, Pencil, X, Heart } from "lucide-react";
 import CategoryStats from "./CategoryStats";
 import { useTranslation } from "@/i18n/provider";
 import JournalListItem from "./JournalListItem";
 import { useIsMobile } from "@/hooks/use-is-mobile";
 import Papa from "papaparse";
 import { Button } from "../ui/button";
+import { Checkbox } from "../ui/checkbox";
+import AddToFavoritesDialog from "../favorites/AddToFavoritesDialog";
+import { Card, CardContent } from "../ui/card";
+import { useFirebase } from "@/firebase";
 
 interface SearchPageProps {
   journals: Journal[];
@@ -140,13 +144,22 @@ const triggerCsvDownload = (data: (string | number)[][], filename: string) => {
 function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: SearchPageProps) {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const [currentPage, setCurrentPage] = useState(1);
+  const { user } = useFirebase();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+
+  // Batch edit state
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedJournals, setSelectedJournals] = useState<Set<string>>(new Set());
+  const [isAddToFavoritesOpen, setIsAddToFavoritesOpen] = useState(false);
+
 
   useEffect(() => {
     setSearchTerm(initialSearchTerm);
     if (initialSearchTerm) {
         setCurrentPage(1);
+        setIsEditing(false);
+        setSelectedJournals(new Set());
     }
   }, [initialSearchTerm]);
 
@@ -176,6 +189,8 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
     setCurrentPage(1);
+    setIsEditing(false);
+    setSelectedJournals(new Set());
   };
   
   const handlePageChange = (page: number) => {
@@ -201,9 +216,92 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 
     triggerCsvDownload([headers, ...data], filename);
   };
+  
+  // --- Batch Edit Handlers ---
+  const toggleEditing = () => {
+    setIsEditing(!isEditing);
+    setSelectedJournals(new Set());
+  };
+
+  const handleSelectionChange = (journalId: string, selected: boolean) => {
+    const newSelection = new Set(selectedJournals);
+    if (selected) {
+      newSelection.add(journalId);
+    } else {
+      newSelection.delete(journalId);
+    }
+    setSelectedJournals(newSelection);
+  };
+
+  const handleSelectAll = (checked: boolean | "indeterminate") => {
+    if (checked) {
+      const allJournalIds = new Set(filteredJournals.map(j => j.issn.split('/')[0]));
+      setSelectedJournals(allJournalIds);
+    } else {
+      setSelectedJournals(new Set());
+    }
+  };
+  
+  const isAllSelected = filteredJournals.length > 0 && selectedJournals.size === filteredJournals.length;
 
   const showInitialMessage = searchTerm.length < 3;
   const showNoResultsMessage = searchTerm.length >= 3 && filteredJournals.length === 0;
+
+  const renderBatchEditToolbar = () => {
+    if (!isEditing) return null;
+    return (
+        <div className="flex items-center gap-4 mb-6 p-2 border rounded-lg bg-background">
+            <Checkbox
+                id="select-all-search"
+                checked={isAllSelected}
+                onCheckedChange={handleSelectAll}
+            />
+            <label htmlFor="select-all-search" className="text-sm font-medium">
+                {isAllSelected ? t('batchEdit.deselectAll') : t('batchEdit.selectAll')}
+            </label>
+        </div>
+    )
+  }
+
+  const BatchActionBottomBar = () => {
+    if (!isEditing || !user || selectedJournals.size === 0) return null;
+
+    const journalsToFavorite = filteredJournals.filter(j => selectedJournals.has(j.issn.split('/')[0]));
+
+    return (
+      <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-12 duration-300">
+        <div className="max-w-xl mx-auto">
+          <Card className="shadow-2xl">
+            <CardContent className="p-3 flex items-center justify-between">
+              <span className="text-sm font-medium">
+                {t('batchEdit.selected', { count: selectedJournals.size })}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setIsAddToFavoritesOpen(true)}>
+                  <Heart className="mr-2" />
+                  {t('batchEdit.favorite.button')}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        {isAddToFavoritesOpen && (
+          <AddToFavoritesDialog
+            open={isAddToFavoritesOpen}
+            onOpenChange={setIsAddToFavoritesOpen}
+            journal={journalsToFavorite[0]}
+            isBatchMove={true}
+            batchJournals={journalsToFavorite}
+            onSuccess={() => {
+                setSelectedJournals(new Set());
+                setIsEditing(false);
+            }}
+          />
+        )}
+      </div>
+    );
+  };
+
 
   return (
     <div className="w-full">
@@ -221,12 +319,19 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 
       {filteredJournals.length > 0 && (
         <div className="mb-8 animate-in fade-in-50 duration-300 space-y-6">
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-4">
+            {user && (
+              <Button variant="outline" onClick={toggleEditing}>
+                  {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
+                  {isEditing ? t('common.cancel') : t('batchEdit.favorite.editButton')}
+              </Button>
+            )}
              <Button variant="outline" onClick={handleExport}>
                 <Download className="mr-2 h-4 w-4" />
                 {t('common.exportCsv')}
             </Button>
           </div>
+          {renderBatchEditToolbar()}
           <CategoryStats journals={filteredJournals} />
         </div>
       )}
@@ -248,13 +353,19 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 
       {paginatedJournals.length > 0 && (
         <div className="space-y-4 animate-in fade-in-50 duration-300">
-          {paginatedJournals.map((journal) => (
-            <JournalListItem
-              key={journal.issn}
-              journal={journal}
-              onClick={() => onJournalSelect(journal, searchTerm)}
-            />
-          ))}
+          {paginatedJournals.map((journal) => {
+            const journalId = journal.issn.split('/')[0];
+            return (
+              <JournalListItem
+                key={journal.issn}
+                journal={journal}
+                onClick={() => onJournalSelect(journal, searchTerm)}
+                isEditing={isEditing}
+                isSelected={selectedJournals.has(journalId)}
+                onSelectionChange={(selected) => handleSelectionChange(journalId, selected)}
+              />
+            )
+          })}
         </div>
       )}
 
@@ -332,6 +443,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
             )}
         </Pagination>
       )}
+      <BatchActionBottomBar />
     </div>
   );
 }
@@ -339,5 +451,3 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 export default function SearchPage({ journals, onJournalSelect, initialSearchTerm = "" }: SearchPageProps) {
   return <SearchClient journals={journals} onJournalSelect={onJournalSelect} initialSearchTerm={initialSearchTerm} />;
 }
-
-    

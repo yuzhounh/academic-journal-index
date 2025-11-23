@@ -270,12 +270,17 @@
         },
         "remove": {
             "button": "Delete",
-            "confirmTitle": "Remove {{count}} journal(s)?",
-            "confirmDescription": "This will remove the selected journals from the list '{{listName}}'.",
+            "confirmTitle_one": "Remove 1 journal?",
+            "confirmTitle_other": "Remove {{count}} journals?",
+            "confirmDescription": "This will remove the selected journals from the list '{{listName}}'. This action cannot be undone.",
             "successTitle": "Journals Removed",
             "successDescription": "{{count}} journals have been removed from the list.",
             "errorTitle": "Error Removing Journals",
             "errorDescription": "An error occurred while removing the journals."
+        },
+        "favorite": {
+            "editButton": "Batch Favorite",
+            "button": "Add to Favorites"
         }
     }
 }

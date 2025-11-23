@@ -143,44 +143,6 @@
             "errorDescription": "无法导入列表。请检查文件格式后重试。"
         }
     },
-    "about": {
-        "title": "关于学术期刊索引",
-        "p1": "本网站“学术期刊索引”（AJI）是一个旨在帮助研究人员和学者快速查找学术期刊信息的工具。您可以通过标题搜索期刊或按不同类别浏览。",
-        "p2": "该平台提供影响因子、CAS分区（中国科学院）和权威级别等关键指标，帮助用户更好地评估和选择适合其发表需求的期刊。您还可以创建一个帐户来保存您最喜欢的期刊以便于访问。",
-        "p3": "所有期刊数据均基于公开信息，仅供参考。",
-        "linksTitle": "相关链接",
-        "contactTitle": "联系方式",
-        "contact": {
-            "author": "作者",
-            "authorName": "王敬",
-            "email": "邮箱",
-            "github": "GitHub"
-        },
-        "features": {
-            "title": "功能介绍",
-            "search": {
-                "title": "搜索期刊",
-                "p1": "在“搜索”页面使用搜索框按名称查找期刊。您需要输入至少三个字符才能开始搜索。结果默认按影响因子排序。"
-            },
-            "browse": {
-                "title": "浏览分类",
-                "p1": "进入“浏览”页面查看所有可用的期刊分类。点击任何一个分类，即可查看该分类下的期刊列表，列表按CAS分区排名排序。"
-            },
-            "favorites": {
-                "title": "管理收藏",
-                "p1": "登录后，您可以在期刊的详情页点击心形图标，将其添加到您的收藏夹。您收藏的内容可以在“我的收藏”页面找到，并按列表进行组织。"
-            },
-            "ai": {
-                "title": "AI 智能分析",
-                "p1": "在每个期刊的详情页面，点击“生成分析”按钮。我们的 AI 助手将提供该期刊的摘要并推荐相关的出版物。"
-            }
-        },
-        "feedback": {
-            "title": "问题与反馈",
-            "p1": "有任何问题或改进建议吗？我们非常期待您的声音！请在我们的 GitHub 仓库中提交一个 Issue。",
-            "button": "提交 GitHub Issue"
-        }
-    },
     "auth": {
         "welcomeBack": "欢迎回来",
         "createAccount": "创建账户",
@@ -270,12 +232,17 @@
         },
         "remove": {
             "button": "删除",
-            "confirmTitle": "移除{{count}}本期刊？",
-            "confirmDescription": "这将从此列表 '{{listName}}' 中移除所选期刊。",
+            "confirmTitle_one": "确定移除这 1 本期刊吗？",
+            "confirmTitle_other": "确定移除这 {{count}} 本期刊吗？",
+            "confirmDescription": "此操作将从此列表 “{{listName}}” 中移除所选期刊，该操作无法撤销。",
             "successTitle": "移除成功",
             "successDescription": "已从此列表中移除{{count}}本期刊。",
             "errorTitle": "移除失败",
             "errorDescription": "移除期刊时发生错误。"
+        },
+        "favorite": {
+            "editButton": "批量收藏",
+            "button": "添加到收藏夹"
         }
     }
 }

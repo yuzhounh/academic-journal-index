@@ -1,6 +1,6 @@
 
 import * as logger from "firebase-functions/logger";
-import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {onCall, HttpsError} from "firebase-functions/v2/onCall";
 import * as admin from "firebase-admin";
 
 admin.initializeApp();
@@ -32,7 +32,7 @@ export const deleteUserData = onCall(async (request) => {
   try {
     const userPath = `users/${uid}`;
 
-    // Gracefully delete subcollections.
+    // Gracefully delete subcollections. These will not throw if collections don't exist.
     await deleteCollection(db, `${userPath}/journal_lists`, 100);
     logger.info(`Finished processing journal_lists for user: ${uid}`);
 

@@ -206,6 +206,21 @@
             "successTitle": "密码重置邮件已发送",
             "successDescription": "请检查您的收件箱以获取密码重置链接。",
             "errorTitle": "发送邮件时出错"
+        },
+        "verification": {
+            "emailSentTitle": "验证邮件已发送",
+            "emailSentDescription": "验证链接已发送到您的邮箱地址，请查收。"
+        },
+        "changeEmail": {
+            "menuItem": "修改邮箱",
+            "title": "修改您的邮箱地址",
+            "description": "您当前的邮箱是 {{email}}。验证链接将被发送到新的邮箱地址。",
+            "newEmailLabel": "新邮箱地址",
+            "submitButton": "更新邮箱",
+            "successTitle": "验证邮件已发送",
+            "successDescription": "用于验证新邮箱地址的链接已发送至 {{email}}。",
+            "errorTitle": "修改邮箱时出错",
+            "invalidEmail": "请输入有效的邮箱地址。"
         }
     },
     "yes": "是",

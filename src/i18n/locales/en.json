@@ -206,6 +206,21 @@
             "successTitle": "Password Reset Email Sent",
             "successDescription": "Please check your inbox for a password reset link.",
             "errorTitle": "Error Sending Email"
+        },
+        "verification": {
+            "emailSentTitle": "Verification Email Sent",
+            "emailSentDescription": "A verification link has been sent to your email address. Please check your inbox."
+        },
+        "changeEmail": {
+            "menuItem": "Change Email",
+            "title": "Change Your Email Address",
+            "description": "Your current email is {{email}}. A verification link will be sent to the new address.",
+            "newEmailLabel": "New Email Address",
+            "submitButton": "Update Email",
+            "successTitle": "Verification Email Sent",
+            "successDescription": "A link to verify your new email address has been sent to {{email}}.",
+            "errorTitle": "Error Changing Email",
+            "invalidEmail": "Please enter a valid email address."
         }
     },
     "yes": "Yes",

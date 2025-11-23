@@ -225,14 +225,7 @@
             "uploadButton": "上传图片",
             "successTitle": "头像已更新",
             "errorTitle": "更新头像时出错"
-        },
-        "deleteAccountConfirmation": {
-            "title": "您确定要这样做吗？",
-            "description": "此操作无法撤销。这将永久删除您的帐户并从我们的服务器中删除您的数据。",
-            "button": "是的，删除我的账户"
-        },
-        "deleteAccountSuccess": "账户已删除",
-        "deleteAccountError": "删除账户时出错"
+        }
     },
     "yes": "是",
     "no": "否",

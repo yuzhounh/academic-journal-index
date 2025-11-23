@@ -81,7 +81,7 @@ async function deleteCollection(
   db: admin.firestore.Firestore,
   collectionPath: string,
   batchSize: number
-) {
+): Promise<void> {
   const collectionRef = db.collection(collectionPath);
   const query = collectionRef.orderBy("__name__").limit(batchSize);
 
@@ -99,13 +99,13 @@ async function deleteCollection(
 async function deleteQueryBatch(
   db: admin.firestore.Firestore,
   query: admin.firestore.Query,
-  resolve: (value: unknown) => void
-) {
+  resolve: (value: void) => void
+): Promise<void> {
   const snapshot = await query.get();
 
   if (snapshot.size === 0) {
     // When there are no more documents to delete (or the collection was empty), we're done.
-    resolve(0);
+    resolve();
     return;
   }
 

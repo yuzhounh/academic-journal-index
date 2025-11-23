@@ -33,10 +33,10 @@ export const deleteUserData = onCall(async (request) => {
     const userPath = `users/${uid}`;
 
     // Gracefully delete subcollections. These will not throw if collections don't exist.
-    await deleteCollection(db, `${userPath}/journal_lists`, 100);
+    await deleteCollection(`${userPath}/journal_lists`, 100);
     logger.info(`Finished processing journal_lists for user: ${uid}`);
 
-    await deleteCollection(db, `${userPath}/favorite_journals`, 100);
+    await deleteCollection(`${userPath}/favorite_journals`, 100);
     logger.info(`Finished processing favorite_journals for user: ${uid}`);
     
     // Now, delete the main user document if it exists.
@@ -73,51 +73,32 @@ export const deleteUserData = onCall(async (request) => {
 /**
  * Deletes a collection and all its documents in batches.
  * This function is safe to call on non-existent collections.
- * @param {admin.firestore.Firestore} db The Firestore database instance.
  * @param {string} collectionPath The path to the collection to delete.
  * @param {number} batchSize The number of documents to delete in each batch.
  */
-async function deleteCollection(
-  db: admin.firestore.Firestore,
-  collectionPath: string,
-  batchSize: number
-): Promise<void> {
-  const collectionRef = db.collection(collectionPath);
-  const query = collectionRef.orderBy("__name__").limit(batchSize);
+async function deleteCollection(collectionPath: string, batchSize: number): Promise<void> {
+    const collectionRef = db.collection(collectionPath);
+    let query = collectionRef.orderBy('__name__').limit(batchSize);
 
-  return new Promise((resolve, reject) => {
-    deleteQueryBatch(db, query, resolve).catch(reject);
-  });
-}
+    while (true) {
+        const snapshot = await query.get();
 
-/**
- * Recursively deletes documents from a query in batches.
- * @param {admin.firestore.Firestore} db The Firestore database instance.
- * @param {admin.firestore.Query} query The query to fetch documents from.
- * @param {Function} resolve The promise resolve function.
- */
-async function deleteQueryBatch(
-  db: admin.firestore.Firestore,
-  query: admin.firestore.Query,
-  resolve: (value: void) => void
-): Promise<void> {
-  const snapshot = await query.get();
+        // When there are no more documents, we're done.
+        if (snapshot.size === 0) {
+            return;
+        }
 
-  if (snapshot.size === 0) {
-    // When there are no more documents to delete (or the collection was empty), we're done.
-    resolve();
-    return;
-  }
+        // Delete documents in a batch
+        const batch = db.batch();
+        snapshot.docs.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
 
-  // Delete documents in a batch
-  const batch = db.batch();
-  snapshot.docs.forEach((doc) => {
-    batch.delete(doc.ref);
-  });
-  await batch.commit();
-
-  // Recurse on the next process tick, to avoid hitting stack limits.
-  process.nextTick(() => {
-    deleteQueryBatch(db, query, resolve);
-  });
+        // If the number of documents deleted is less than the batch size,
+        // it means we've reached the end.
+        if (snapshot.size < batchSize) {
+            return;
+        }
+    }
 }

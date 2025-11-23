@@ -185,6 +185,9 @@
         "confirmPassword": "确认密码",
         "passwordsDoNotMatch": "密码不匹配。",
         "forgotPassword": "忘记密码？",
+        "nickname": "昵称",
+        "nicknamePlaceholder": "例如：张三",
+        "nicknameRequired": "昵称至少需要2个字符。",
         "googleSignInFailed": "Google 登录失败",
         "unknownError": "发生未知错误。",
         "loginFailed": "登录失败",
@@ -196,7 +199,8 @@
             "button": "发送重置邮件",
             "backToLogin": "返回登录",
             "successTitle": "密码重置邮件已发送",
-            "successDescription": "请检查您的收件箱以获取密码重置链接。"
+            "successDescription": "请检查您的收件箱以获取密码重置链接。",
+            "errorTitle": "错误"
         },
         "verification": {
             "emailSentTitle": "验证邮件已发送",
@@ -221,11 +225,23 @@
             "successDescription": "密码重置链接已发送至 {{email}}。",
             "errorTitle": "修改密码时出错",
             "noEmailError": "此账户没有关联的邮箱地址。"
+        },
+        "changeNickname": {
+            "menuItem": "修改昵称",
+            "title": "修改您的昵称",
+            "description": "您当前的昵称是 '{{nickname}}'。",
+            "noNicknameDescription": "您还没有设置昵称。",
+            "newNicknameLabel": "新昵称",
+            "submitButton": "更新昵称",
+            "successTitle": "昵称已更新",
+            "successDescription": "您的昵称已成功更新。",
+            "errorTitle": "更新昵称时出错"
         }
     },
     "yes": "是",
     "no": "否",
     "common": {
-        "cancel": "取消"
+        "cancel": "取消",
+        "save": "保存"
     }
 }

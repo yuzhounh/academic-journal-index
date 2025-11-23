@@ -31,6 +31,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
+  updateProfile,
 } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -40,6 +41,7 @@ const formSchema = (view: 'login' | 'register' | 'reset', t: (key: string) => st
   email: z.string().email({ message: "Please enter a valid email." }),
   password: z.string().optional(),
   confirmPassword: z.string().optional(),
+  displayName: z.string().optional(),
 }).refine(data => {
     if (view !== 'register') return true;
     return data.password && data.password.length >= 6;
@@ -52,6 +54,12 @@ const formSchema = (view: 'login' | 'register' | 'reset', t: (key: string) => st
 }, {
     message: t('auth.passwordsDoNotMatch'),
     path: ["confirmPassword"],
+}).refine(data => {
+    if (view !== 'register') return true;
+    return !!data.displayName && data.displayName.length >= 2;
+}, {
+    message: t('auth.nicknameRequired'),
+    path: ["displayName"],
 });
 
 
@@ -75,6 +83,7 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       email: "",
       password: "",
       confirmPassword: "",
+      displayName: "",
     },
     // Re-validate when view changes
     context: { view },
@@ -105,13 +114,16 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   };
 
   const handleEmailAuth = async (data: FormValues) => {
-    if (!auth || !data.password) return;
+    if (!auth || (view !== 'register' && !data.password)) return;
     setIsLoading(true);
     try {
       if (view === "login") {
-        await signInWithEmailAndPassword(auth, data.email, data.password);
+        await signInWithEmailAndPassword(auth, data.email, data.password!);
       } else { // register
-        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password!);
+        await updateProfile(userCredential.user, {
+            displayName: data.displayName
+        });
         if (userCredential.user) {
           await sendEmailVerification(userCredential.user);
           toast({
@@ -277,6 +289,21 @@ function AuthForm({ form, onSubmit, isLoading, buttonText, view, onForgotPasswor
     return (
         <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+          {view === 'register' && (
+            <FormField
+                control={form.control}
+                name="displayName"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>{t('auth.nickname')}</FormLabel>
+                    <FormControl>
+                    <Input placeholder={t('auth.nicknamePlaceholder')} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+          )}
           <FormField
             control={form.control}
             name="email"
@@ -338,5 +365,3 @@ function AuthForm({ form, onSubmit, isLoading, buttonText, view, onForgotPasswor
       </Form>
     )
 }
-
-    

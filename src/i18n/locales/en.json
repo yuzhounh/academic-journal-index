@@ -185,6 +185,9 @@
         "confirmPassword": "Confirm Password",
         "passwordsDoNotMatch": "Passwords do not match.",
         "forgotPassword": "Forgot Password?",
+        "nickname": "Nickname",
+        "nicknamePlaceholder": "e.g. Jane Doe",
+        "nicknameRequired": "Nickname must be at least 2 characters.",
         "googleSignInFailed": "Google Sign-In Failed",
         "unknownError": "An unknown error occurred.",
         "loginFailed": "Login Failed",
@@ -196,7 +199,8 @@
             "button": "Send Reset Email",
             "backToLogin": "Back to Login",
             "successTitle": "Password Reset Email Sent",
-            "successDescription": "Please check your inbox for a password reset link."
+            "successDescription": "Please check your inbox for a password reset link.",
+            "errorTitle": "Error"
         },
         "verification": {
             "emailSentTitle": "Verification Email Sent",
@@ -221,11 +225,23 @@
             "successDescription": "A password reset link has been sent to {{email}}.",
             "errorTitle": "Error Changing Password",
             "noEmailError": "No email address is associated with this account."
+        },
+        "changeNickname": {
+            "menuItem": "Change Nickname",
+            "title": "Change Your Nickname",
+            "description": "Your current nickname is '{{nickname}}'.",
+            "noNicknameDescription": "You don't have a nickname set yet.",
+            "newNicknameLabel": "New Nickname",
+            "submitButton": "Update Nickname",
+            "successTitle": "Nickname Updated",
+            "successDescription": "Your nickname has been successfully updated.",
+            "errorTitle": "Error Updating Nickname"
         }
     },
     "yes": "Yes",
     "no": "No",
     "common": {
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "save": "Save"
     }
 }

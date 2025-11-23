@@ -13,11 +13,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { LogIn, LogOut, Mail, KeyRound } from "lucide-react";
+import { LogIn, LogOut, Mail, KeyRound, User as UserIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/provider";
 import ChangeEmailDialog from "./ChangeEmailDialog";
 import ChangePasswordDialog from "./ChangePasswordDialog";
+import ChangeNicknameDialog from "./ChangeNicknameDialog";
 
 interface UserAvatarProps {
   onLoginClick: () => void;
@@ -28,6 +29,7 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
   const { t } = useTranslation();
   const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false);
   const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
+  const [isChangeNicknameDialogOpen, setIsChangeNicknameDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     if (!auth) return;
@@ -73,6 +75,10 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
               <p className="text-xs text-muted-foreground font-normal truncate">{user.email}</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+           <DropdownMenuItem onClick={() => setIsChangeNicknameDialogOpen(true)} className="cursor-pointer">
+            <UserIcon className="mr-2 h-4 w-4" />
+            <span>{t('auth.changeNickname.menuItem')}</span>
+          </DropdownMenuItem>
            <DropdownMenuItem onClick={() => setIsChangeEmailDialogOpen(true)} className="cursor-pointer">
             <Mail className="mr-2 h-4 w-4" />
             <span>{t('auth.changeEmail.menuItem')}</span>
@@ -90,6 +96,11 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
       </DropdownMenu>
       {user && (
         <>
+           <ChangeNicknameDialog
+            open={isChangeNicknameDialogOpen}
+            onOpenChange={setIsChangeNicknameDialogOpen}
+            user={user}
+           />
           <ChangeEmailDialog
             open={isChangeEmailDialogOpen}
             onOpenChange={setIsChangeEmailDialogOpen}

@@ -38,12 +38,20 @@ interface AddToFavoritesDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   journal: Journal;
+  isBatchMove?: boolean;
+  batchJournals?: Journal[];
+  currentListId?: string;
+  onSuccess?: () => void;
 }
 
 export default function AddToFavoritesDialog({
   open,
   onOpenChange,
   journal,
+  isBatchMove = false,
+  batchJournals = [],
+  currentListId,
+  onSuccess,
 }: AddToFavoritesDialogProps) {
   const { user, firestore } = useFirebase();
   const { t } = useTranslation();
@@ -52,7 +60,8 @@ export default function AddToFavoritesDialog({
   const [isCreating, setIsCreating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
-  const journalId = journal.issn.split('/')[0];
+  const journalsToProcess = isBatchMove ? batchJournals : [journal];
+  const journalIdsToProcess = journalsToProcess.map(j => j.issn.split('/')[0]);
 
   const journalListsQuery = useMemoFirebase(
     () =>
@@ -65,25 +74,29 @@ export default function AddToFavoritesDialog({
     [user, firestore]
   );
   const { data: journalLists, setData: setJournalLists } = useCollection<JournalList>(journalListsQuery);
-
+  
   const favoritedInQuery = useMemoFirebase(
     () =>
-      user && firestore
+      user && firestore && !isBatchMove
         ? query(
             collection(firestore, `users/${user.uid}/favorite_journals`),
-            where("journalId", "==", journalId)
+            where("journalId", "==", journal.issn.split('/')[0])
           )
         : null,
-    [user, firestore, journalId]
+    [user, firestore, journal, isBatchMove]
   );
   const { data: favoritedIn, isLoading: isLoadingFavorites } = useCollection<{listId: string}>(favoritedInQuery);
 
   useEffect(() => {
-    if (favoritedIn) {
+    if (isBatchMove) {
+        // For batch move, we start with no lists selected.
+        setSelectedLists(new Set());
+    } else if (favoritedIn) {
+        // For single add, we pre-select the lists the journal is already in.
         const listIds = new Set(favoritedIn.map((fav) => fav.listId).filter(Boolean));
         setSelectedLists(listIds);
     }
-  }, [favoritedIn]);
+  }, [favoritedIn, isBatchMove]);
 
   const handleCreateNewList = async () => {
     if (!newList.trim() || !user || !firestore) return;
@@ -94,12 +107,9 @@ export default function AddToFavoritesDialog({
     const newListData = {
       name: listName,
       userId: user.uid,
-      // We can't use serverTimestamp here for optimistic update, so we use a client-side date
-      // The real value will be set by the server.
       createdAt: new Date(), 
     };
 
-    // Optimistic UI update
     setJournalLists(prev => [...(prev || []), { ...newListData, id: tempId }]);
     setSelectedLists(prev => new Set(prev).add(tempId));
     setNewList("");
@@ -111,7 +121,6 @@ export default function AddToFavoritesDialog({
           createdAt: serverTimestamp(),
       });
 
-      // Replace temp ID with real ID
       setJournalLists(prev => (prev || []).map(list => list.id === tempId ? { ...list, id: docRef.id } : list));
       setSelectedLists(prev => {
           const newSet = new Set(prev);
@@ -127,7 +136,6 @@ export default function AddToFavoritesDialog({
         title: "Error",
         description: "Could not create the new list.",
       });
-      // Revert optimistic update
       setJournalLists(prev => (prev || []).filter(list => list.id !== tempId));
       setSelectedLists(prev => {
         const newSet = new Set(prev);
@@ -137,26 +145,28 @@ export default function AddToFavoritesDialog({
     }
   };
 
-  const handleSaveChanges = () => {
+  const handleSaveChanges = async () => {
     if (!user || !firestore) return;
 
     setIsSaving(true);
-    onOpenChange(false); // Optimistic UI update
+    
+    try {
+      const batch = writeBatch(firestore);
 
-    const performSave = async () => {
-      try {
-        const batch = writeBatch(firestore);
-        
-        const favsQuery = query(collection(firestore, `users/${user.uid}/favorite_journals`), where('journalId', '==', journalId));
-        const existingFavsSnapshot = await getDocs(favsQuery);
-        const existingFavDocs = existingFavsSnapshot.docs;
-        const initialListIds = new Set(existingFavDocs.map(doc => doc.data().listId).filter(Boolean));
+      for (const journalId of journalIdsToProcess) {
+        if (isBatchMove && currentListId) {
+            // MOVE logic: delete from old list
+            const oldFavQuery = query(
+                collection(firestore, `users/${user.uid}/favorite_journals`),
+                where('journalId', '==', journalId),
+                where('listId', '==', currentListId)
+            );
+            const oldFavs = await getDocs(oldFavQuery);
+            oldFavs.forEach(doc => batch.delete(doc.ref));
+        }
 
-        const listsToAdd = new Set([...selectedLists].filter(id => !initialListIds.has(id)));
-        const listsToRemove = new Set([...initialListIds].filter(id => !selectedLists.has(id)));
-
-        // Handle additions
-        listsToAdd.forEach(listId => {
+        // ADD logic: add to all newly selected lists
+        selectedLists.forEach(listId => {
             const favoriteId = `${journalId}_${listId}`;
             const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, favoriteId);
             batch.set(favoriteRef, {
@@ -167,53 +177,60 @@ export default function AddToFavoritesDialog({
             });
         });
 
-        // Handle removals
-        existingFavDocs.forEach(doc => {
-            const listId = doc.data().listId;
-            if (listId && listsToRemove.has(listId)) {
-                batch.delete(doc.ref);
-            }
-        });
-        
-        // Final check: if after all changes, the journal is in ZERO lists, it should be unfavorited completely.
-        const finalNumberOfLists = initialListIds.size + listsToAdd.size - listsToRemove.size;
-        
-        if (finalNumberOfLists === 0) {
-            // It's not in any list, so remove all entries for this journalId
-            const allFavsForJournalQuery = query(collection(firestore, `users/${user.uid}/favorite_journals`), where('journalId', '==', journalId));
-            const snapshot = await getDocs(allFavsForJournalQuery);
-            snapshot.forEach(doc => batch.delete(doc.ref));
-        }
+        // For single-journal "add/edit" logic (not batch move)
+        if (!isBatchMove) {
+          const favsQuery = query(collection(firestore, `users/${user.uid}/favorite_journals`), where('journalId', '==', journalId));
+          const existingFavsSnapshot = await getDocs(favsQuery);
+          const initialListIds = new Set(existingFavsSnapshot.docs.map(doc => doc.data().listId).filter(Boolean));
 
-
-        await batch.commit();
-
-      } catch (error) {
-          console.error("Error updating favorites:", error);
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not save your changes. Please try again.",
+          const listsToRemove = new Set([...initialListIds].filter(id => !selectedLists.has(id)));
+          
+          existingFavsSnapshot.docs.forEach(doc => {
+              const listId = doc.data().listId;
+              if (listId && listsToRemove.has(listId)) {
+                  batch.delete(doc.ref);
+              }
           });
-      } finally {
-          setIsSaving(false);
-      }
-    };
 
-    // Special case: If journal was NOT favorited and user selects NO lists, it means they want to add to "Uncategorized".
-    const wasFavorited = (favoritedIn || []).length > 0;
-    if (!wasFavorited && selectedLists.size === 0) {
-      const uncategorizedFavoriteId = `${journalId}_uncategorized`;
-      const docRef = doc(firestore, `users/${user.uid}/favorite_journals`, uncategorizedFavoriteId);
-      addDocumentNonBlocking(docRef, {
-          journalId: journalId,
-          userId: user.uid,
-          listId: "",
-          createdAt: serverTimestamp(),
+           // Handle adding to uncategorized if no lists are selected
+          if (selectedLists.size === 0 && initialListIds.size === 0) {
+            const uncategorizedFavoriteId = `${journalId}_uncategorized`;
+            const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, uncategorizedFavoriteId);
+            batch.set(favoriteRef, {
+                journalId: journalId,
+                userId: user.uid,
+                listId: "",
+                createdAt: serverTimestamp(),
+            });
+          } else if (selectedLists.size > 0) {
+            // if it was uncategorized, remove that entry
+            const uncategorizedId = `${journalId}_uncategorized`;
+            const favDoc = existingFavsSnapshot.docs.find(d => d.id === uncategorizedId);
+            if (favDoc) {
+                batch.delete(favDoc.ref);
+            }
+          }
+        }
+      }
+      
+      await batch.commit();
+
+      toast({
+        title: isBatchMove ? t('batchEdit.move.successTitle') : t('favorites.dialog.saveSuccessTitle'),
+        description: isBatchMove ? t('batchEdit.move.successDescription', {count: batchJournals.length}) : t('favorites.dialog.saveSuccessDescription'),
       });
+      onSuccess?.(); // Callback for post-action cleanup
       onOpenChange(false);
-    } else {
-      performSave();
+
+    } catch (error) {
+        console.error("Error updating favorites:", error);
+        toast({
+          variant: "destructive",
+          title: t('common.error'),
+          description: isBatchMove ? t('batchEdit.move.errorDescription') : t('favorites.dialog.saveErrorDescription'),
+        });
+    } finally {
+        setIsSaving(false);
     }
   };
 
@@ -228,12 +245,17 @@ export default function AddToFavoritesDialog({
         return newSet;
     });
   }
+  
+  const dialogTitle = isBatchMove 
+    ? t('batchEdit.move.title', { count: batchJournals.length }) 
+    : t('favorites.dialog.title');
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{t('favorites.dialog.title')}</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 py-4">
             <div className="flex gap-2">
@@ -261,7 +283,7 @@ export default function AddToFavoritesDialog({
                             id={list.id}
                             checked={selectedLists.has(list.id)}
                             onCheckedChange={(checked) => onCheckedChange(checked, list.id)}
-                            disabled={isLoadingFavorites}
+                            disabled={isLoadingFavorites || (isBatchMove && list.id === currentListId)}
                         />
                         <span className="text-sm font-medium leading-none">
                             {list.name}
@@ -275,7 +297,7 @@ export default function AddToFavoritesDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)} className="min-w-[100px]">{t('common.cancel')}</Button>
           <Button onClick={handleSaveChanges} disabled={isSaving} className="min-w-[100px]">
             {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {t('favorites.dialog.saveButton')}
+            {isBatchMove ? t('batchEdit.move.button') : t('favorites.dialog.saveButton')}
           </Button>
         </DialogFooter>
       </DialogContent>

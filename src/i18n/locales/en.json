@@ -115,7 +115,10 @@
             "title": "Add to list...",
             "newListPlaceholder": "New list name...",
             "createButton": "Create",
-            "saveButton": "Save"
+            "saveButton": "Save",
+            "saveSuccessTitle": "Favorites Updated",
+            "saveSuccessDescription": "Your journal has been saved to the selected lists.",
+            "saveErrorDescription": "Could not save your changes. Please try again."
         },
         "uncategorized": "Uncategorized",
         "deleteList": {
@@ -250,6 +253,29 @@
     "common": {
         "cancel": "Cancel",
         "save": "Save",
-        "exportCsv": "Export as CSV"
+        "exportCsv": "Export as CSV",
+        "error": "Error"
+    },
+    "batchEdit": {
+        "button": "Batch Edit",
+        "selectAll": "Select All",
+        "deselectAll": "Deselect All",
+        "selected": "{{count}} selected",
+        "move": {
+            "button": "Move to...",
+            "title": "Move {{count}} journals to...",
+            "successTitle": "Journals Moved",
+            "successDescription": "Successfully moved {{count}} journals.",
+            "errorDescription": "An error occurred while moving the journals."
+        },
+        "remove": {
+            "button": "Delete",
+            "confirmTitle": "Remove {{count}} journal(s)?",
+            "confirmDescription": "This will remove the selected journals from the list '{{listName}}'.",
+            "successTitle": "Journals Removed",
+            "successDescription": "{{count}} journals have been removed from the list.",
+            "errorTitle": "Error Removing Journals",
+            "errorDescription": "An error occurred while removing the journals."
+        }
     }
 }

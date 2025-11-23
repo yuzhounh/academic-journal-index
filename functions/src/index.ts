@@ -78,27 +78,31 @@ export const deleteUserData = onCall(async (request) => {
  */
 async function deleteCollection(collectionPath: string, batchSize: number): Promise<void> {
     const collectionRef = db.collection(collectionPath);
-    let query = collectionRef.orderBy('__name__').limit(batchSize);
+    const query = collectionRef.orderBy('__name__').limit(batchSize);
 
-    while (true) {
-        const snapshot = await query.get();
+    return new Promise((resolve, reject) => {
+        deleteQueryBatch(query, resolve).catch(reject);
+    });
+}
 
-        // When there are no more documents, we're done.
-        if (snapshot.size === 0) {
-            return;
-        }
+async function deleteQueryBatch(query: admin.firestore.Query, resolve: () => void) {
+    const snapshot = await query.get();
 
-        // Delete documents in a batch
-        const batch = db.batch();
-        snapshot.docs.forEach(doc => {
-            batch.delete(doc.ref);
-        });
-        await batch.commit();
-
-        // If the number of documents deleted is less than the batch size,
-        // it means we've reached the end.
-        if (snapshot.size < batchSize) {
-            return;
-        }
+    // When there are no documents left, we are done
+    if (snapshot.size === 0) {
+        return resolve();
     }
+
+    // Delete documents in a batch
+    const batch = db.batch();
+    snapshot.docs.forEach((doc) => {
+        batch.delete(doc.ref);
+    });
+    await batch.commit();
+
+    // Recurse on the next process tick, to avoid
+    // exploding the stack.
+    process.nextTick(() => {
+        deleteQueryBatch(query, resolve);
+    });
 }

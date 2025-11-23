@@ -227,20 +227,20 @@
         "changeEmail": {
             "menuItem": "Change Email",
             "title": "Change Your Email Address",
-            "description": "Your current email is {{email}}. A verification link will be sent to the new address.",
+            "description": "Your current email is {{email}}. A verification link will be sent to the new address. You must click the link to confirm the change.",
             "newEmailLabel": "New Email Address",
             "submitButton": "Update Email",
             "successTitle": "Verification Email Sent",
-            "successDescription": "A link to verify your new email address has been sent to {{email}}.",
+            "successDescription": "A link to verify your new email address has been sent to {{email}}. Please check your inbox.",
             "errorTitle": "Error Changing Email",
             "invalidEmail": "Please enter a valid email address."
         },
         "changePassword": {
             "menuItem": "Change Password",
             "title": "Change Your Password",
-            "description": "A password reset link will be sent to your email address {{email}}.",
+            "description": "We will send a password reset link to your email address ({{email}}). Click the link in the email to set a new password.",
             "submitButton": "Send Reset Email",
-            "successDescription": "A password reset link has been sent to {{email}}.",
+            "successDescription": "A password reset link has been sent to {{email}}. Please check your inbox.",
             "errorTitle": "Error Changing Password",
             "noEmailError": "No email address is associated with this account."
         },

@@ -189,20 +189,20 @@
         "changeEmail": {
             "menuItem": "修改邮箱",
             "title": "修改您的邮箱地址",
-            "description": "您当前的邮箱是 {{email}}。验证链接将被发送到新的邮箱地址。",
+            "description": "您当前的邮箱是 {{email}}。验证链接将被发送到新的邮箱地址，您必须点击链接以确认更改。",
             "newEmailLabel": "新邮箱地址",
             "submitButton": "更新邮箱",
             "successTitle": "验证邮件已发送",
-            "successDescription": "用于验证新邮箱地址的链接已发送至 {{email}}。",
+            "successDescription": "用于验证新邮箱地址的链接已发送至 {{email}}。请检查您的收件箱。",
             "errorTitle": "修改邮箱时出错",
             "invalidEmail": "请输入有效的邮箱地址。"
         },
         "changePassword": {
             "menuItem": "修改密码",
             "title": "修改您的密码",
-            "description": "密码重置链接将发送到您的邮箱地址 {{email}}。",
+            "description": "我们将向您的邮箱（{{email}}）发送一个密码重置链接。请点击邮件中的链接来设置新密码。",
             "submitButton": "发送重置邮件",
-            "successDescription": "密码重置链接已发送至 {{email}}。",
+            "successDescription": "密码重置链接已发送至 {{email}}。请检查您的收件箱。",
             "errorTitle": "修改密码时出错",
             "noEmailError": "此账户没有关联的邮箱地址。"
         },

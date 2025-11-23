@@ -112,6 +112,7 @@ export default function AddToFavoritesDialog({
       createdAt: new Date(), 
     };
 
+    // Optimistic UI update
     setJournalLists(prev => [...(prev || []), { ...newListData, id: tempId }]);
     setSelectedLists(prev => new Set(prev).add(tempId));
     setNewList("");
@@ -122,6 +123,7 @@ export default function AddToFavoritesDialog({
           createdAt: serverTimestamp(),
       });
 
+      // Replace temp ID with real ID from Firestore
       setJournalLists(prev => (prev || []).map(list => list.id === tempId ? { ...list, id: docRef.id } : list));
       setSelectedLists(prev => {
           const newSet = new Set(prev);
@@ -137,6 +139,7 @@ export default function AddToFavoritesDialog({
         title: "Error",
         description: "Could not create the new list.",
       });
+      // Rollback optimistic update on error
       setJournalLists(prev => (prev || []).filter(list => list.id !== tempId));
       setSelectedLists(prev => {
         const newSet = new Set(prev);

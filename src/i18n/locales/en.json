@@ -263,14 +263,7 @@
             "uploadButton": "Upload an Image",
             "successTitle": "Avatar Updated",
             "errorTitle": "Error Updating Avatar"
-        },
-        "deleteAccountConfirmation": {
-            "title": "Are you absolutely sure?",
-            "description": "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
-            "button": "Yes, delete my account"
-        },
-        "deleteAccountSuccess": "Account Deleted",
-        "deleteAccountError": "Error Deleting Account"
+        }
     },
     "yes": "Yes",
     "no": "No",

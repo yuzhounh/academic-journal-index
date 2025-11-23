@@ -28,18 +28,18 @@ interface ChangeAvatarDialogProps {
 }
 
 const predefinedAvatars = [
-  '/avatars/01.png',
-  '/avatars/02.png',
-  '/avatars/03.png',
-  '/avatars/04.png',
-  '/avatars/05.png',
-  '/avatars/06.png',
-  '/avatars/07.png',
-  '/avatars/08.png',
-  '/avatars/09.png',
-  '/avatars/10.png',
-  '/avatars/11.png',
-  '/avatars/12.png',
+    "https://picsum.photos/seed/avatar1/200",
+    "https://picsum.photos/seed/avatar2/200",
+    "https://picsum.photos/seed/avatar3/200",
+    "https://picsum.photos/seed/avatar4/200",
+    "https://picsum.photos/seed/avatar5/200",
+    "https://picsum.photos/seed/avatar6/200",
+    "https://picsum.photos/seed/avatar7/200",
+    "https://picsum.photos/seed/avatar8/200",
+    "https://picsum.photos/seed/avatar9/200",
+    "https://picsum.photos/seed/avatar10/200",
+    "https://picsum.photos/seed/avatar11/200",
+    "https://picsum.photos/seed/avatar12/200",
 ];
 
 

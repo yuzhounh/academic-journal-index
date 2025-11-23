@@ -150,93 +150,99 @@ export default function AddToFavoritesDialog({
 
   const handleSaveChanges = async () => {
     if (!user || !firestore || selectedLists.size === 0) return;
-
-    setIsSaving(true);
     
-    try {
-      const batch = writeBatch(firestore);
+    setIsSaving(true);
+    onOpenChange(false); // Optimistic UI update: close dialog immediately
 
-      for (const journalId of journalIdsToProcess) {
-        // If moving, delete from the old list first.
-        if (mode === 'move' && currentListId) {
-            const oldFavQuery = query(
-                collection(firestore, `users/${user.uid}/favorite_journals`),
-                where('journalId', '==', journalId),
-                where('listId', '==', currentListId)
-            );
-            const oldFavs = await getDocs(oldFavQuery);
-            oldFavs.forEach(doc => batch.delete(doc.ref));
-        }
-
-        // Add to all newly selected lists.
-        selectedLists.forEach(listId => {
-            const favoriteId = `${journalId}_${listId}`;
-            const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, favoriteId);
-            batch.set(favoriteRef, {
-                journalId: journalId,
-                userId: user.uid,
-                listId: listId,
-                createdAt: serverTimestamp(),
-            });
-        });
-
-        // For single-journal "add/edit" (not batch add/move).
-        if (!isBatchOperation && mode === 'add') {
-          const favsQuery = query(collection(firestore, `users/${user.uid}/favorite_journals`), where('journalId', '==', journalId));
-          const existingFavsSnapshot = await getDocs(favsQuery);
-          const initialListIds = new Set(existingFavsSnapshot.docs.map(doc => doc.data().listId).filter(Boolean));
-
-          // Remove from lists that are no longer selected.
-          const listsToRemove = new Set([...initialListIds].filter(id => !selectedLists.has(id)));
-          existingFavsSnapshot.docs.forEach(doc => {
-              const listId = doc.data().listId;
-              if (listId && listsToRemove.has(listId)) {
-                  batch.delete(doc.ref);
-              }
-          });
-
-          // Handle uncategorized logic
-          if (selectedLists.size === 0 && initialListIds.size === 0) {
-            // Add to uncategorized if it's the first time and no list is selected.
-            const uncategorizedFavoriteId = `${journalId}_uncategorized`;
-            const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, uncategorizedFavoriteId);
-            batch.set(favoriteRef, {
-                journalId: journalId,
-                userId: user.uid,
-                listId: "",
-                createdAt: serverTimestamp(),
-            });
-          } else if (selectedLists.size > 0) {
-            // Remove uncategorized entry if it's now in a list.
-            const uncategorizedId = `${journalId}_uncategorized`;
-            const favDoc = existingFavsSnapshot.docs.find(d => d.id === uncategorizedId);
-            if (favDoc) {
-                batch.delete(favDoc.ref);
-            }
-          }
-        }
-      }
-      
-      await batch.commit();
-
-      toast({
+    // Show optimistic toast
+    toast({
         title: isBatchOperation ? t('batchEdit.add.successTitle') : t('favorites.dialog.saveSuccessTitle'),
         description: isBatchOperation ? t('batchEdit.add.successDescription', {count: batchJournals.length}) : t('favorites.dialog.saveSuccessDescription'),
-      });
-      
-      onSuccess?.();
-      onOpenChange(false);
+    });
+    
+    onSuccess?.();
 
-    } catch (error) {
-        console.error("Error updating favorites:", error);
-        toast({
-          variant: "destructive",
-          title: t('common.error'),
-          description: isBatchOperation ? t('batchEdit.add.errorDescription') : t('favorites.dialog.saveErrorDescription'),
-        });
-    } finally {
-        setIsSaving(false);
-    }
+    const performSave = async () => {
+        try {
+            const batch = writeBatch(firestore);
+
+            for (const journalId of journalIdsToProcess) {
+                // If moving, delete from the old list first.
+                if (mode === 'move' && currentListId) {
+                    const oldFavQuery = query(
+                        collection(firestore, `users/${user.uid}/favorite_journals`),
+                        where('journalId', '==', journalId),
+                        where('listId', '==', currentListId)
+                    );
+                    const oldFavs = await getDocs(oldFavQuery);
+                    oldFavs.forEach(doc => batch.delete(doc.ref));
+                }
+
+                // Add to all newly selected lists.
+                selectedLists.forEach(listId => {
+                    const favoriteId = `${journalId}_${listId}`;
+                    const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, favoriteId);
+                    batch.set(favoriteRef, {
+                        journalId: journalId,
+                        userId: user.uid,
+                        listId: listId,
+                        createdAt: serverTimestamp(),
+                    });
+                });
+
+                // For single-journal "add/edit" (not batch add/move).
+                if (!isBatchOperation && mode === 'add') {
+                const favsQuery = query(collection(firestore, `users/${user.uid}/favorite_journals`), where('journalId', '==', journalId));
+                const existingFavsSnapshot = await getDocs(favsQuery);
+                const initialListIds = new Set(existingFavsSnapshot.docs.map(doc => doc.data().listId).filter(Boolean));
+
+                // Remove from lists that are no longer selected.
+                const listsToRemove = new Set([...initialListIds].filter(id => !selectedLists.has(id)));
+                existingFavsSnapshot.docs.forEach(doc => {
+                    const listId = doc.data().listId;
+                    if (listId && listsToRemove.has(listId)) {
+                        batch.delete(doc.ref);
+                    }
+                });
+
+                // Handle uncategorized logic
+                if (selectedLists.size === 0 && initialListIds.size === 0) {
+                    // Add to uncategorized if it's the first time and no list is selected.
+                    const uncategorizedFavoriteId = `${journalId}_uncategorized`;
+                    const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, uncategorizedFavoriteId);
+                    batch.set(favoriteRef, {
+                        journalId: journalId,
+                        userId: user.uid,
+                        listId: "",
+                        createdAt: serverTimestamp(),
+                    });
+                } else if (selectedLists.size > 0) {
+                    // Remove uncategorized entry if it's now in a list.
+                    const uncategorizedId = `${journalId}_uncategorized`;
+                    const favDoc = existingFavsSnapshot.docs.find(d => d.id === uncategorizedId);
+                    if (favDoc) {
+                        batch.delete(favDoc.ref);
+                    }
+                }
+                }
+            }
+            
+            await batch.commit();
+
+        } catch (error) {
+            console.error("Error updating favorites:", error);
+            // Show error toast if background operation fails
+            toast({
+              variant: "destructive",
+              title: t('common.error'),
+              description: isBatchOperation ? t('batchEdit.add.errorDescription') : t('favorites.dialog.saveErrorDescription'),
+            });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+    
+    performSave();
   };
 
   const onCheckedChange = (checked: boolean | "indeterminate", listId: string) => {

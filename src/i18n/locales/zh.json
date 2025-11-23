@@ -208,7 +208,14 @@
             "successTitle": "昵称已更新",
             "successDescription": "您的昵称已成功更新。",
             "errorTitle": "更新昵称时出错"
-        }
+        },
+        "deleteAccountConfirmation": {
+            "title": "您确定要这样做吗？",
+            "description": "此操作无法撤销。这将永久删除您的帐户并从我们的服务器中删除您的数据。",
+            "button": "是的，删除我的账户"
+        },
+        "deleteAccountSuccess": "账户已删除",
+        "deleteAccountError": "删除账户时出错"
     },
     "yes": "是",
     "no": "否",
@@ -240,9 +247,15 @@
             "errorTitle": "移除失败",
             "errorDescription": "移除期刊时发生错误。"
         },
+        "add": {
+            "button": "添加到列表",
+            "title": "将 {{count}} 本期刊添加到...",
+            "successTitle": "添加成功",
+            "successDescription": "已成功将 {{count}} 本期刊添加到您的收藏。",
+            "errorDescription": "添加期刊时发生错误。"
+        },
         "favorite": {
-            "editButton": "批量收藏",
-            "button": "添加到收藏夹"
+            "editButton": "批量收藏"
         }
     }
 }

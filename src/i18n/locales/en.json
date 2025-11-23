@@ -246,7 +246,14 @@
             "successTitle": "Nickname Updated",
             "successDescription": "Your nickname has been successfully updated.",
             "errorTitle": "Error Updating Nickname"
-        }
+        },
+        "deleteAccountConfirmation": {
+            "title": "Are you absolutely sure?",
+            "description": "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
+            "button": "Yes, delete my account"
+        },
+        "deleteAccountSuccess": "Account Deleted",
+        "deleteAccountError": "Error Deleting Account"
     },
     "yes": "Yes",
     "no": "No",
@@ -278,9 +285,15 @@
             "errorTitle": "Error Removing Journals",
             "errorDescription": "An error occurred while removing the journals."
         },
+        "add": {
+            "button": "Add to Lists",
+            "title": "Add {{count}} journals to...",
+            "successTitle": "Journals Added",
+            "successDescription": "Successfully added {{count}} journals to your favorites.",
+            "errorDescription": "An error occurred while adding the journals."
+        },
         "favorite": {
-            "editButton": "Batch Favorite",
-            "button": "Add to Favorites"
+            "editButton": "Batch Favorite"
         }
     }
 }

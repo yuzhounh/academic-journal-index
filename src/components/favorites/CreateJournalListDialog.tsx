@@ -30,32 +30,39 @@ export default function CreateJournalListDialog({ open, onOpenChange }: CreateJo
   const [listName, setListName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
 
-  const handleCreate = async () => {
+  const handleCreate = () => {
     if (!user || !firestore || !listName.trim()) return;
 
     setIsCreating(true);
-    try {
-      await addDoc(collection(firestore, `users/${user.uid}/journal_lists`), {
-        name: listName.trim(),
-        userId: user.uid,
-        createdAt: serverTimestamp(),
-      });
-      toast({
-        title: t('favorites.createList.successTitle'),
-        description: t('favorites.createList.successDescription', { listName: listName.trim() }),
-      });
-      setListName('');
-      onOpenChange(false);
-    } catch (error: any) {
-      console.error("Error creating new list:", error);
-      toast({
-        variant: 'destructive',
-        title: t('favorites.createList.errorTitle'),
-        description: error.message,
-      });
-    } finally {
-      setIsCreating(false);
+    // Optimistically close dialog and show toast
+    onOpenChange(false);
+    toast({
+      title: t('favorites.createList.successTitle'),
+      description: t('favorites.createList.successDescription', { listName: listName.trim() }),
+    });
+    const finalListName = listName.trim();
+    setListName('');
+
+    const performCreate = async () => {
+        try {
+          await addDoc(collection(firestore, `users/${user.uid}/journal_lists`), {
+            name: finalListName,
+            userId: user.uid,
+            createdAt: serverTimestamp(),
+          });
+        } catch (error: any) {
+          console.error("Error creating new list:", error);
+          toast({
+            variant: 'destructive',
+            title: t('favorites.createList.errorTitle'),
+            description: error.message,
+          });
+        } finally {
+          setIsCreating(false);
+        }
     }
+    
+    performCreate();
   };
 
   return (

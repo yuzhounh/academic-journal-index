@@ -196,8 +196,7 @@
             "button": "Send Reset Email",
             "backToLogin": "Back to Login",
             "successTitle": "Password Reset Email Sent",
-            "successDescription": "Please check your inbox for a password reset link.",
-            "errorTitle": "Error Sending Email"
+            "successDescription": "Please check your inbox for a password reset link."
         },
         "verification": {
             "emailSentTitle": "Verification Email Sent",
@@ -213,6 +212,15 @@
             "successDescription": "A link to verify your new email address has been sent to {{email}}.",
             "errorTitle": "Error Changing Email",
             "invalidEmail": "Please enter a valid email address."
+        },
+        "changePassword": {
+            "menuItem": "Change Password",
+            "title": "Change Your Password",
+            "description": "A password reset link will be sent to your email address {{email}}.",
+            "submitButton": "Send Reset Email",
+            "successDescription": "A password reset link has been sent to {{email}}.",
+            "errorTitle": "Error Changing Password",
+            "noEmailError": "No email address is associated with this account."
         }
     },
     "yes": "Yes",

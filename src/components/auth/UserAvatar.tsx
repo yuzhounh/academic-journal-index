@@ -13,10 +13,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { LogIn, LogOut, Mail } from "lucide-react";
+import { LogIn, LogOut, Mail, KeyRound } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/provider";
 import ChangeEmailDialog from "./ChangeEmailDialog";
+import ChangePasswordDialog from "./ChangePasswordDialog";
 
 interface UserAvatarProps {
   onLoginClick: () => void;
@@ -26,6 +27,7 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
   const { user, auth } = useFirebase();
   const { t } = useTranslation();
   const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false);
+  const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     if (!auth) return;
@@ -75,6 +77,11 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
             <Mail className="mr-2 h-4 w-4" />
             <span>{t('auth.changeEmail.menuItem')}</span>
           </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setIsChangePasswordDialogOpen(true)} className="cursor-pointer">
+            <KeyRound className="mr-2 h-4 w-4" />
+            <span>{t('auth.changePassword.menuItem')}</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             <span>{t('auth.logout')}</span>
@@ -86,6 +93,11 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
           <ChangeEmailDialog
             open={isChangeEmailDialogOpen}
             onOpenChange={setIsChangeEmailDialogOpen}
+            user={user}
+          />
+          <ChangePasswordDialog
+            open={isChangePasswordDialogOpen}
+            onOpenChange={setIsChangePasswordDialogOpen}
             user={user}
           />
         </>

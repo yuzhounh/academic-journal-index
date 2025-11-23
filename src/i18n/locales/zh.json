@@ -196,8 +196,7 @@
             "button": "发送重置邮件",
             "backToLogin": "返回登录",
             "successTitle": "密码重置邮件已发送",
-            "successDescription": "请检查您的收件箱以获取密码重置链接。",
-            "errorTitle": "发送邮件时出错"
+            "successDescription": "请检查您的收件箱以获取密码重置链接。"
         },
         "verification": {
             "emailSentTitle": "验证邮件已发送",
@@ -213,6 +212,15 @@
             "successDescription": "用于验证新邮箱地址的链接已发送至 {{email}}。",
             "errorTitle": "修改邮箱时出错",
             "invalidEmail": "请输入有效的邮箱地址。"
+        },
+        "changePassword": {
+            "menuItem": "修改密码",
+            "title": "修改您的密码",
+            "description": "密码重置链接将发送到您的邮箱地址 {{email}}。",
+            "submitButton": "发送重置邮件",
+            "successDescription": "密码重置链接已发送至 {{email}}。",
+            "errorTitle": "修改密码时出错",
+            "noEmailError": "此账户没有关联的邮箱地址。"
         }
     },
     "yes": "是",

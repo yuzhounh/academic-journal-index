@@ -16,12 +16,13 @@ import {
 import { useMemoFirebase } from "@/firebase/provider";
 import { Journal } from "@/data/journals";
 import { useTranslation } from "@/i18n/provider";
-import { BookText, FolderOpen, LogIn, Pencil, Trash2, Upload } from "lucide-react";
+import { BookText, FolderOpen, LogIn, Pencil, Trash2, Upload, FolderPlus } from "lucide-react";
 import CategoryStats from "../search/CategoryStats";
 import DeleteJournalListDialog from "./DeleteJournalListDialog";
 import RenameJournalListDialog from "./RenameJournalListDialog";
 import Papa from "papaparse";
 import { useToast } from "@/hooks/use-toast";
+import CreateJournalListDialog from "./CreateJournalListDialog";
 
 export type JournalList = {
     name: string;
@@ -49,6 +50,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
     const { toast } = useToast();
     const [deleteDialogState, setDeleteDialogState] = useState<{open: boolean, listId: string, listName: string}>({open: false, listId: '', listName: ''});
     const [renameDialogState, setRenameDialogState] = useState<{open: boolean, listId: string, listName: string}>({open: false, listId: '', listName: ''});
+    const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     
     // IMPORTANT: All hooks are now called unconditionally at the top.
@@ -202,10 +204,14 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
             {allFavorites && allFavorites.length > 0 ? (
                 <div className="space-y-8">
                     <CategoryStats journals={journalsForStats} />
-                    <div className="flex justify-end">
+                    <div className="flex justify-end gap-4">
                         <Button variant="outline" onClick={handleImportClick}>
                             <Upload className="mr-2 h-4 w-4" />
                             {t('favorites.importList.button')}
+                        </Button>
+                        <Button onClick={() => setIsCreateListDialogOpen(true)}>
+                            <FolderPlus className="mr-2 h-4 w-4" />
+                            {t('favorites.createList.button')}
                         </Button>
                         <input
                             type="file"
@@ -295,6 +301,10 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                             <Upload className="mr-2 h-4 w-4" />
                             {t('favorites.importList.button')}
                         </Button>
+                         <Button onClick={() => setIsCreateListDialogOpen(true)}>
+                            <FolderPlus className="mr-2 h-4 w-4" />
+                            {t('favorites.createList.button')}
+                        </Button>
                         <input
                             type="file"
                             ref={fileInputRef}
@@ -321,6 +331,10 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                     listName={renameDialogState.listName}
                 />
             )}
+             <CreateJournalListDialog 
+                open={isCreateListDialogOpen}
+                onOpenChange={setIsCreateListDialogOpen}
+            />
         </div>
     );
 }

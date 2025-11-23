@@ -209,7 +209,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                             <Upload className="mr-2 h-4 w-4" />
                             {t('favorites.importList.button')}
                         </Button>
-                        <Button onClick={() => setIsCreateListDialogOpen(true)}>
+                        <Button variant="outline" onClick={() => setIsCreateListDialogOpen(true)}>
                             <FolderPlus className="mr-2 h-4 w-4" />
                             {t('favorites.createList.button')}
                         </Button>
@@ -301,7 +301,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                             <Upload className="mr-2 h-4 w-4" />
                             {t('favorites.importList.button')}
                         </Button>
-                         <Button onClick={() => setIsCreateListDialogOpen(true)}>
+                         <Button variant="outline" onClick={() => setIsCreateListDialogOpen(true)}>
                             <FolderPlus className="mr-2 h-4 w-4" />
                             {t('favorites.createList.button')}
                         </Button>

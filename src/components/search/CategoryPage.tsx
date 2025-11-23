@@ -30,7 +30,7 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ArrowLeft, BookText, BookOpen, Menu, Folder, Download, Pencil, X, Check, Trash2, FolderSync } from "lucide-react";
+import { ArrowLeft, BookText, BookOpen, Menu, Folder, Download, Pencil, X, Check, Trash2, FolderSync, Heart } from "lucide-react";
 import JournalDetail from "./JournalDetail";
 import SearchPage from "./SearchPage";
 import CategoryStats from "./CategoryStats";
@@ -203,6 +203,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   // Batch edit state
   const [isEditing, setIsEditing] = useState(false);
   const [selectedJournals, setSelectedJournals] = useState<Set<string>>(new Set());
+  const [isAddToFavoritesOpen, setIsAddToFavoritesOpen] = useState(false);
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { toast } = useToast();
@@ -238,7 +239,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   );
   const { data: allFavoriteEntries } = useCollection<FavoriteJournalEntry>(allFavoritesQuery);
 
-  // For Browse view
+  // For Browse view or Uncategorized Favorites view
   const journalsForCategory = useMemo(() => {
     if (!selectedCategory) return [];
     
@@ -287,7 +288,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       });
   }, [favoriteJournalIdsInList, journalMap]);
 
-  const journalsToDisplay = (selectedJournalList) ? journalsForList : journalsForCategory;
+  const journalsToDisplay = (selectedJournalList || selectedCategory === 'Uncategorized') ? (selectedJournalList ? journalsForList : journalsForCategory) : journalsForCategory;
 
   const paginatedJournals = useMemo(() => {
     const startIndex = (currentPage - 1) * JOURNALS_PER_PAGE;
@@ -304,6 +305,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     setCurrentPage(1);
     setJournalHistory([]);
     setSelectedJournalList(null);
+    setIsEditing(false);
+    setSelectedJournals(new Set());
   };
   
   const handleJournalListSelect = (list: WithId<JournalList>) => {
@@ -311,6 +314,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     setSelectedCategory(null);
     setCurrentPage(1);
     setJournalHistory([]);
+    setIsEditing(false);
+    setSelectedJournals(new Set());
   }
 
   const handleJournalSelect = (journal: Journal, searchTerm: string = "") => {
@@ -414,13 +419,43 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   };
 
   const handleDeleteSelected = async () => {
-    if (!user || !firestore || !selectedJournalList) return;
+    if (!user || !firestore) return;
+    
+    let listIdToRemove = "";
+    if (selectedJournalList) {
+        listIdToRemove = selectedJournalList.id;
+    } else if (selectedCategory === 'Uncategorized') {
+        listIdToRemove = 'uncategorized';
+    } else {
+        return; // Should not be able to delete from browse/search
+    }
+
     try {
         const batch = writeBatch(firestore);
         const favoritesColRef = collection(firestore, `users/${user.uid}/favorite_journals`);
-        const q = query(favoritesColRef, where('listId', '==', selectedJournalList.id), where('journalId', 'in', Array.from(selectedJournals)));
-        const snapshot = await getDocs(q);
-        snapshot.forEach(doc => batch.delete(doc.ref));
+        
+        // Firestore 'in' query limit is 30. We need to batch the deletion query.
+        const journalIds = Array.from(selectedJournals);
+        const queryPromises = [];
+        for (let i = 0; i < journalIds.length; i += 30) {
+            const chunk = journalIds.slice(i, i + 30);
+            
+            const conditions = [where('journalId', 'in', chunk)];
+            if (listIdToRemove !== 'uncategorized') {
+                conditions.push(where('listId', '==', listIdToRemove));
+            } else {
+                conditions.push(where('listId', 'in', [null, '', 'uncategorized']));
+            }
+            
+            const q = query(favoritesColRef, ...conditions);
+            queryPromises.push(getDocs(q));
+        }
+
+        const snapshots = await Promise.all(queryPromises);
+        snapshots.forEach(snapshot => {
+            snapshot.forEach(doc => batch.delete(doc.ref));
+        });
+
         await batch.commit();
 
         toast({
@@ -537,7 +572,9 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   }
   
   const renderListHeader = () => {
-    const isFavoritesList = !!selectedJournalList;
+    const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
+    const canEdit = user && (isFavoritesView || view === 'categories');
+
     return (
         <div className="flex items-center gap-4 mb-6">
             <Button variant="outline" size="icon" onClick={handleBackToList}>
@@ -546,13 +583,13 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             <div className="flex items-center gap-2 flex-grow">
                 <Folder className="h-6 w-6 text-primary" />
                 <h2 className="font-headline text-2xl md:text-3xl font-bold tracking-tight">
-                {selectedJournalList?.name || (selectedCategory === 'Uncategorized' ? t('favorites.uncategorized') : getMajorCategoryName(selectedCategory || '', locale))}
+                {selectedJournalList?.name || (selectedCategory ? (selectedCategory === 'Uncategorized' ? t('favorites.uncategorized') : getMajorCategoryName(selectedCategory, locale)) : '')}
                 </h2>
             </div>
-            {isFavoritesList && (
+            {canEdit && (
                 <Button variant="outline" onClick={toggleEditing}>
                     {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
-                    {isEditing ? t('common.cancel') : t('batchEdit.button')}
+                    {isEditing ? t('common.cancel') : (isFavoritesView ? t('batchEdit.button') : t('batchEdit.favorite.editButton'))}
                 </Button>
             )}
             <Button variant="outline" onClick={handleExport} disabled={journalsToDisplay.length === 0}>
@@ -564,7 +601,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   };
   
   const renderBatchEditToolbar = () => {
-    if (!isEditing || !selectedJournalList) return null;
+    if (!isEditing) return null;
     return (
         <div className="flex items-center gap-4 mb-6 p-2 border rounded-lg bg-background">
             <Checkbox
@@ -584,7 +621,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       case "search":
         return <SearchPage journals={journals} onJournalSelect={handleJournalSelect} initialSearchTerm={preservedSearchTerm} />;
       case "favorites":
-        if (selectedJournalList || selectedCategory === 'Uncategorized') {
+      case "categories":
+        if (selectedJournalList || selectedCategory) {
           return (
             <div className="animate-in fade-in-50 duration-300">
               {renderListHeader()}
@@ -617,7 +655,9 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             </div>
           );
         }
-        return <FavoritesContent 
+        // Fallback to specific view content if no list/category is selected
+        if (view === 'favorites') {
+          return <FavoritesContent 
                   allFavorites={allFavoriteEntries} 
                   onJournalListSelect={handleJournalListSelect} 
                   onUncategorizedSelect={() => handleCategorySelect("Uncategorized")} 
@@ -625,29 +665,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                   onLoginClick={() => setIsLoginDialogOpen(true)}
                   journals={journals}
                 />;
-      case "about":
-        return <AboutPage />;
-      case "categories":
-        if (selectedCategory) {
-          return (
-            <div className="animate-in fade-in-50 duration-300">
-              {renderListHeader()}
-              <div className="mb-8">
-                <CategoryStats journals={journalsToDisplay} />
-              </div>
-              <div className="space-y-4">
-                {paginatedJournals.map((journal) => (
-                   <JournalListItem
-                      key={journal.issn}
-                      journal={journal}
-                      onClick={() => handleJournalSelect(journal)}
-                    />
-                ))}
-              </div>
-              {renderPagination()}
-            </div>
-          );
-        } else {
+        } else { // categories
           return (
             <div className="animate-in fade-in-50 duration-300 space-y-8">
               <CategoryStats journals={journals} />
@@ -675,6 +693,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             </div>
           );
         }
+      case "about":
+        return <AboutPage />;
       default:
         return null;
     }
@@ -747,9 +767,18 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   )
 
   const BatchActionBottomBar = () => {
-    if (!isEditing || selectedJournals.size === 0) return null;
-
-    const journalsToMove = journalsToDisplay.filter(j => selectedJournals.has(j.issn.split('/')[0]));
+    if (!isEditing || !user || selectedJournals.size === 0) return null;
+    
+    const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
+    const isBrowseView = view === 'categories' && selectedCategory && selectedCategory !== 'Uncategorized';
+    const journalsToProcess = journalsToDisplay.filter(j => selectedJournals.has(j.issn.split('/')[0]));
+    
+    const getDeleteDialogTitle = () => {
+        if (selectedJournals.size === 1) {
+            return t('batchEdit.remove.confirmTitle_one');
+        }
+        return t('batchEdit.remove.confirmTitle_other', {count: selectedJournals.size});
+    };
 
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-12 duration-300">
@@ -760,25 +789,37 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 {t('batchEdit.selected', { count: selectedJournals.size })}
               </span>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => setIsMoveDialogOpen(true)}>
-                  <FolderSync className="mr-2" />
-                  {t('batchEdit.move.button')}
-                </Button>
-                <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
-                  <Trash2 className="mr-2" />
-                  {t('batchEdit.remove.button')}
-                </Button>
+                {isFavoritesView && (
+                    <Button variant="outline" size="sm" onClick={() => setIsMoveDialogOpen(true)}>
+                        <FolderSync className="mr-2" />
+                        {t('batchEdit.move.button')}
+                    </Button>
+                )}
+                {isBrowseView && (
+                    <Button variant="outline" size="sm" onClick={() => setIsAddToFavoritesOpen(true)}>
+                        <Heart className="mr-2" />
+                        {t('batchEdit.favorite.button')}
+                    </Button>
+                )}
+                {isFavoritesView && (
+                    <Button variant="destructive" size="sm" onClick={() => setIsDeleteDialogOpen(true)}>
+                        <Trash2 className="mr-2" />
+                        {t('batchEdit.remove.button')}
+                    </Button>
+                )}
               </div>
             </CardContent>
           </Card>
         </div>
-        {isMoveDialogOpen && (
+        
+        {/* Dialog for Moving in Favorites */}
+        {isMoveDialogOpen && isFavoritesView && (
           <AddToFavoritesDialog
             open={isMoveDialogOpen}
             onOpenChange={setIsMoveDialogOpen}
-            journal={journalsToMove[0]} // Pass first journal as a template
+            journal={journalsToProcess[0]}
             isBatchMove={true}
-            batchJournals={journalsToMove}
+            batchJournals={journalsToProcess}
             currentListId={selectedJournalList?.id}
             onSuccess={() => {
                 setSelectedJournals(new Set());
@@ -786,22 +827,41 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             }}
           />
         )}
-        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{t('batchEdit.remove.confirmTitle')}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name || '' })}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive hover:bg-destructive/90">
-                      {t('batchEdit.remove.button')}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        
+        {/* Dialog for Adding to Favorites from Browse */}
+        {isAddToFavoritesOpen && isBrowseView && (
+             <AddToFavoritesDialog
+                open={isAddToFavoritesOpen}
+                onOpenChange={setIsAddToFavoritesOpen}
+                journal={journalsToProcess[0]}
+                isBatchMove={true}
+                batchJournals={journalsToProcess}
+                onSuccess={() => {
+                    setSelectedJournals(new Set());
+                    setIsEditing(false);
+                }}
+            />
+        )}
+
+        {/* Dialog for Deleting from Favorites */}
+        {isDeleteDialogOpen && isFavoritesView && (
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{getDeleteDialogTitle()}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                        {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name || t('favorites.uncategorized') })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive hover:bg-destructive/90">
+                        {t('batchEdit.remove.button')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        )}
       </div>
     );
   };
@@ -878,5 +938,3 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     </>
   );
 }
-
-    

@@ -13,12 +13,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { LogIn, LogOut, Mail, KeyRound, User as UserIcon, Trash2 } from "lucide-react";
+import { LogIn, LogOut, Mail, KeyRound, User as UserIcon, Image as ImageIcon } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/provider";
 import ChangeEmailDialog from "./ChangeEmailDialog";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
+import ChangeAvatarDialog from "./ChangeAvatarDialog";
 
 interface UserAvatarProps {
   onLoginClick: () => void;
@@ -30,6 +31,7 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
   const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false);
   const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
   const [isChangeNicknameDialogOpen, setIsChangeNicknameDialogOpen] = useState(false);
+  const [isChangeAvatarDialogOpen, setIsChangeAvatarDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     if (!auth) return;
@@ -64,10 +66,12 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Avatar className="cursor-pointer h-9 w-9">
-            <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'User'} />
-            <AvatarFallback>{userInitial}</AvatarFallback>
-          </Avatar>
+          <button onClick={() => setIsChangeAvatarDialogOpen(true)} aria-label={t('auth.changeAvatar.title')}>
+            <Avatar className="cursor-pointer h-9 w-9">
+              <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'User'} />
+              <AvatarFallback>{userInitial}</AvatarFallback>
+            </Avatar>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>
@@ -75,6 +79,10 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
               <p className="text-xs text-muted-foreground font-normal truncate">{user.email}</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+           <DropdownMenuItem onClick={() => setIsChangeAvatarDialogOpen(true)} className="cursor-pointer">
+            <ImageIcon className="mr-2 h-4 w-4" />
+            <span>{t('auth.changeAvatar.menuItem')}</span>
+          </DropdownMenuItem>
            <DropdownMenuItem onClick={() => setIsChangeNicknameDialogOpen(true)} className="cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" />
             <span>{t('auth.changeNickname.menuItem')}</span>
@@ -96,6 +104,11 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
       </DropdownMenu>
       {user && (
         <>
+           <ChangeAvatarDialog
+            open={isChangeAvatarDialogOpen}
+            onOpenChange={setIsChangeAvatarDialogOpen}
+            user={user}
+           />
            <ChangeNicknameDialog
             open={isChangeNicknameDialogOpen}
             onOpenChange={setIsChangeNicknameDialogOpen}

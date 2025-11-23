@@ -159,7 +159,7 @@
         "login": "登录",
         "logout": "退出",
         "register": "注册",
-        "orContinueWith": "或使用其他方式继续",
+        "orContinueWith": "或",
         "email": "邮箱",
         "password": "密码",
         "confirmPassword": "确认密码",
@@ -216,6 +216,15 @@
             "successTitle": "昵称已更新",
             "successDescription": "您的昵称已成功更新。",
             "errorTitle": "更新昵称时出错"
+        },
+        "changeAvatar": {
+            "menuItem": "更换头像",
+            "title": "更换头像",
+            "description": "选择一个预设头像或上传您自己的图片。",
+            "predefined": "从预设中选择",
+            "uploadButton": "上传图片",
+            "successTitle": "头像已更新",
+            "errorTitle": "更新头像时出错"
         },
         "deleteAccountConfirmation": {
             "title": "您确定要这样做吗？",

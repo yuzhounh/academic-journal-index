@@ -62,6 +62,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useToast } from "@/hooks/use-toast";
+import { journals as allJournalsData } from "@/data/journals";
 
 const JOURNALS_PER_PAGE = 20;
 
@@ -461,11 +462,16 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         });
 
         await batch.commit();
+        
+        const successDescription = selectedJournals.size === 1
+            ? t('batchEdit.remove.successDescription_one')
+            : t('batchEdit.remove.successDescription_other', {count: selectedJournals.size});
 
         toast({
             title: t('batchEdit.remove.successTitle'),
-            description: t('batchEdit.remove.successDescription', {count: selectedJournals.size})
+            description: successDescription,
         });
+
     } catch(e) {
         console.error("Error deleting journals: ", e);
         toast({
@@ -593,7 +599,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
 
   const renderActionToolbar = () => {
     const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
-    const canEdit = user && isFavoritesView;
+    // This allows batch edit on Category Browse view as well
+    const canEdit = user;
     
     if (journalsToDisplay.length === 0) return null;
 
@@ -614,7 +621,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           {canEdit && (
               <Button variant="outline" onClick={toggleEditing}>
                   {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
-                  {isEditing ? t('common.cancel') : t('batchEdit.button')}
+                  {isEditing ? t('common.cancel') : (isFavoritesView ? t('batchEdit.button') : t('batchEdit.favorite.editButton'))}
               </Button>
           )}
           <Button variant="outline" onClick={handleExport} disabled={journalsToDisplay.length === 0}>
@@ -779,7 +786,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     if (!isEditing || !user || selectedJournals.size === 0) return null;
     
     const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
-    const isBrowseOrSearch = (view === 'categories' && selectedCategory && selectedCategory !== 'Uncategorized') || view === 'search';
+    const isBrowseView = view === 'categories' && selectedCategory && selectedCategory !== 'Uncategorized';
     const journalsToProcess = journalsToDisplay.filter(j => selectedJournals.has(j.issn.split('/')[0]));
     
     const getDeleteDialogTitle = () => {
@@ -818,24 +825,28 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       />
     );
 
-    const getBatchDeleteDialog = () => (
-        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>{getDeleteDialogTitle()}</AlertDialogTitle>
-                    <AlertDialogDescription>
-                    {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name || t('favorites.uncategorized') })}
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive hover:bg-destructive/90">
-                    {t('batchEdit.remove.button')}
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
-    );
+    const getBatchDeleteDialog = () => {
+        const title = selectedJournals.size === 1 ? t('batchEdit.remove.confirmTitle_one') : t('batchEdit.remove.confirmTitle_other', {count: selectedJournals.size});
+        return (
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{title}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                        {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name || t('favorites.uncategorized') })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDeleteSelected} className="bg-destructive hover:bg-destructive/90">
+                        {t('batchEdit.remove.button')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+        );
+    }
+
 
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-12 duration-300">
@@ -852,7 +863,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                         {t('batchEdit.move.button')}
                     </Button>
                 )}
-                {isBrowseOrSearch && (
+                {isBrowseView && (
                     <Button variant="outline" size="sm" onClick={() => setIsAddToFavoritesOpen(true)}>
                         <Heart className="mr-2 h-4 w-4" />
                         {t('batchEdit.add.button')}
@@ -870,7 +881,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         </div>
         
         {isMoveDialogOpen && isFavoritesView && getBatchMoveDialog()}
-        {isAddToFavoritesOpen && isBrowseOrSearch && getBatchAddDialog()}
+        {isAddToFavoritesOpen && isBrowseView && getBatchAddDialog()}
         {isDeleteDialogOpen && isFavoritesView && getBatchDeleteDialog()}
       </div>
     );

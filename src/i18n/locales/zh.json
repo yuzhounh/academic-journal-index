@@ -243,7 +243,8 @@
             "confirmTitle_other": "确定移除这 {{count}} 本期刊吗？",
             "confirmDescription": "此操作将从此列表 “{{listName}}” 中移除所选期刊，该操作无法撤销。",
             "successTitle": "移除成功",
-            "successDescription": "已从此列表中移除{{count}}本期刊。",
+            "successDescription_one": "已从此列表中移除 1 本期刊。",
+            "successDescription_other": "已从此列表中移除 {{count}} 本期刊。",
             "errorTitle": "移除失败",
             "errorDescription": "移除期刊时发生错误。"
         },

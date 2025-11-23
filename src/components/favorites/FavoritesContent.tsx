@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useFirebase } from "@/firebase";
 import { useCollection, WithId } from "@/firebase/firestore/use-collection";
-import { collection, query, orderBy } from "firebase/firestore";
+import { collection, query, orderBy, writeBatch, doc, serverTimestamp, addDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -15,10 +15,12 @@ import {
 import { useMemoFirebase } from "@/firebase/provider";
 import { Journal } from "@/data/journals";
 import { useTranslation } from "@/i18n/provider";
-import { BookText, FolderOpen, LogIn, Pencil, Trash2 } from "lucide-react";
+import { BookText, FolderOpen, LogIn, Pencil, Trash2, Upload } from "lucide-react";
 import CategoryStats from "../search/CategoryStats";
 import DeleteJournalListDialog from "./DeleteJournalListDialog";
 import RenameJournalListDialog from "./RenameJournalListDialog";
+import Papa from "papaparse";
+import { useToast } from "@/hooks/use-toast";
 
 export type JournalList = {
     name: string;
@@ -43,8 +45,10 @@ interface FavoritesContentProps {
 export default function FavoritesContent({ onJournalListSelect, onUncategorizedSelect, allFavorites, onFindJournalsClick, onLoginClick, journals }: FavoritesContentProps) {
     const { user, isUserLoading, firestore } = useFirebase();
     const { t } = useTranslation();
+    const { toast } = useToast();
     const [deleteDialogState, setDeleteDialogState] = useState<{open: boolean, listId: string, listName: string}>({open: false, listId: '', listName: ''});
     const [renameDialogState, setRenameDialogState] = useState<{open: boolean, listId: string, listName: string}>({open: false, listId: '', listName: ''});
+    const fileInputRef = useRef<HTMLInputElement>(null);
     
     // IMPORTANT: All hooks are now called unconditionally at the top.
     const journalListsQuery = useMemoFirebase(
@@ -58,7 +62,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
         [user, firestore]
     );
     
-    const { data: journalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
+    const { data: journalLists, setData: setJournalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
     
     const { categorized, uncategorizedCount } = useMemo(() => {
         if (!allFavorites) return { categorized: {}, uncategorizedCount: 0 };
@@ -67,7 +71,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
         let uncategorized = 0;
 
         allFavorites.forEach(fav => {
-            if (fav.listId && fav.listId.trim() !== '') {
+            if (fav.listId && fav.listId.trim() !== '' && fav.listId !== 'uncategorized') {
                 categorizedFavorites[fav.listId] = (categorizedFavorites[fav.listId] || 0) + 1;
             } else {
                 uncategorized++;
@@ -93,6 +97,80 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
     const handleRenameClick = (e: React.MouseEvent, list: WithId<JournalList>) => {
         e.stopPropagation(); // Prevent card's onClick from firing
         setRenameDialogState({ open: true, listId: list.id, listName: list.name });
+    };
+
+    const handleImportClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file || !user || !firestore) return;
+
+        // Reset file input to allow re-uploading the same file
+        event.target.value = '';
+
+        Papa.parse(file, {
+            header: true,
+            skipEmptyLines: true,
+            complete: async (results) => {
+                const importedJournals = results.data as { "ISSN/EISSN": string }[];
+                const journalIssns = new Set(importedJournals.map(j => j["ISSN/EISSN"]?.split('/')[0]).filter(Boolean));
+
+                let listName = file.name.replace(/\.csv$/, '').replace(/_/g, ' ');
+                // Make name unique if it already exists
+                const existingNames = new Set((journalLists || []).map(l => l.name));
+                if (existingNames.has(listName)) {
+                    listName = `${listName} (${new Date().toLocaleDateString()})`;
+                }
+
+                try {
+                    const journalMapByIssn = new Map(journals.map(j => [j.issn.split('/')[0], j]));
+                    const validJournalIds = Array.from(journalIssns).filter(issn => journalMapByIssn.has(issn));
+                    
+                    // Create new list
+                    const listRef = await addDoc(collection(firestore, `users/${user.uid}/journal_lists`), {
+                        name: listName,
+                        userId: user.uid,
+                        createdAt: serverTimestamp(),
+                    });
+                    
+                    // Batch add journals to the new list
+                    const batch = writeBatch(firestore);
+                    validJournalIds.forEach(journalId => {
+                        const favoriteId = `${journalId}_${listRef.id}`;
+                        const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, favoriteId);
+                        batch.set(favoriteRef, {
+                            journalId: journalId,
+                            userId: user.uid,
+                            listId: listRef.id,
+                            createdAt: serverTimestamp(),
+                        });
+                    });
+                    await batch.commit();
+
+                    toast({
+                        title: t('favorites.importList.successTitle'),
+                        description: t('favorites.importList.successDescription', { listName, count: validJournalIds.length }),
+                    });
+                } catch (error) {
+                    console.error("Error importing list:", error);
+                    toast({
+                        variant: 'destructive',
+                        title: t('favorites.importList.errorTitle'),
+                        description: t('favorites.importList.errorDescription'),
+                    });
+                }
+            },
+            error: (error) => {
+                console.error("CSV parsing error:", error);
+                toast({
+                    variant: 'destructive',
+                    title: t('favorites.importList.errorTitle'),
+                    description: t('favorites.importList.errorDescription'),
+                });
+            }
+        });
     };
 
 
@@ -122,6 +200,19 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
         <div className="animate-in fade-in-50 duration-300">
             {allFavorites && allFavorites.length > 0 ? (
                 <div className="space-y-8">
+                    <div className="flex justify-end">
+                        <Button variant="outline" onClick={handleImportClick}>
+                            <Upload className="mr-2 h-4 w-4" />
+                            {t('favorites.importList.button')}
+                        </Button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileImport}
+                            accept=".csv"
+                            style={{ display: 'none' }}
+                        />
+                    </div>
                     <CategoryStats journals={journalsForStats} />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {uncategorizedCount > 0 && (
@@ -188,14 +279,29 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                     </div>
                 </div>
             ) : (
-                <div className="text-center py-20 px-4 border-2 border-dashed rounded-lg">
-                    <h3 className="mt-4 text-lg font-medium text-foreground">{t('favorites.empty.title')}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                        {t('favorites.empty.description')}
-                    </p>
-                    <Button className="mt-6" onClick={onFindJournalsClick}>
-                       {t('favorites.empty.button')}
-                    </Button>
+                <div className="text-center py-20 px-4 border-2 border-dashed rounded-lg space-y-6">
+                    <div>
+                        <h3 className="mt-4 text-lg font-medium text-foreground">{t('favorites.empty.title')}</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                            {t('favorites.empty.description')}
+                        </p>
+                    </div>
+                    <div className="flex justify-center items-center gap-4">
+                        <Button onClick={onFindJournalsClick}>
+                            {t('favorites.empty.button')}
+                        </Button>
+                        <Button variant="outline" onClick={handleImportClick}>
+                            <Upload className="mr-2 h-4 w-4" />
+                            {t('favorites.importList.button')}
+                        </Button>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileImport}
+                            accept=".csv"
+                            style={{ display: 'none' }}
+                        />
+                    </div>
                 </div>
             )}
             {deleteDialogState.open && (

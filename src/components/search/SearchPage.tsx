@@ -15,11 +15,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Search } from "lucide-react";
+import { Search, Download } from "lucide-react";
 import CategoryStats from "./CategoryStats";
 import { useTranslation } from "@/i18n/provider";
 import JournalListItem from "./JournalListItem";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import Papa from "papaparse";
+import { Button } from "../ui/button";
 
 interface SearchPageProps {
   journals: Journal[];
@@ -123,6 +125,17 @@ const getPaginationItems = (
   return uniquePages;
 };
 
+const triggerCsvDownload = (data: (string | number)[][], filename: string) => {
+  const csvContent = "data:text/csv;charset=utf-8," + Papa.unparse(data);
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", filename);
+  document.body.appendChild(link); // Required for FF
+  link.click();
+  document.body.removeChild(link);
+};
+
 
 function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: SearchPageProps) {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
@@ -172,6 +185,23 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
     }
   };
 
+  const handleExport = () => {
+    if (filteredJournals.length === 0) return;
+    
+    const filename = `Search-results-for-${searchTerm.replace(/\s+/g, '_')}.csv`;
+    const headers = ["Journal Name", "ISSN/EISSN", "Impact Factor", "CAS Partition", "Authority Level", "Open Access"];
+    const data = filteredJournals.map(j => [
+        j.journalName,
+        j.issn,
+        j.impactFactor,
+        j.majorCategoryPartition,
+        j.authorityJournal,
+        j.openAccess
+    ]);
+
+    triggerCsvDownload([headers, ...data], filename);
+  };
+
   const showInitialMessage = searchTerm.length < 3;
   const showNoResultsMessage = searchTerm.length >= 3 && filteredJournals.length === 0;
 
@@ -190,7 +220,13 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
       </div>
 
       {filteredJournals.length > 0 && (
-        <div className="mb-6 animate-in fade-in-50 duration-300">
+        <div className="mb-8 animate-in fade-in-50 duration-300 space-y-6">
+          <div className="flex justify-end">
+             <Button variant="outline" onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" />
+                {t('common.exportCsv')}
+            </Button>
+          </div>
           <CategoryStats journals={filteredJournals} />
         </div>
       )}

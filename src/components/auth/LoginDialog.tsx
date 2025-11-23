@@ -29,19 +29,24 @@ import {
   signInWithPopup,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useTranslation } from "@/i18n/provider";
 
-const formSchema = (isRegister: boolean, t: (key: string) => string) => z.object({
+const formSchema = (view: 'login' | 'register' | 'reset', t: (key: string) => string) => z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters." }),
+  password: z.string().optional(),
   confirmPassword: z.string().optional(),
 }).refine(data => {
-    if (!isRegister) return true; // Don't validate for login
+    if (view !== 'register') return true;
+    return data.password && data.password.length >= 6;
+}, {
+    message: "Password must be at least 6 characters.",
+    path: ["password"],
+}).refine(data => {
+    if (view !== 'register') return true; 
     return data.password === data.confirmPassword;
 }, {
     message: t('auth.passwordsDoNotMatch'),
@@ -59,30 +64,25 @@ interface LoginDialogProps {
 export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const { auth } = useFirebase();
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("login");
+  const [view, setView] = useState<'login' | 'register' | 'reset'>("login");
   const { toast } = useToast();
   const { t } = useTranslation();
 
-  const isRegister = activeTab === 'register';
-
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema(isRegister, t)),
+    resolver: zodResolver(formSchema(view, t)),
     defaultValues: {
       email: "",
       password: "",
       confirmPassword: "",
     },
-    // Re-validate when tab changes
-    context: { isRegister },
+    // Re-validate when view changes
+    context: { view },
   });
   
-  // Effect to clear confirm password error when switching to login tab
+  // Effect to clear errors and reset form when view changes
   useEffect(() => {
-    if (activeTab === 'login') {
-      form.clearErrors('confirmPassword');
-    }
-    form.reset(); // Reset form values on tab change
-  }, [activeTab, form]);
+    form.reset();
+  }, [view, form]);
 
 
   const handleGoogleSignIn = async () => {
@@ -104,12 +104,12 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   };
 
   const handleEmailAuth = async (data: FormValues) => {
-    if (!auth) return;
+    if (!auth || !data.password) return;
     setIsLoading(true);
     try {
-      if (activeTab === "login") {
+      if (view === "login") {
         await signInWithEmailAndPassword(auth, data.email, data.password);
-      } else {
+      } else { // register
         await createUserWithEmailAndPassword(auth, data.email, data.password);
       }
       onOpenChange(false);
@@ -117,7 +117,7 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: activeTab === "login" ? t('auth.loginFailed') : t('auth.registrationFailed'),
+        title: view === "login" ? t('auth.loginFailed') : t('auth.registrationFailed'),
         description: error.message || t('auth.checkCredentials'),
       });
     } finally {
@@ -125,30 +125,70 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold">
-            {activeTab === "login" ? t('auth.welcomeBack') : t('auth.createAccount')}
-          </DialogTitle>
-          <DialogDescription className="text-center">
-            {activeTab === "login"
-              ? t('auth.signInToFavorites')
-              : t('auth.signUpToFavorites')}
-          </DialogDescription>
-        </DialogHeader>
+  const handlePasswordReset = async (data: FormValues) => {
+    if (!auth) return;
+    setIsLoading(true);
+    try {
+        await sendPasswordResetEmail(auth, data.email);
+        toast({
+            title: t('auth.reset.successTitle'),
+            description: t('auth.reset.successDescription'),
+        });
+        setView('login');
+    } catch (error: any) {
+        toast({
+            variant: "destructive",
+            title: t('auth.reset.errorTitle'),
+            description: error.message,
+        });
+    } finally {
+        setIsLoading(false);
+    }
+  }
+
+  const getDialogContent = () => {
+    if (view === 'reset') {
+        return (
+            <div className="py-4">
+                <p className="text-muted-foreground text-sm mb-4">{t('auth.reset.description')}</p>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(handlePasswordReset)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>{t('auth.email')}</FormLabel>
+                                <FormControl>
+                                <Input placeholder="name@example.com" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full" disabled={isLoading}>
+                            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {t('auth.reset.button')}
+                        </Button>
+                    </form>
+                </Form>
+                <Button variant="link" className="w-full mt-2" onClick={() => setView('login')}>{t('auth.reset.backToLogin')}</Button>
+            </div>
+        );
+    }
+
+    return (
         <div className="py-4">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs value={view} onValueChange={(value) => setView(value as 'login' | 'register')} className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="login">{t('auth.login')}</TabsTrigger>
               <TabsTrigger value="register">{t('auth.register')}</TabsTrigger>
             </TabsList>
             <TabsContent value="login">
-              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.login')} isRegister={false} />
+              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.login')} view={view} onForgotPassword={() => setView('reset')} />
             </TabsContent>
             <TabsContent value="register">
-              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.createAccount')} isRegister={true} />
+              <AuthForm form={form} onSubmit={handleEmailAuth} isLoading={isLoading} buttonText={t('auth.createAccount')} view={view} />
             </TabsContent>
           </Tabs>
           <div className="relative my-4">
@@ -180,6 +220,35 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             Google
           </Button>
         </div>
+    );
+  }
+
+  const getDialogTitle = () => {
+    if (view === 'reset') return t('auth.reset.title');
+    if (view === 'login') return t('auth.welcomeBack');
+    return t('auth.createAccount');
+  }
+
+  const getDialogDescription = () => {
+    if (view === 'reset') return '';
+    if (view === 'login') return t('auth.signInToFavorites');
+    return t('auth.signUpToFavorites');
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-center text-2xl font-bold">
+            {getDialogTitle()}
+          </DialogTitle>
+          {getDialogDescription() && (
+            <DialogDescription className="text-center">
+                {getDialogDescription()}
+            </DialogDescription>
+          )}
+        </DialogHeader>
+        {getDialogContent()}
       </DialogContent>
     </Dialog>
   );
@@ -191,10 +260,11 @@ interface AuthFormProps {
     onSubmit: (data: FormValues) => Promise<void>;
     isLoading: boolean;
     buttonText: string;
-    isRegister: boolean;
+    view: 'login' | 'register';
+    onForgotPassword?: () => void;
 }
 
-function AuthForm({ form, onSubmit, isLoading, buttonText, isRegister }: AuthFormProps) {
+function AuthForm({ form, onSubmit, isLoading, buttonText, view, onForgotPassword }: AuthFormProps) {
   const { t } = useTranslation();
     return (
         <Form {...form}>
@@ -225,7 +295,7 @@ function AuthForm({ form, onSubmit, isLoading, buttonText, isRegister }: AuthFor
               </FormItem>
             )}
           />
-          {isRegister && (
+          {view === 'register' && (
             <FormField
                 control={form.control}
                 name="confirmPassword"
@@ -239,6 +309,18 @@ function AuthForm({ form, onSubmit, isLoading, buttonText, isRegister }: AuthFor
                 </FormItem>
                 )}
             />
+          )}
+           {view === 'login' && onForgotPassword && (
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="link"
+                className="p-0 h-auto text-xs"
+                onClick={onForgotPassword}
+              >
+                {t('auth.forgotPassword')}
+              </Button>
+            </div>
           )}
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

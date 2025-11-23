@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -12,10 +13,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { LogIn, LogOut, Trash2 } from "lucide-react";
+import { LogIn, LogOut, Trash2, Mail } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/provider";
 import DeleteAccountDialog from "./DeleteAccountDialog";
+import ChangeEmailDialog from "./ChangeEmailDialog";
 
 interface UserAvatarProps {
   onLoginClick: () => void;
@@ -25,6 +27,7 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
   const { user, auth } = useFirebase();
   const { t } = useTranslation();
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
+  const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     if (!auth) return;
@@ -70,6 +73,10 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
               <p className="text-xs text-muted-foreground font-normal truncate">{user.email}</p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+           <DropdownMenuItem onClick={() => setIsChangeEmailDialogOpen(true)} className="cursor-pointer">
+            <Mail className="mr-2 h-4 w-4" />
+            <span>{t('auth.changeEmail.menuItem')}</span>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             <span>{t('auth.logout')}</span>
@@ -85,12 +92,21 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
         </DropdownMenuContent>
       </DropdownMenu>
       {user && (
-        <DeleteAccountDialog
-          open={isDeleteAccountDialogOpen}
-          onOpenChange={setIsDeleteAccountDialogOpen}
-          user={user}
-        />
+        <>
+          <DeleteAccountDialog
+            open={isDeleteAccountDialogOpen}
+            onOpenChange={setIsDeleteAccountDialogOpen}
+            user={user}
+          />
+          <ChangeEmailDialog
+            open={isChangeEmailDialogOpen}
+            onOpenChange={setIsChangeEmailDialogOpen}
+            user={user}
+          />
+        </>
       )}
     </>
   );
 }
+
+    

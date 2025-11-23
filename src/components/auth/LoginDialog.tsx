@@ -30,6 +30,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
+  sendEmailVerification,
 } from "firebase/auth";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -110,7 +111,14 @@ export default function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       if (view === "login") {
         await signInWithEmailAndPassword(auth, data.email, data.password);
       } else { // register
-        await createUserWithEmailAndPassword(auth, data.email, data.password);
+        const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
+        if (userCredential.user) {
+          await sendEmailVerification(userCredential.user);
+          toast({
+            title: t('auth.verification.emailSentTitle'),
+            description: t('auth.verification.emailSentDescription')
+          });
+        }
       }
       onOpenChange(false);
       form.reset();

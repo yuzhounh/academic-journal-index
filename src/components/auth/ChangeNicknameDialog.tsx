@@ -54,23 +54,28 @@ export default function ChangeNicknameDialog({ open, onOpenChange, user }: Chang
 
   const handleChangeNickname = async (data: FormValues) => {
     setIsUpdating(true);
-    try {
-      await updateProfile(user, { displayName: data.newNickname });
-      toast({
+    onOpenChange(false);
+    toast({
         title: t('auth.changeNickname.successTitle'),
         description: t('auth.changeNickname.successDescription'),
-      });
-      onOpenChange(false);
-    } catch (error: any) {
-      console.error("Error updating nickname:", error);
-      toast({
-        variant: 'destructive',
-        title: t('auth.changeNickname.errorTitle'),
-        description: error.message,
-      });
-    } finally {
-      setIsUpdating(false);
-    }
+    });
+
+    const performUpdate = async () => {
+        try {
+            await updateProfile(user, { displayName: data.newNickname });
+        } catch (error: any) {
+            console.error("Error updating nickname:", error);
+            toast({
+                variant: 'destructive',
+                title: t('auth.changeNickname.errorTitle'),
+                description: error.message,
+            });
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+    
+    performUpdate();
   };
 
   const description = user.displayName

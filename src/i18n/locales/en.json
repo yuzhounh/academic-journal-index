@@ -281,7 +281,8 @@
             "confirmTitle_other": "Remove {{count}} journals?",
             "confirmDescription": "This will remove the selected journals from the list '{{listName}}'. This action cannot be undone.",
             "successTitle": "Journals Removed",
-            "successDescription": "{{count}} journals have been removed from the list.",
+            "successDescription_one": "1 journal has been removed from the list.",
+            "successDescription_other": "{{count}} journals have been removed from the list.",
             "errorTitle": "Error Removing Journals",
             "errorDescription": "An error occurred while removing the journals."
         },

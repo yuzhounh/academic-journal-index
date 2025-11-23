@@ -247,18 +247,32 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
   const showInitialMessage = searchTerm.length < 3;
   const showNoResultsMessage = searchTerm.length >= 3 && filteredJournals.length === 0;
 
-  const renderBatchEditToolbar = () => {
-    if (!isEditing) return null;
+  const renderActionToolbar = () => {
+    if (filteredJournals.length === 0) return null;
     return (
-        <div className="flex items-center gap-4 mb-6 p-2 border rounded-lg bg-background">
-            <Checkbox
-                id="select-all-search"
-                checked={isAllSelected}
-                onCheckedChange={handleSelectAll}
-            />
-            <label htmlFor="select-all-search" className="text-sm font-medium">
-                {isAllSelected ? t('batchEdit.deselectAll') : t('batchEdit.selectAll')}
-            </label>
+        <div className="flex items-center justify-end gap-4 mb-6">
+            {isEditing && (
+              <div className="flex items-center gap-2 mr-auto">
+                  <Checkbox
+                      id="select-all-search"
+                      checked={isAllSelected}
+                      onCheckedChange={handleSelectAll}
+                  />
+                  <label htmlFor="select-all-search" className="text-sm font-medium">
+                      {isAllSelected ? t('batchEdit.deselectAll') : t('batchEdit.selectAll')}
+                  </label>
+              </div>
+            )}
+            {user && (
+              <Button variant="outline" onClick={toggleEditing}>
+                  {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
+                  {isEditing ? t('common.cancel') : t('batchEdit.favorite.editButton')}
+              </Button>
+            )}
+             <Button variant="outline" onClick={handleExport}>
+                <Download className="mr-2 h-4 w-4" />
+                {t('common.exportCsv')}
+            </Button>
         </div>
     )
   }
@@ -319,20 +333,8 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 
       {filteredJournals.length > 0 && (
         <div className="mb-8 animate-in fade-in-50 duration-300 space-y-6">
-          <div className="flex justify-end gap-4">
-            {user && (
-              <Button variant="outline" onClick={toggleEditing}>
-                  {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
-                  {isEditing ? t('common.cancel') : t('batchEdit.favorite.editButton')}
-              </Button>
-            )}
-             <Button variant="outline" onClick={handleExport}>
-                <Download className="mr-2 h-4 w-4" />
-                {t('common.exportCsv')}
-            </Button>
-          </div>
-          {renderBatchEditToolbar()}
           <CategoryStats journals={filteredJournals} />
+          {renderActionToolbar()}
         </div>
       )}
 

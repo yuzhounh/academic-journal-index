@@ -105,20 +105,15 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
     return match ? `Q${match[1]}` : partition;
   };
 
-  const handleCardClick = () => {
+  const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isEditing) {
-      onSelectionChange?.(!isSelected);
+        // Prevent click from propagating to anything behind the checkbox
+        if (e.target instanceof HTMLInputElement) return;
+        onSelectionChange?.(!isSelected);
     } else {
-      onClick();
+        onClick();
     }
-  };
-  
-  const handleCheckboxClick = (e: React.MouseEvent) => {
-    // When in editing mode, clicking the checkbox should not trigger card navigation
-    if (isEditing) {
-      e.stopPropagation();
-    }
-  };
+};
 
   return (
     <Card
@@ -127,14 +122,12 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
     >
       <CardContent className="p-4 md:p-6 flex items-center gap-4">
         {isEditing && (
-            <div onClick={handleCheckboxClick}>
-                 <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={onSelectionChange}
-                    className="h-5 w-5"
-                    aria-label={`Select journal ${journal.journalName}`}
-                />
-            </div>
+            <Checkbox
+                checked={isSelected}
+                onCheckedChange={onSelectionChange}
+                className="h-5 w-5"
+                aria-label={`Select journal ${journal.journalName}`}
+            />
         )}
         <div className="flex flex-col md:grid md:grid-cols-12 md:items-start md:gap-4 w-full">
             {/* Left side: Title and metadata */}

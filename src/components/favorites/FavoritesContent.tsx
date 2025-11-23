@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useMemo, useState, useRef } from "react";
@@ -200,6 +201,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
         <div className="animate-in fade-in-50 duration-300">
             {allFavorites && allFavorites.length > 0 ? (
                 <div className="space-y-8">
+                    <CategoryStats journals={journalsForStats} />
                     <div className="flex justify-end">
                         <Button variant="outline" onClick={handleImportClick}>
                             <Upload className="mr-2 h-4 w-4" />
@@ -213,7 +215,6 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                             style={{ display: 'none' }}
                         />
                     </div>
-                    <CategoryStats journals={journalsForStats} />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {uncategorizedCount > 0 && (
                             <Card

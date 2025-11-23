@@ -572,9 +572,6 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   }
   
   const renderListHeader = () => {
-    const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
-    const canEdit = user && (isFavoritesView || view === 'categories');
-
     return (
         <div className="flex items-center gap-4 mb-6">
             <Button variant="outline" size="icon" onClick={handleBackToList}>
@@ -586,35 +583,43 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 {selectedJournalList?.name || (selectedCategory ? (selectedCategory === 'Uncategorized' ? t('favorites.uncategorized') : getMajorCategoryName(selectedCategory, locale)) : '')}
                 </h2>
             </div>
-            {canEdit && (
-                <Button variant="outline" onClick={toggleEditing}>
-                    {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
-                    {isEditing ? t('common.cancel') : (isFavoritesView ? t('batchEdit.button') : t('batchEdit.favorite.editButton'))}
-                </Button>
-            )}
-            <Button variant="outline" onClick={handleExport} disabled={journalsToDisplay.length === 0}>
-                <Download className="mr-2 h-4 w-4" />
-                {t('common.exportCsv')}
-            </Button>
         </div>
     )
   };
-  
-  const renderBatchEditToolbar = () => {
-    if (!isEditing) return null;
+
+  const renderActionToolbar = () => {
+    const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
+    const canEdit = user && (isFavoritesView || view === 'categories');
+    
+    if (journalsToDisplay.length === 0) return null;
+
     return (
-        <div className="flex items-center gap-4 mb-6 p-2 border rounded-lg bg-background">
-            <Checkbox
-                id="select-all"
-                checked={isAllSelected}
-                onCheckedChange={handleSelectAll}
-            />
-            <label htmlFor="select-all" className="text-sm font-medium">
-                {isAllSelected ? t('batchEdit.deselectAll') : t('batchEdit.selectAll')}
-            </label>
-        </div>
+      <div className="flex items-center justify-end gap-4 mb-6">
+          {isEditing && (
+              <div className="flex items-center gap-2 mr-auto">
+                  <Checkbox
+                      id="select-all"
+                      checked={isAllSelected}
+                      onCheckedChange={handleSelectAll}
+                  />
+                  <label htmlFor="select-all" className="text-sm font-medium">
+                      {isAllSelected ? t('batchEdit.deselectAll') : t('batchEdit.selectAll')}
+                  </label>
+              </div>
+          )}
+          {canEdit && (
+              <Button variant="outline" onClick={toggleEditing}>
+                  {isEditing ? <X className="mr-2 h-4 w-4" /> : <Pencil className="mr-2 h-4 w-4" />}
+                  {isEditing ? t('common.cancel') : (isFavoritesView ? t('batchEdit.button') : t('batchEdit.favorite.editButton'))}
+              </Button>
+          )}
+          <Button variant="outline" onClick={handleExport} disabled={journalsToDisplay.length === 0}>
+              <Download className="mr-2 h-4 w-4" />
+              {t('common.exportCsv')}
+          </Button>
+      </div>
     )
-  }
+  };
 
   const renderContent = () => {
     switch (view) {
@@ -626,10 +631,10 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           return (
             <div className="animate-in fade-in-50 duration-300">
               {renderListHeader()}
-              {renderBatchEditToolbar()}
               <div className="mb-8">
                 <CategoryStats journals={journalsToDisplay} />
               </div>
+              {renderActionToolbar()}
               {paginatedJournals.length > 0 ? (
                 <div className="space-y-4">
                   {paginatedJournals.map((journal) => {
@@ -669,7 +674,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           return (
             <div className="animate-in fade-in-50 duration-300 space-y-8">
               <CategoryStats journals={journals} />
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 {sortedCategories.map(([category, count]) => (
                   <Card
                     key={category}

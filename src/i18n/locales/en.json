@@ -184,6 +184,7 @@
         "password": "Password",
         "confirmPassword": "Confirm Password",
         "passwordsDoNotMatch": "Passwords do not match.",
+        "forgotPassword": "Forgot Password?",
         "googleSignInFailed": "Google Sign-In Failed",
         "unknownError": "An unknown error occurred.",
         "loginFailed": "Login Failed",
@@ -196,7 +197,16 @@
             "button": "Yes, delete my account"
         },
         "deleteAccountSuccess": "Your account has been successfully deleted.",
-        "deleteAccountError": "Failed to delete account. Please try again."
+        "deleteAccountError": "Failed to delete account. Please try again.",
+        "reset": {
+            "title": "Reset Password",
+            "description": "Enter your email address and we will send you a link to reset your password.",
+            "button": "Send Reset Email",
+            "backToLogin": "Back to Login",
+            "successTitle": "Password Reset Email Sent",
+            "successDescription": "Please check your inbox for a password reset link.",
+            "errorTitle": "Error Sending Email"
+        }
     },
     "yes": "Yes",
     "no": "No",

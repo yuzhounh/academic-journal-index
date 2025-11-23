@@ -70,33 +70,37 @@ export default function ChangeAvatarDialog({ open, onOpenChange, user }: ChangeA
     if (!selectedAvatar || !firebaseApp) return;
 
     setIsUploading(true);
-    try {
-      let finalAvatarUrl = selectedAvatar;
-      
-      // If the selected avatar is a data URL, it means it's a newly uploaded file.
-      if (selectedAvatar.startsWith('data:image')) {
-        const storage = getStorage(firebaseApp);
-        const avatarRef = ref(storage, `avatars/${user.uid}/${uuidv4()}`);
-        const uploadResult = await uploadString(avatarRef, selectedAvatar, 'data_url');
-        finalAvatarUrl = await getDownloadURL(uploadResult.ref);
-      }
-
-      await updateProfile(user, { photoURL: finalAvatarUrl });
-      
-      toast({
+    onOpenChange(false);
+    toast({
         title: t('auth.changeAvatar.successTitle'),
-      });
-      onOpenChange(false);
-    } catch (error: any) {
-      console.error("Error updating avatar:", error);
-      toast({
-        variant: 'destructive',
-        title: t('auth.changeAvatar.errorTitle'),
-        description: error.message,
-      });
-    } finally {
-      setIsUploading(false);
-    }
+    });
+
+    const performSave = async () => {
+        try {
+            let finalAvatarUrl = selectedAvatar;
+            
+            if (selectedAvatar.startsWith('data:image')) {
+                const storage = getStorage(firebaseApp);
+                const avatarRef = ref(storage, `avatars/${user.uid}/${uuidv4()}`);
+                const uploadResult = await uploadString(avatarRef, selectedAvatar, 'data_url');
+                finalAvatarUrl = await getDownloadURL(uploadResult.ref);
+            }
+
+            await updateProfile(user, { photoURL: finalAvatarUrl });
+            
+        } catch (error: any) {
+            console.error("Error updating avatar:", error);
+            toast({
+                variant: 'destructive',
+                title: t('auth.changeAvatar.errorTitle'),
+                description: error.message,
+            });
+        } finally {
+            setIsUploading(false);
+        }
+    };
+    
+    performSave();
   };
 
   return (

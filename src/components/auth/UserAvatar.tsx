@@ -13,10 +13,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { LogIn, LogOut, Trash2, Mail } from "lucide-react";
+import { LogIn, LogOut, Mail } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/provider";
-import DeleteAccountDialog from "./DeleteAccountDialog";
 import ChangeEmailDialog from "./ChangeEmailDialog";
 
 interface UserAvatarProps {
@@ -26,7 +25,6 @@ interface UserAvatarProps {
 export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
   const { user, auth } = useFirebase();
   const { t } = useTranslation();
-  const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
   const [isChangeEmailDialogOpen, setIsChangeEmailDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
@@ -81,23 +79,10 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
             <LogOut className="mr-2 h-4 w-4" />
             <span>{t('auth.logout')}</span>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem 
-            onClick={() => setIsDeleteAccountDialogOpen(true)} 
-            className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            <span>{t('auth.deleteAccount')}</span>
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       {user && (
         <>
-          <DeleteAccountDialog
-            open={isDeleteAccountDialogOpen}
-            onOpenChange={setIsDeleteAccountDialogOpen}
-            user={user}
-          />
           <ChangeEmailDialog
             open={isChangeEmailDialogOpen}
             onOpenChange={setIsChangeEmailDialogOpen}
@@ -108,5 +93,3 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
     </>
   );
 }
-
-    

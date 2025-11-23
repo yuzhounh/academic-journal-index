@@ -197,7 +197,7 @@
         "login": "Login",
         "logout": "Logout",
         "register": "Register",
-        "orContinueWith": "Or continue with",
+        "orContinueWith": "Or",
         "email": "Email",
         "password": "Password",
         "confirmPassword": "Confirm Password",
@@ -254,6 +254,15 @@
             "successTitle": "Nickname Updated",
             "successDescription": "Your nickname has been successfully updated.",
             "errorTitle": "Error Updating Nickname"
+        },
+        "changeAvatar": {
+            "menuItem": "Change Avatar",
+            "title": "Change Avatar",
+            "description": "Select a predefined avatar or upload your own.",
+            "predefined": "Select from predefined",
+            "uploadButton": "Upload an Image",
+            "successTitle": "Avatar Updated",
+            "errorTitle": "Error Updating Avatar"
         },
         "deleteAccountConfirmation": {
             "title": "Are you absolutely sure?",

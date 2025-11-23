@@ -115,7 +115,10 @@
             "title": "添加到列表...",
             "newListPlaceholder": "新列表名称...",
             "createButton": "创建",
-            "saveButton": "保存"
+            "saveButton": "保存",
+            "saveSuccessTitle": "收藏已更新",
+            "saveSuccessDescription": "您的期刊已保存到所选列表中。",
+            "saveErrorDescription": "无法保存您的更改，请重试。"
         },
         "uncategorized": "未分类",
         "deleteList": {
@@ -250,6 +253,29 @@
     "common": {
         "cancel": "取消",
         "save": "保存",
-        "exportCsv": "导出为 CSV"
+        "exportCsv": "导出为 CSV",
+        "error": "错误"
+    },
+    "batchEdit": {
+        "button": "批量编辑",
+        "selectAll": "全选",
+        "deselectAll": "取消全选",
+        "selected": "已选择 {{count}} 项",
+        "move": {
+            "button": "移动到...",
+            "title": "将 {{count}} 本期刊移动到...",
+            "successTitle": "移动成功",
+            "successDescription": "已成功移动 {{count}} 本期刊。",
+            "errorDescription": "移动期刊时发生错误。"
+        },
+        "remove": {
+            "button": "删除",
+            "confirmTitle": "移除{{count}}本期刊？",
+            "confirmDescription": "这将从此列表 '{{listName}}' 中移除所选期刊。",
+            "successTitle": "移除成功",
+            "successDescription": "已从此列表中移除{{count}}本期刊。",
+            "errorTitle": "移除失败",
+            "errorDescription": "移除期刊时发生错误。"
+        }
     }
 }

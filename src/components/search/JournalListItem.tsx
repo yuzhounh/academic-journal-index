@@ -1,4 +1,3 @@
-
 "use client";
 
 import { type Journal } from "@/data/journals";
@@ -7,11 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Crown, Medal, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/i18n/provider";
+import { Checkbox } from "../ui/checkbox";
 
 interface JournalListItemProps {
   journal: Journal;
   onClick: () => void;
-  searchTerm?: string;
+  isEditing?: boolean;
+  isSelected?: boolean;
+  onSelectionChange?: (selected: boolean) => void;
 }
 
 const getPartitionColorClass = (partition: string): string => {
@@ -85,7 +87,7 @@ const formatIssn = (issn: string) => {
   );
 };
 
-export default function JournalListItem({ journal, onClick }: JournalListItemProps) {
+export default function JournalListItem({ journal, onClick, isEditing, isSelected, onSelectionChange }: JournalListItemProps) {
   const { t, locale } = useTranslation();
 
   const getPartitionText = (partition: string) => {
@@ -103,37 +105,64 @@ export default function JournalListItem({ journal, onClick }: JournalListItemPro
     return match ? `Q${match[1]}` : partition;
   };
 
+  const handleCardClick = () => {
+    if (isEditing) {
+      onSelectionChange?.(!isSelected);
+    } else {
+      onClick();
+    }
+  };
+  
+  const handleCheckboxClick = (e: React.MouseEvent) => {
+    // When in editing mode, clicking the checkbox should not trigger card navigation
+    if (isEditing) {
+      e.stopPropagation();
+    }
+  };
+
   return (
     <Card
-      className="cursor-pointer hover:shadow-lg hover:border-primary/50 transition-shadow"
-      onClick={onClick}
+      className={cn("cursor-pointer hover:shadow-lg hover:border-primary/50 transition-shadow", isSelected && "border-primary shadow-lg")}
+      onClick={handleCardClick}
     >
-      <CardContent className="p-4 md:p-6 flex flex-col md:grid md:grid-cols-12 md:items-start md:gap-4">
-        {/* Left side: Title and metadata */}
-        <div className="md:col-span-7">
-          <p className="font-headline text-lg font-semibold">{journal.journalName}</p>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
-            <p className="font-mono whitespace-nowrap">{formatIssn(journal.issn)}</p>
-            <div className="flex items-center gap-2">
-                <AuthorityBadge level={journal.authorityJournal} />
-                {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
+      <CardContent className="p-4 md:p-6 flex items-center gap-4">
+        {isEditing && (
+            <div onClick={handleCheckboxClick}>
+                 <Checkbox
+                    checked={isSelected}
+                    onCheckedChange={onSelectionChange}
+                    className="h-5 w-5"
+                    aria-label={`Select journal ${journal.journalName}`}
+                />
             </div>
-          </div>
-        </div>
-
-        {/* Divider for mobile view */}
-        <div className="h-px bg-border my-3 md:hidden"></div>
-
-        {/* Right side: Stats */}
-        <div className="md:col-span-5 w-full flex justify-around md:justify-end items-start gap-4">
-            <div className="text-center md:w-1/2">
-                <p className="text-xs text-muted-foreground font-semibold">{t('journal.impactFactor')}</p>
-                <p className="font-medium text-base">{formatImpactFactor(journal.impactFactor)}</p>
+        )}
+        <div className="flex flex-col md:grid md:grid-cols-12 md:items-start md:gap-4 w-full">
+            {/* Left side: Title and metadata */}
+            <div className="md:col-span-7">
+              <p className="font-headline text-lg font-semibold">{journal.journalName}</p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
+                <p className="font-mono whitespace-nowrap">{formatIssn(journal.issn)}</p>
+                <div className="flex items-center gap-2">
+                    <AuthorityBadge level={journal.authorityJournal} />
+                    {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
+                </div>
+              </div>
             </div>
-            <div className="text-center md:w-1/2">
-                <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>
-                <div className={cn("flex items-center justify-center font-semibold text-base", getPartitionColorClass(journal.majorCategoryPartition))}>
-                    <span className="ml-1">{getPartitionText(journal.majorCategoryPartition)}</span>
+
+            {/* Divider for mobile view */}
+            <div className="h-px bg-border my-3 md:hidden"></div>
+
+            {/* Right side: Stats */}
+            <div className="md:col-span-5 w-full flex justify-around md:justify-end items-start gap-4">
+                <div className="text-center md:w-1/2">
+                    <p className="text-xs text-muted-foreground font-semibold">{t('journal.impactFactor')}</p>
+                    <p className="font-medium text-base">{formatImpactFactor(journal.impactFactor)}</p>
+                </div>
+                <div className="text-center md:w-1/2">
+                    <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>
+                    <div className={cn("flex items-center justify-center font-semibold text-base", getPartitionColorClass(journal.majorCategoryPartition))}>
+                        <span className="ml-1">{getPartitionText(journal.majorCategoryPartition)}</span>
+                    </div>
                 </div>
             </div>
         </div>

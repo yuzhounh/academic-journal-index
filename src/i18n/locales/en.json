@@ -182,6 +182,8 @@
         "orContinueWith": "Or continue with",
         "email": "Email",
         "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "passwordsDoNotMatch": "Passwords do not match.",
         "googleSignInFailed": "Google Sign-In Failed",
         "unknownError": "An unknown error occurred.",
         "loginFailed": "Login Failed",

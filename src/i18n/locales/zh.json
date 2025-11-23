@@ -182,6 +182,8 @@
         "orContinueWith": "或使用其他方式继续",
         "email": "邮箱",
         "password": "密码",
+        "confirmPassword": "确认密码",
+        "passwordsDoNotMatch": "密码不匹配。",
         "googleSignInFailed": "Google 登录失败",
         "unknownError": "发生未知错误。",
         "loginFailed": "登录失败",

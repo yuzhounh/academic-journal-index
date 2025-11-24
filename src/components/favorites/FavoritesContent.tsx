@@ -211,13 +211,13 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                 <div className="space-y-8">
                     <CategoryStats journals={journalsForStats} />
                     <div className="flex justify-end gap-4">
-                        <Button variant="outline" onClick={handleImportClick}>
-                            <Upload className="mr-2 h-4 w-4" />
-                            {t('favorites.importList.button')}
-                        </Button>
                         <Button variant="outline" onClick={() => setIsCreateListDialogOpen(true)}>
                             <FolderPlus className="mr-2 h-4 w-4" />
                             {t('favorites.createList.button')}
+                        </Button>
+                        <Button variant="outline" onClick={handleImportClick}>
+                            <Upload className="mr-2 h-4 w-4" />
+                            {t('favorites.importList.button')}
                         </Button>
                         <input
                             type="file"

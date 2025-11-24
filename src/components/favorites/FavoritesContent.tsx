@@ -87,10 +87,16 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
     const journalsForStats = useMemo(() => {
         if (!allFavorites) return [];
         const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
-        return allFavorites
-            .map(fav => journalMap.get(fav.journalId))
+        
+        // Get unique journal IDs from all favorites
+        const uniqueJournalIds = new Set(allFavorites.map(fav => fav.journalId));
+
+        // Map unique IDs to journal objects
+        return Array.from(uniqueJournalIds)
+            .map(id => journalMap.get(id))
             .filter((j): j is Journal => !!j);
     }, [allFavorites, journals]);
+
 
     const handleDeleteClick = (e: React.MouseEvent, list: WithId<JournalList>) => {
         e.stopPropagation(); // Prevent card's onClick from firing

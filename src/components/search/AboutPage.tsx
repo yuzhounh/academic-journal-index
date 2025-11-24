@@ -49,18 +49,18 @@ export default function AboutPage() {
   const contacts = [
       {
           icon: Users,
-          labelKey: 'author',
+          label: t('about.contact.author'),
           value: t('about.contact.authorName'),
       },
       {
           icon: Mail,
-          labelKey: 'email',
+          label: t('about.contact.email'),
           value: 'yuzhounh@163.com',
           href: 'mailto:yuzhounh@163.com'
       },
       {
           icon: Github,
-          labelKey: 'github',
+          label: t('about.contact.github'),
           value: 'yuzhounh/Academic-Journal-Index',
           href: 'https://github.com/yuzhounh/Academic-Journal-Index'
       }
@@ -184,10 +184,10 @@ export default function AboutPage() {
         </CardHeader>
         <CardContent className="space-y-4">
             {contacts.map(contact => (
-                <div key={contact.labelKey} className="flex items-center gap-4">
+                <div key={contact.label} className="flex items-center gap-4">
                     <div className="flex items-center gap-2 w-24">
                         <contact.icon className="w-5 h-5 text-muted-foreground"/>
-                        <span className="font-semibold">{t(`about.contact.${contact.labelKey}`)}</span>
+                        <span className="font-semibold">{contact.label}</span>
                     </div>
                     {contact.href ? (
                         <a href={contact.href} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-mono">

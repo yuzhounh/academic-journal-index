@@ -376,17 +376,22 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   }
 
   const handleExport = () => {
-    if (journalsToDisplay.length === 0) return;
+    const isExportingSelection = isEditing && selectedJournals.size > 0;
+    const journalsForExport = isExportingSelection
+      ? journalsToDisplay.filter(j => selectedJournals.has(j.issn.split('/')[0]))
+      : journalsToDisplay;
+
+    if (journalsForExport.length === 0) return;
 
     let filename = "journal-list.csv";
     if (selectedJournalList) {
-      filename = `Favorites-${selectedJournalList.name.replace(/\s+/g, '_')}.csv`;
+      filename = `${isExportingSelection ? 'Selected-' : ''}Favorites-${selectedJournalList.name.replace(/\s+/g, '_')}.csv`;
     } else if (selectedCategory) {
-      filename = `Category-${selectedCategory.replace(/\s+/g, '_')}.csv`;
+      filename = `${isExportingSelection ? 'Selected-' : ''}Category-${selectedCategory.replace(/\s+/g, '_')}.csv`;
     }
 
     const headers = ["Journal Name", "ISSN/EISSN", "Impact Factor", "CAS Partition", "Authority Level", "Open Access"];
-    const data = journalsToDisplay.map(j => [
+    const data = journalsForExport.map(j => [
         j.journalName,
         j.issn,
         j.impactFactor,
@@ -460,11 +465,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 
                 let q;
                 if (isUncategorized) {
-                    // Firestore doesn't support querying for multiple 'in' conditions on different fields.
-                    // So we query for all favorites of the selected journals and filter client-side.
                     q = query(favoritesColRef, where('journalId', 'in', chunk));
                 } else {
-                    // For a specific list, the query is more direct.
                     q = query(favoritesColRef, where('listId', '==', listIdToRemove), where('journalId', 'in', chunk));
                 }
 
@@ -472,7 +474,6 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 snapshot.forEach(doc => {
                     if (isUncategorized) {
                         const data = doc.data();
-                        // Client-side filter for uncategorized
                         if (!data.listId || data.listId === '' || data.listId === 'uncategorized') {
                             batch.delete(doc.ref);
                         }

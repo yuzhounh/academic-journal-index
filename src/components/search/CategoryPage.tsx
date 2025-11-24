@@ -30,7 +30,7 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ArrowLeft, BookText, BookOpen, Menu, Folder, Download, Pencil, X, Check, Trash2, FolderSync, Heart } from "lucide-react";
+import { ArrowLeft, BookText, BookOpen, Menu, Folder, Download, Pencil, X, Check, Trash2, FolderSync, Heart, Info, Star, Search as SearchIcon } from "lucide-react";
 import JournalDetail from "./JournalDetail";
 import SearchPage from "./SearchPage";
 import CategoryStats from "./CategoryStats";
@@ -732,29 +732,33 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       <Button
         onClick={() => handleViewChange("search")}
         variant={view === "search" ? "secondary" : "ghost"}
-        className="w-full justify-start"
+        className="w-full justify-start text-base py-6"
       >
+        <SearchIcon className="mr-3 h-5 w-5" />
         {t('nav.search')}
       </Button>
       <Button
         onClick={() => handleViewChange("categories")}
         variant={view === "categories" ? "secondary" : "ghost"}
-        className="w-full justify-start"
+        className="w-full justify-start text-base py-6"
       >
+        <BookOpen className="mr-3 h-5 w-5" />
         {t('nav.browse')}
       </Button>
       <Button 
         onClick={() => handleViewChange("favorites")}
         variant={view === "favorites" ? "secondary" : "ghost"}
-        className="w-full justify-start"
+        className="w-full justify-start text-base py-6"
       >
+          <Star className="mr-3 h-5 w-5" />
           {t('nav.favorites')}
       </Button>
       <Button
           onClick={() => handleViewChange("about")}
           variant={view === "about" ? "secondary" : "ghost"}
-          className="w-full justify-start"
+          className="w-full justify-start text-base py-6"
       >
+          <Info className="mr-3 h-5 w-5" />
           {t('nav.about')}
       </Button>
     </>
@@ -911,18 +915,18 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                             <span className="sr-only">Open menu</span>
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="pr-0">
+                    <SheetContent side="left" className="pr-0 pt-8">
                       <SheetHeader>
                         <SheetTitle className="sr-only">Menu</SheetTitle>
                         <SheetDescription className="sr-only">
                           Main navigation menu
                         </SheetDescription>
                       </SheetHeader>
-                      <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline mb-6">
+                      <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline mb-6 px-6">
                         <BookOpen className="h-5 w-5 text-primary" />
                         <span>AJI</span>
                       </a>
-                      <div className="flex flex-col gap-2">
+                      <div className="flex flex-col gap-2 px-4">
                         {navItems}
                       </div>
                     </SheetContent>
@@ -930,7 +934,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             </div>
             <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline">
               <BookOpen className="h-5 w-5 text-primary" />
-              <span>AJI</span>
+              <span className="hidden sm:inline-block">AJI</span>
             </a>
             {desktopNavItems}
           </div>

@@ -16,7 +16,7 @@ import {
 import { useMemoFirebase } from "@/firebase/provider";
 import { Journal } from "@/data/journals";
 import { useTranslation } from "@/i18n/provider";
-import { BookText, FolderOpen, LogIn, Pencil, Trash2, Upload, FolderPlus } from "lucide-react";
+import { BookText, FolderOpen, LogIn, Pencil, Trash2, Upload, FolderPlus, Search } from "lucide-react";
 import CategoryStats from "../search/CategoryStats";
 import DeleteJournalListDialog from "./DeleteJournalListDialog";
 import RenameJournalListDialog from "./RenameJournalListDialog";
@@ -298,6 +298,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                     </div>
                     <div className="flex flex-wrap justify-center items-center gap-4">
                         <Button onClick={onFindJournalsClick}>
+                            <Search className="mr-2 h-4 w-4" />
                             {t('favorites.empty.button')}
                         </Button>
                         <Button variant="outline" onClick={() => setIsCreateListDialogOpen(true)}>

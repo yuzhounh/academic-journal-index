@@ -617,7 +617,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     if (journalsToDisplay.length === 0) return null;
 
     return (
-      <div className="flex items-center justify-end gap-4 mb-6">
+      <div className="flex flex-wrap items-center justify-end gap-4 mb-6">
           {isEditing && (
               <div className="flex items-center gap-2 mr-auto">
                   <Checkbox

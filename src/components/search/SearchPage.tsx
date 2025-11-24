@@ -201,11 +201,16 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
   };
 
   const handleExport = () => {
-    if (filteredJournals.length === 0) return;
+    const isExportingSelection = isEditing && selectedJournals.size > 0;
+    const journalsForExport = isExportingSelection
+      ? filteredJournals.filter(j => selectedJournals.has(j.issn.split('/')[0]))
+      : filteredJournals;
+
+    if (journalsForExport.length === 0) return;
     
-    const filename = `Search-results-for-${searchTerm.replace(/\s+/g, '_')}.csv`;
+    const filename = `${isExportingSelection ? 'Selected-' : ''}Search-results-for-${searchTerm.replace(/\s+/g, '_')}.csv`;
     const headers = ["Journal Name", "ISSN/EISSN", "Impact Factor", "CAS Partition", "Authority Level", "Open Access"];
-    const data = filteredJournals.map(j => [
+    const data = journalsForExport.map(j => [
         j.journalName,
         j.issn,
         j.impactFactor,

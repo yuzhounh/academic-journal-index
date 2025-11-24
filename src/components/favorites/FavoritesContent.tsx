@@ -207,7 +207,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
             {hasFavorites ? (
                 <div className="space-y-8">
                     <CategoryStats journals={journalsForStats} />
-                    <div className="flex justify-end gap-4">
+                    <div className="flex flex-wrap justify-end gap-4">
                         <Button variant="outline" onClick={() => setIsCreateListDialogOpen(true)}>
                             <FolderPlus className="mr-2 h-4 w-4" />
                             {t('favorites.createList.button')}

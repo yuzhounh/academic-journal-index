@@ -67,13 +67,17 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
     
     const { data: journalLists, setData: setJournalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
     
-    const { categorized, uncategorizedCount } = useMemo(() => {
-        if (!allFavorites) return { categorized: {}, uncategorizedCount: 0 };
+    const { categorized, uncategorizedCount, journalsForStats } = useMemo(() => {
+        if (!allFavorites) return { categorized: {}, uncategorizedCount: 0, journalsForStats: [] };
 
         const categorizedFavorites: Record<string, number> = {};
         let uncategorized = 0;
+        
+        const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
+        const uniqueJournalIds = new Set<string>();
 
         allFavorites.forEach(fav => {
+            uniqueJournalIds.add(fav.journalId);
             if (fav.listId && fav.listId.trim() !== '' && fav.listId !== 'uncategorized') {
                 categorizedFavorites[fav.listId] = (categorizedFavorites[fav.listId] || 0) + 1;
             } else {
@@ -81,20 +85,11 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
             }
         });
 
-        return { categorized: categorizedFavorites, uncategorizedCount: uncategorized };
-    }, [allFavorites]);
-    
-    const journalsForStats = useMemo(() => {
-        if (!allFavorites) return [];
-        const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
-        
-        // Get unique journal IDs from all favorites
-        const uniqueJournalIds = new Set(allFavorites.map(fav => fav.journalId));
-
-        // Map unique IDs to journal objects
-        return Array.from(uniqueJournalIds)
+        const statsJournals = Array.from(uniqueJournalIds)
             .map(id => journalMap.get(id))
             .filter((j): j is Journal => !!j);
+
+        return { categorized: categorizedFavorites, uncategorizedCount: uncategorized, journalsForStats: statsJournals };
     }, [allFavorites, journals]);
 
 
@@ -301,7 +296,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                             {t('favorites.empty.description')}
                         </p>
                     </div>
-                    <div className="flex justify-center items-center gap-4">
+                    <div className="flex flex-wrap justify-center items-center gap-4">
                         <Button onClick={onFindJournalsClick}>
                             {t('favorites.empty.button')}
                         </Button>

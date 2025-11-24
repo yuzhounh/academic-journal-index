@@ -934,7 +934,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             </div>
             <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline">
               <BookOpen className="h-5 w-5 text-primary" />
-              <span className="hidden sm:inline-block">AJI</span>
+              <span>AJI</span>
             </a>
             {desktopNavItems}
           </div>

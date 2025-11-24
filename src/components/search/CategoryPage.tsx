@@ -441,39 +441,46 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     });
 
     const performDelete = async () => {
-        let listIdToRemove = "";
-        if (selectedJournalList) {
-            listIdToRemove = selectedJournalList.id;
-        } else if (selectedCategory === 'Uncategorized') {
-            listIdToRemove = 'uncategorized';
-        } else {
-            return; // Should not happen
+        const isUncategorized = selectedCategory === 'Uncategorized';
+        const listIdToRemove = selectedJournalList?.id;
+
+        if (!listIdToRemove && !isUncategorized) {
+            console.error("No list or 'Uncategorized' selected for deletion.");
+            return;
         }
 
         try {
             const batch = writeBatch(firestore);
             const favoritesColRef = collection(firestore, `users/${user.uid}/favorite_journals`);
-            
             const journalIds = Array.from(selectedJournals);
-            const queryPromises = [];
+            
+            // Chunking journalIds to stay within query limits
             for (let i = 0; i < journalIds.length; i += 30) {
                 const chunk = journalIds.slice(i, i + 30);
                 
-                const conditions = [where('journalId', 'in', chunk)];
-                if (listIdToRemove !== 'uncategorized') {
-                    conditions.push(where('listId', '==', listIdToRemove));
+                let q;
+                if (isUncategorized) {
+                    // Firestore doesn't support querying for multiple 'in' conditions on different fields.
+                    // So we query for all favorites of the selected journals and filter client-side.
+                    q = query(favoritesColRef, where('journalId', 'in', chunk));
                 } else {
-                    conditions.push(where('listId', 'in', [null, '', 'uncategorized']));
+                    // For a specific list, the query is more direct.
+                    q = query(favoritesColRef, where('listId', '==', listIdToRemove), where('journalId', 'in', chunk));
                 }
-                
-                const q = query(favoritesColRef, ...conditions);
-                queryPromises.push(getDocs(q));
-            }
 
-            const snapshots = await Promise.all(queryPromises);
-            snapshots.forEach(snapshot => {
-                snapshot.forEach(doc => batch.delete(doc.ref));
-            });
+                const snapshot = await getDocs(q);
+                snapshot.forEach(doc => {
+                    if (isUncategorized) {
+                        const data = doc.data();
+                        // Client-side filter for uncategorized
+                        if (!data.listId || data.listId === '' || data.listId === 'uncategorized') {
+                            batch.delete(doc.ref);
+                        }
+                    } else {
+                        batch.delete(doc.ref);
+                    }
+                });
+            }
 
             await batch.commit();
 

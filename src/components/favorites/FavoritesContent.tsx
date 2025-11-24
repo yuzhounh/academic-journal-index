@@ -204,10 +204,12 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
             </div>
         );
     }
+    
+    const hasFavorites = allFavorites && allFavorites.length > 0;
 
     return (
         <div className="animate-in fade-in-50 duration-300">
-            {allFavorites && allFavorites.length > 0 ? (
+            {hasFavorites ? (
                 <div className="space-y-8">
                     <CategoryStats journals={journalsForStats} />
                     <div className="flex justify-end gap-4">
@@ -303,13 +305,13 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                         <Button onClick={onFindJournalsClick}>
                             {t('favorites.empty.button')}
                         </Button>
+                        <Button variant="outline" onClick={() => setIsCreateListDialogOpen(true)}>
+                            <FolderPlus className="mr-2 h-4 w-4" />
+                            {t('favorites.createList.button')}
+                        </Button>
                         <Button variant="outline" onClick={handleImportClick}>
                             <Upload className="mr-2 h-4 w-4" />
                             {t('favorites.importList.button')}
-                        </Button>
-                         <Button variant="outline" onClick={() => setIsCreateListDialogOpen(true)}>
-                            <FolderPlus className="mr-2 h-4 w-4" />
-                            {t('favorites.createList.button')}
                         </Button>
                         <input
                             type="file"

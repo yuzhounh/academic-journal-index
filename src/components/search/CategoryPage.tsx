@@ -902,18 +902,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     <>
       <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8 justify-between">
-          <div className="flex items-center gap-6">
-            <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline">
-              <BookOpen className="h-5 w-5 text-primary" />
-              <span>AJI</span>
-            </a>
-            {desktopNavItems}
-          </div>
-          
-          <div className="flex items-center justify-end gap-2">
-            <LanguageToggle />
-            <ThemeToggle />
-            <UserAvatar onLoginClick={() => setIsLoginDialogOpen(true)} />
+          <div className="flex items-center gap-4 sm:gap-6">
             <div className="sm:hidden">
                 <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                     <SheetTrigger asChild>
@@ -939,6 +928,17 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                     </SheetContent>
                 </Sheet>
             </div>
+            <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <span>AJI</span>
+            </a>
+            {desktopNavItems}
+          </div>
+          
+          <div className="flex items-center justify-end gap-2">
+            <LanguageToggle />
+            <ThemeToggle />
+            <UserAvatar onLoginClick={() => setIsLoginDialogOpen(true)} />
           </div>
         </div>
       </header>

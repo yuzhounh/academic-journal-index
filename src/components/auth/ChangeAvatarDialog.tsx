@@ -33,7 +33,6 @@ const avatarStyles = [
     'fun-emoji',
     'pixel-art-neutral',
     'micah',
-    'initials',
 ];
 
 const generateRandomAvatars = (count: number, name: string) => {

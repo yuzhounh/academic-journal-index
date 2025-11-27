@@ -65,6 +65,13 @@ export default function CreateJournalListDialog({ open, onOpenChange }: CreateJo
     performCreate();
   };
 
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      handleCreate();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -78,6 +85,7 @@ export default function CreateJournalListDialog({ open, onOpenChange }: CreateJo
           <Input
             value={listName}
             onChange={(e) => setListName(e.target.value)}
+            onKeyDown={handleInputKeyDown}
             placeholder={t('favorites.dialog.newListPlaceholder')}
             autoFocus
           />

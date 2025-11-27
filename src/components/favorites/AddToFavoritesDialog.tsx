@@ -195,38 +195,18 @@ export default function AddToFavoritesDialog({
 
                 // For single-journal "add/edit" (not batch add/move).
                 if (!isBatchOperation && mode === 'add') {
-                const favsQuery = query(collection(firestore, `users/${user.uid}/favorite_journals`), where('journalId', '==', journalId));
-                const existingFavsSnapshot = await getDocs(favsQuery);
-                const initialListIds = new Set(existingFavsSnapshot.docs.map(doc => doc.data().listId).filter(Boolean));
+                    const favsQuery = query(collection(firestore, `users/${user.uid}/favorite_journals`), where('journalId', '==', journalId));
+                    const existingFavsSnapshot = await getDocs(favsQuery);
+                    const initialListIds = new Set(existingFavsSnapshot.docs.map(doc => doc.data().listId).filter(Boolean));
 
-                // Remove from lists that are no longer selected.
-                const listsToRemove = new Set([...initialListIds].filter(id => !selectedLists.has(id)));
-                existingFavsSnapshot.docs.forEach(doc => {
-                    const listId = doc.data().listId;
-                    if (listId && listsToRemove.has(listId)) {
-                        batch.delete(doc.ref);
-                    }
-                });
-
-                // Handle uncategorized logic
-                if (selectedLists.size === 0 && initialListIds.size === 0) {
-                    // Add to uncategorized if it's the first time and no list is selected.
-                    const uncategorizedFavoriteId = `${journalId}_uncategorized`;
-                    const favoriteRef = doc(firestore, `users/${user.uid}/favorite_journals`, uncategorizedFavoriteId);
-                    batch.set(favoriteRef, {
-                        journalId: journalId,
-                        userId: user.uid,
-                        listId: "",
-                        createdAt: serverTimestamp(),
+                    // Remove from lists that are no longer selected.
+                    const listsToRemove = new Set([...initialListIds].filter(id => !selectedLists.has(id)));
+                    existingFavsSnapshot.docs.forEach(doc => {
+                        const listId = doc.data().listId;
+                        if (listId && listsToRemove.has(listId)) {
+                            batch.delete(doc.ref);
+                        }
                     });
-                } else if (selectedLists.size > 0) {
-                    // Remove uncategorized entry if it's now in a list.
-                    const uncategorizedId = `${journalId}_uncategorized`;
-                    const favDoc = existingFavsSnapshot.docs.find(d => d.id === uncategorizedId);
-                    if (favDoc) {
-                        batch.delete(favDoc.ref);
-                    }
-                }
                 }
             }
             

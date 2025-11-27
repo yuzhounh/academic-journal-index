@@ -82,7 +82,7 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
 
         return categorizedFavorites;
     }, [allFavorites]);
-
+    
     useEffect(() => {
       if (!allFavorites) {
         setJournalsForStats([]);
@@ -90,7 +90,6 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
       }
   
       if (allFavorites.length === 0) {
-        // Explicitly clear stats when all favorites are gone.
         setJournalsForStats([]);
       } else {
         const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));

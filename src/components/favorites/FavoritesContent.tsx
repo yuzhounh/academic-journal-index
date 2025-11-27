@@ -37,14 +37,13 @@ type FavoriteJournalEntry = {
 
 interface FavoritesContentProps {
     onJournalListSelect: (list: WithId<JournalList>) => void;
-    onUncategorizedSelect: () => void;
     allFavorites: WithId<FavoriteJournalEntry>[] | null;
     onFindJournalsClick: () => void;
     onLoginClick: () => void;
     journals: Journal[];
 }
 
-export default function FavoritesContent({ onJournalListSelect, onUncategorizedSelect, allFavorites, onFindJournalsClick, onLoginClick, journals }: FavoritesContentProps) {
+export default function FavoritesContent({ onJournalListSelect, allFavorites, onFindJournalsClick, onLoginClick, journals }: FavoritesContentProps) {
     const { user, isUserLoading, firestore } = useFirebase();
     const { t } = useTranslation();
     const { toast } = useToast();
@@ -67,23 +66,20 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
     
     const { data: journalLists, setData: setJournalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
     
-    const { categorized, uncategorizedCount, journalsForStats } = useMemo(() => {
+    const { categorized, journalsForStats } = useMemo(() => {
         if (!allFavorites || allFavorites.length === 0) {
-            return { categorized: {}, uncategorizedCount: 0, journalsForStats: [] };
+            return { categorized: {}, journalsForStats: [] };
         }
 
         const categorizedFavorites: Record<string, number> = {};
-        let uncategorized = 0;
         
         const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
         const uniqueJournalIds = new Set<string>();
 
         allFavorites.forEach(fav => {
             uniqueJournalIds.add(fav.journalId);
-            if (fav.listId && fav.listId.trim() !== '' && fav.listId !== 'uncategorized') {
+            if (fav.listId && fav.listId.trim() !== '') {
                 categorizedFavorites[fav.listId] = (categorizedFavorites[fav.listId] || 0) + 1;
-            } else {
-                uncategorized++;
             }
         });
 
@@ -91,7 +87,7 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
             .map(id => journalMap.get(id))
             .filter((j): j is Journal => !!j);
 
-        return { categorized: categorizedFavorites, uncategorizedCount: uncategorized, journalsForStats: statsJournals };
+        return { categorized: categorizedFavorites, journalsForStats: statsJournals };
     }, [allFavorites, journals]);
 
 
@@ -227,26 +223,6 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
                         />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        {uncategorizedCount > 0 && (
-                            <Card
-                                className="cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200 flex flex-col"
-                                onClick={onUncategorizedSelect}
-                            >
-                                <CardHeader className="flex-grow pb-2">
-                                    <CardTitle className="font-headline text-xl flex items-center gap-2">
-                                       <FolderOpen /> {t('favorites.uncategorized')}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="flex items-center text-sm text-muted-foreground">
-                                        <BookText className="w-4 h-4 mr-2" />
-                                        <span>
-                                            {uncategorizedCount} {t('categories.journals')}
-                                        </span>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
                         {(journalLists || []).map((list) => (
                            <Card
                             key={list.id}

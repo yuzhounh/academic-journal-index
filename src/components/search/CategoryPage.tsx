@@ -240,25 +240,9 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   );
   const { data: allFavoriteEntries } = useCollection<FavoriteJournalEntry>(allFavoritesQuery);
 
-  // For Browse view or Uncategorized Favorites view
+  // For Browse view
   const journalsForCategory = useMemo(() => {
     if (!selectedCategory) return [];
-    
-    // Uncategorized favorites logic
-    if (selectedCategory === "Uncategorized") {
-        const uncategorizedIds = (allFavoriteEntries || [])
-            .filter(fav => !fav.listId || fav.listId === '' || fav.listId === 'uncategorized')
-            .map(fav => fav.journalId);
-
-        return uncategorizedIds
-            .map(id => journalMap.get(id))
-            .filter((j): j is Journal => !!j)
-            .sort((a, b) => {
-                const factorA = typeof a.impactFactor === 'number' ? a.impactFactor : 0;
-                const factorB = typeof b.impactFactor === 'number' ? b.impactFactor : 0;
-                return factorB - factorA;
-            });
-    }
 
     // Regular category logic from all journals
     return journals
@@ -268,7 +252,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         const rankB = extractRank(b.majorCategoryPartition);
         return rankA - rankB;
       });
-  }, [journals, selectedCategory, allFavoriteEntries, journalMap]);
+  }, [journals, selectedCategory]);
 
   // For Favorites list view
   const favoriteJournalIdsInList = useMemo(() => {
@@ -289,7 +273,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       });
   }, [favoriteJournalIdsInList, journalMap]);
 
-  const journalsToDisplay = (selectedJournalList || selectedCategory === 'Uncategorized') ? (selectedJournalList ? journalsForList : journalsForCategory) : journalsForCategory;
+  const journalsToDisplay = selectedJournalList ? journalsForList : journalsForCategory;
 
   const paginatedJournals = useMemo(() => {
     const startIndex = (currentPage - 1) * JOURNALS_PER_PAGE;
@@ -429,7 +413,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   };
 
   const handleDeleteSelected = () => {
-    if (!user || !firestore) return;
+    if (!user || !firestore || !selectedJournalList) return;
 
     setIsDeleteDialogOpen(false);
     setSelectedJournals(new Set());
@@ -446,11 +430,10 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     });
 
     const performDelete = async () => {
-        const isUncategorized = selectedCategory === 'Uncategorized';
         const listIdToRemove = selectedJournalList?.id;
 
-        if (!listIdToRemove && !isUncategorized) {
-            console.error("No list or 'Uncategorized' selected for deletion.");
+        if (!listIdToRemove) {
+            console.error("No list selected for deletion.");
             return;
         }
 
@@ -463,23 +446,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             for (let i = 0; i < journalIds.length; i += 30) {
                 const chunk = journalIds.slice(i, i + 30);
                 
-                let q;
-                if (isUncategorized) {
-                    q = query(favoritesColRef, where('journalId', 'in', chunk));
-                } else {
-                    q = query(favoritesColRef, where('listId', '==', listIdToRemove), where('journalId', 'in', chunk));
-                }
+                const q = query(favoritesColRef, where('listId', '==', listIdToRemove), where('journalId', 'in', chunk));
 
                 const snapshot = await getDocs(q);
                 snapshot.forEach(doc => {
-                    if (isUncategorized) {
-                        const data = doc.data();
-                        if (!data.listId || data.listId === '' || data.listId === 'uncategorized') {
-                            batch.delete(doc.ref);
-                        }
-                    } else {
-                        batch.delete(doc.ref);
-                    }
+                   batch.delete(doc.ref);
                 });
             }
 
@@ -602,7 +573,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             <div className="flex items-center gap-2 flex-grow">
                 <Folder className="h-6 w-6 text-primary" />
                 <h2 className="font-headline text-2xl md:text-3xl font-bold tracking-tight">
-                {selectedJournalList?.name || (selectedCategory ? (selectedCategory === 'Uncategorized' ? t('favorites.uncategorized') : getMajorCategoryName(selectedCategory, locale)) : '')}
+                {selectedJournalList?.name || (selectedCategory ? getMajorCategoryName(selectedCategory, locale) : '')}
                 </h2>
             </div>
         </div>
@@ -610,8 +581,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   };
 
   const renderActionToolbar = () => {
-    const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
-    // This allows batch edit on Category Browse view as well
+    const isFavoritesView = !!selectedJournalList;
     const canEdit = user;
     
     if (journalsToDisplay.length === 0) return null;
@@ -688,7 +658,6 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           return <FavoritesContent 
                   allFavorites={allFavoriteEntries} 
                   onJournalListSelect={handleJournalListSelect} 
-                  onUncategorizedSelect={() => handleCategorySelect("Uncategorized")} 
                   onFindJournalsClick={() => handleViewChange('search')}
                   onLoginClick={() => setIsLoginDialogOpen(true)}
                   journals={journals}
@@ -801,8 +770,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   const BatchActionBottomBar = () => {
     if (!isEditing || !user || selectedJournals.size === 0) return null;
     
-    const isFavoritesView = !!selectedJournalList || selectedCategory === 'Uncategorized';
-    const isBrowseView = view === 'categories' && selectedCategory && selectedCategory !== 'Uncategorized';
+    const isFavoritesView = !!selectedJournalList;
+    const isBrowseView = view === 'categories' && selectedCategory;
     const journalsToProcess = journalsToDisplay.filter(j => selectedJournals.has(j.issn.split('/')[0]));
     
     const getDeleteDialogTitle = () => {
@@ -848,7 +817,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>{title}</AlertDialogTitle>
                         <AlertDialogDescription>
-                        {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name || t('favorites.uncategorized') })}
+                        {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

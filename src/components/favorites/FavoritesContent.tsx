@@ -84,24 +84,24 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
     }, [allFavorites]);
     
     useEffect(() => {
-      if (!allFavorites) {
-        setJournalsForStats([]);
-        return;
-      }
-  
-      if (allFavorites.length === 0) {
-        setJournalsForStats([]);
-      } else {
-        const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
-        const uniqueJournalIds = new Set<string>();
-        allFavorites.forEach(fav => {
-            uniqueJournalIds.add(fav.journalId);
-        });
-        const statsJournals = Array.from(uniqueJournalIds)
-            .map(id => journalMap.get(id))
-            .filter((j): j is Journal => !!j);
-        setJournalsForStats(statsJournals);
-      }
+        if (!allFavorites) {
+            setJournalsForStats([]);
+            return;
+        }
+
+        if (allFavorites.length === 0) {
+            setJournalsForStats([]);
+        } else {
+            const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
+            const uniqueJournalIds = new Set<string>();
+            allFavorites.forEach(fav => {
+                uniqueJournalIds.add(fav.journalId);
+            });
+            const statsJournals = Array.from(uniqueJournalIds)
+                .map(id => journalMap.get(id))
+                .filter((j): j is Journal => !!j);
+            setJournalsForStats(statsJournals);
+        }
     }, [allFavorites, journals]);
 
 
@@ -207,11 +207,11 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
         );
     }
     
-    const hasFavorites = allFavorites && allFavorites.length > 0;
+    const hasContentToShow = (allFavorites && allFavorites.length > 0) || (journalLists && journalLists.length > 0);
 
     return (
         <div className="animate-in fade-in-50 duration-300">
-            {hasFavorites ? (
+            {hasContentToShow ? (
                 <div className="space-y-8">
                     <CategoryStats journals={journalsForStats} />
                     <div className="flex flex-wrap justify-end gap-4">

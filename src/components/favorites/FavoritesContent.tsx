@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useMemo, useState, useRef } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import { useFirebase } from "@/firebase";
 import { useCollection, WithId } from "@/firebase/firestore/use-collection";
 import { collection, query, orderBy, writeBatch, doc, serverTimestamp, addDoc } from "firebase/firestore";
@@ -52,7 +52,6 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
     const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     
-    // IMPORTANT: All hooks are now called unconditionally at the top.
     const journalListsQuery = useMemoFirebase(
         () =>
           user && firestore
@@ -64,40 +63,56 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
         [user, firestore]
     );
     
-    const { data: journalLists, setData: setJournalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
+    const { data: journalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
     
-    const { categorized, journalsForStats } = useMemo(() => {
+    const [journalsForStats, setJournalsForStats] = useState<Journal[]>([]);
+
+    const categorized = useMemo(() => {
         if (!allFavorites || allFavorites.length === 0) {
-            return { categorized: {}, journalsForStats: [] };
+            return {};
         }
 
         const categorizedFavorites: Record<string, number> = {};
         
-        const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
-        const uniqueJournalIds = new Set<string>();
-
         allFavorites.forEach(fav => {
-            uniqueJournalIds.add(fav.journalId);
             if (fav.listId && fav.listId.trim() !== '') {
                 categorizedFavorites[fav.listId] = (categorizedFavorites[fav.listId] || 0) + 1;
             }
         });
 
+        return categorizedFavorites;
+    }, [allFavorites]);
+
+    useEffect(() => {
+      if (!allFavorites) {
+        setJournalsForStats([]);
+        return;
+      }
+  
+      if (allFavorites.length === 0) {
+        // Explicitly clear stats when all favorites are gone.
+        setJournalsForStats([]);
+      } else {
+        const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
+        const uniqueJournalIds = new Set<string>();
+        allFavorites.forEach(fav => {
+            uniqueJournalIds.add(fav.journalId);
+        });
         const statsJournals = Array.from(uniqueJournalIds)
             .map(id => journalMap.get(id))
             .filter((j): j is Journal => !!j);
-
-        return { categorized: categorizedFavorites, journalsForStats: statsJournals };
+        setJournalsForStats(statsJournals);
+      }
     }, [allFavorites, journals]);
 
 
     const handleDeleteClick = (e: React.MouseEvent, list: WithId<JournalList>) => {
-        e.stopPropagation(); // Prevent card's onClick from firing
+        e.stopPropagation(); 
         setDeleteDialogState({ open: true, listId: list.id, listName: list.name });
     };
 
     const handleRenameClick = (e: React.MouseEvent, list: WithId<JournalList>) => {
-        e.stopPropagation(); // Prevent card's onClick from firing
+        e.stopPropagation(); 
         setRenameDialogState({ open: true, listId: list.id, listName: list.name });
     };
 
@@ -109,7 +124,6 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
         const file = event.target.files?.[0];
         if (!file || !user || !firestore) return;
 
-        // Reset file input to allow re-uploading the same file
         event.target.value = '';
 
         Papa.parse(file, {
@@ -120,7 +134,6 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
                 const journalIssns = new Set(importedJournals.map(j => j["ISSN/EISSN"]?.split('/')[0]).filter(Boolean));
 
                 let listName = file.name.replace(/\.csv$/, '').replace(/_/g, ' ');
-                // Make name unique if it already exists
                 const existingNames = new Set((journalLists || []).map(l => l.name));
                 if (existingNames.has(listName)) {
                     listName = `${listName} (${new Date().toLocaleDateString()})`;
@@ -130,14 +143,12 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
                     const journalMapByIssn = new Map(journals.map(j => [j.issn.split('/')[0], j]));
                     const validJournalIds = Array.from(journalIssns).filter(issn => journalMapByIssn.has(issn));
                     
-                    // Create new list
                     const listRef = await addDoc(collection(firestore, `users/${user.uid}/journal_lists`), {
                         name: listName,
                         userId: user.uid,
                         createdAt: serverTimestamp(),
                     });
                     
-                    // Batch add journals to the new list
                     const batch = writeBatch(firestore);
                     validJournalIds.forEach(journalId => {
                         const favoriteId = `${journalId}_${listRef.id}`;
@@ -176,7 +187,6 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
     };
 
 
-    // Conditional rendering logic now comes AFTER all hooks have been called.
     if (isUserLoading || isLoadingLists) {
         return (
           <div className="flex justify-center items-center h-64">

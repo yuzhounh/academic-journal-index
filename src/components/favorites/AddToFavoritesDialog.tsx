@@ -239,6 +239,20 @@ export default function AddToFavoritesDialog({
         return newSet;
     });
   }
+
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      handleCreateNewList();
+    }
+  };
+
+  const handleListKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      handleSaveChanges();
+    }
+  };
   
   const getDialogTitle = () => {
     if (!isBatchOperation) {
@@ -272,6 +286,7 @@ export default function AddToFavoritesDialog({
                     placeholder={t('favorites.dialog.newListPlaceholder')}
                     value={newList}
                     onChange={(e) => setNewList(e.target.value)}
+                    onKeyDown={handleInputKeyDown}
                     disabled={isCreating}
                 />
                 <Button onClick={handleCreateNewList} disabled={!newList.trim() || isCreating} className="min-w-[100px]">
@@ -280,8 +295,11 @@ export default function AddToFavoritesDialog({
                 </Button>
             </div>
 
-            <ScrollArea className="h-40 rounded-md border p-2">
-                <div className="space-y-2">
+            <ScrollArea className="h-40 rounded-md border">
+                <div 
+                  className="p-2 space-y-2"
+                  onKeyDown={handleListKeyDown}
+                >
                 {(journalLists || []).map((list: WithId<JournalList>) => (
                     <label 
                         key={list.id} 

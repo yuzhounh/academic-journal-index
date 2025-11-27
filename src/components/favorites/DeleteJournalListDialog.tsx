@@ -39,34 +39,18 @@ export default function DeleteJournalListDialog({ open, onOpenChange, listId, li
     try {
       const batch = writeBatch(firestore);
 
-      // 1. Delete the journal list document
+      // 1. Delete the journal list document itself.
       const listRef = doc(firestore, `users/${user.uid}/journal_lists`, listId);
       batch.delete(listRef);
 
-      // 2. Find all favorite entries associated with this list
+      // 2. Find and delete all favorite entries associated with this list.
       const favoritesQuery = query(
         collection(firestore, `users/${user.uid}/favorite_journals`),
         where('listId', '==', listId)
       );
       const favoritesSnapshot = await getDocs(favoritesQuery);
-
-      // 3. Delete old favorite entries and create new uncategorized ones
       favoritesSnapshot.forEach((favDoc) => {
-        // Delete the old favorite entry from the list
         batch.delete(favDoc.ref);
-
-        // Create a new uncategorized entry.
-        // IMPORTANT: Sanitize the journalId to prevent invalid document paths.
-        const journalIdWithSlash = favDoc.data().journalId;
-        const journalId = journalIdWithSlash.split('/')[0]; // Use only the ISSN part
-        const uncategorizedFavoriteId = `${journalId}_uncategorized`;
-        const uncategorizedRef = doc(firestore, `users/${user.uid}/favorite_journals`, uncategorizedFavoriteId);
-        
-        batch.set(uncategorizedRef, {
-            journalId: journalId, // Store the sanitized ID
-            userId: user.uid,
-            createdAt: favDoc.data().createdAt // Preserve original favorite date
-        }, { merge: true }); // Use merge to not overwrite if it already exists
       });
 
       await batch.commit();

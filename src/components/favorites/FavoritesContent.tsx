@@ -68,7 +68,9 @@ export default function FavoritesContent({ onJournalListSelect, onUncategorizedS
     const { data: journalLists, setData: setJournalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
     
     const { categorized, uncategorizedCount, journalsForStats } = useMemo(() => {
-        if (!allFavorites) return { categorized: {}, uncategorizedCount: 0, journalsForStats: [] };
+        if (!allFavorites || allFavorites.length === 0) {
+            return { categorized: {}, uncategorizedCount: 0, journalsForStats: [] };
+        }
 
         const categorizedFavorites: Record<string, number> = {};
         let uncategorized = 0;

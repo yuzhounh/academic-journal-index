@@ -916,17 +916,19 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                             <span className="sr-only">Open menu</span>
                         </Button>
                     </SheetTrigger>
-                    <SheetContent side="left" className="pr-0 pt-8">
-                      <SheetHeader>
-                        <SheetTitle className="sr-only">Menu</SheetTitle>
-                        <SheetDescription className="sr-only">
-                          Main navigation menu
-                        </SheetDescription>
-                      </SheetHeader>
-                      <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline mb-6 px-6">
-                        <BookOpen className="h-5 w-5 text-primary" />
-                        <span>AJI</span>
-                      </a>
+                    <SheetContent side="left" className="pt-8">
+                      <div className="px-4">
+                        <SheetHeader>
+                          <SheetTitle className="sr-only">Menu</SheetTitle>
+                          <SheetDescription className="sr-only">
+                            Main navigation menu
+                          </SheetDescription>
+                        </SheetHeader>
+                        <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline mb-6">
+                          <BookOpen className="h-5 w-5 text-primary" />
+                          <span>AJI</span>
+                        </a>
+                      </div>
                       <div className="flex flex-col gap-2 px-4">
                         {navItems}
                       </div>

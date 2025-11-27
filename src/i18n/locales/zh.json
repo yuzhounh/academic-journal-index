@@ -181,7 +181,7 @@
             "errorDescription": "无法导入列表。请检查文件格式后重试。"
         },
         "createList": {
-            "button": "创建新文件夹",
+            "button": "创建新列表",
             "title": "创建新期刊列表",
             "description": "为您的新列表输入一个名称。",
             "successTitle": "列表已创建",

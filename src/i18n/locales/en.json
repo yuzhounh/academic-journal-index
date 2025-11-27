@@ -123,7 +123,7 @@
         "uncategorized": "Uncategorized",
         "deleteList": {
             "title": "Delete '{{listName}}'?",
-            "description": "This action cannot be undone. All journals in this list will be moved to Uncategorized.",
+            "description": "This action cannot be undone. All favorited journals within this list will be permanently removed.",
             "confirmButton": "Yes, delete list",
             "successTitle": "List Deleted",
             "successDescription": "The list '{{listName}}' has been deleted.",

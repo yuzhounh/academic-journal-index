@@ -161,7 +161,7 @@
         "uncategorized": "未分类",
         "deleteList": {
             "title": "删除 '{{listName}}'？",
-            "description": "此操作无法撤销。此列表中的所有期刊将被移至“未分类”。",
+            "description": "此操作无法撤销。此列表中的所有期刊收藏记录将被彻底删除。",
             "confirmButton": "是的，删除列表",
             "successTitle": "列表已删除",
             "successDescription": "列表 '{{listName}}' 已被删除。",

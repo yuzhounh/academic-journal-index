@@ -257,7 +257,7 @@
           "schema": {
             "$ref": "#/backend/entities/JournalList"
           },
-          "description": "Stores user-created journal lists (folders). Path-based security ensures users can only access their own lists.",
+          "description": "Stores user-created journal lists. Path-based security ensures users can only access their own lists.",
           "params": [
             {
               "name": "userId",

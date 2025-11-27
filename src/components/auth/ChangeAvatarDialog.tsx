@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -27,20 +27,22 @@ interface ChangeAvatarDialogProps {
   user: User;
 }
 
-const predefinedAvatars = [
-    "https://picsum.photos/seed/avatar1/200",
-    "https://picsum.photos/seed/avatar2/200",
-    "https://picsum.photos/seed/avatar3/200",
-    "https://picsum.photos/seed/avatar4/200",
-    "https://picsum.photos/seed/avatar5/200",
-    "https://picsum.photos/seed/avatar6/200",
-    "https://picsum.photos/seed/avatar7/200",
-    "https://picsum.photos/seed/avatar8/200",
-    "https://picsum.photos/seed/avatar9/200",
-    "https://picsum.photos/seed/avatar10/200",
-    "https://picsum.photos/seed/avatar11/200",
-    "https://picsum.photos/seed/avatar12/200",
+const avatarStyles = [
+    'adventurer',
+    'bottts',
+    'fun-emoji',
+    'pixel-art-neutral',
+    'micah',
+    'initials',
 ];
+
+const generateRandomAvatars = (count: number, name: string) => {
+    return Array.from({ length: count }, (_, i) => {
+        const style = avatarStyles[i % avatarStyles.length];
+        const seed = `${name}-${Math.random().toString(36).substring(7)}`;
+        return `https://api.dicebear.com/8.x/${style}/svg?seed=${encodeURIComponent(seed)}`;
+    });
+};
 
 
 export default function ChangeAvatarDialog({ open, onOpenChange, user }: ChangeAvatarDialogProps) {
@@ -50,6 +52,14 @@ export default function ChangeAvatarDialog({ open, onOpenChange, user }: ChangeA
   const [selectedAvatar, setSelectedAvatar] = useState<string | null>(user.photoURL);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [predefinedAvatars, setPredefinedAvatars] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      const newAvatars = generateRandomAvatars(12, user.displayName || 'user');
+      setPredefinedAvatars(newAvatars);
+    }
+  }, [open, user.displayName]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -84,6 +94,16 @@ export default function ChangeAvatarDialog({ open, onOpenChange, user }: ChangeA
                 const avatarRef = ref(storage, `avatars/${user.uid}/${uuidv4()}`);
                 const uploadResult = await uploadString(avatarRef, selectedAvatar, 'data_url');
                 finalAvatarUrl = await getDownloadURL(uploadResult.ref);
+            } else if (selectedAvatar.startsWith('https://api.dicebear.com')) {
+                // To make the avatar permanent, we can fetch it and upload it to our own storage
+                const response = await fetch(selectedAvatar);
+                const svgText = await response.text();
+                const svgDataUrl = `data:image/svg+xml;base64,${btoa(svgText)}`;
+                
+                const storage = getStorage(firebaseApp);
+                const avatarRef = ref(storage, `avatars/${user.uid}/${uuidv4()}.svg`);
+                await uploadString(avatarRef, svgDataUrl, 'data_url');
+                finalAvatarUrl = await getDownloadURL(avatarRef);
             }
 
             await updateProfile(user, { photoURL: finalAvatarUrl });
@@ -152,7 +172,7 @@ export default function ChangeAvatarDialog({ open, onOpenChange, user }: ChangeA
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                accept="image/png, image/jpeg, image/gif"
+                accept="image/png, image/jpeg, image/gif, image/svg+xml"
                 style={{ display: 'none' }}
             />
         </div>

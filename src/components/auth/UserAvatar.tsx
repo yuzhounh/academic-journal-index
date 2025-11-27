@@ -13,13 +13,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useFirebase } from "@/firebase";
 import { signOut } from "firebase/auth";
-import { LogIn, LogOut, Mail, KeyRound, User as UserIcon, Image as ImageIcon } from "lucide-react";
+import { LogIn, LogOut, Mail, KeyRound, User as UserIcon, Image as ImageIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/provider";
 import ChangeEmailDialog from "./ChangeEmailDialog";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
 import ChangeAvatarDialog from "./ChangeAvatarDialog";
+import ClearFavoritesDialog from "../favorites/ClearFavoritesDialog";
 
 interface UserAvatarProps {
   onLoginClick: () => void;
@@ -32,6 +33,7 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
   const [isChangePasswordDialogOpen, setIsChangePasswordDialogOpen] = useState(false);
   const [isChangeNicknameDialogOpen, setIsChangeNicknameDialogOpen] = useState(false);
   const [isChangeAvatarDialogOpen, setIsChangeAvatarDialogOpen] = useState(false);
+  const [isClearFavoritesDialogOpen, setIsClearFavoritesDialogOpen] = useState(false);
 
   const handleSignOut = async () => {
     if (!auth) return;
@@ -96,6 +98,11 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
             <span>{t('auth.changePassword.menuItem')}</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => setIsClearFavoritesDialogOpen(true)} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
+            <Trash2 className="mr-2 h-4 w-4" />
+            <span>{t('favorites.clearAll.menuItem')}</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             <span>{t('auth.logout')}</span>
@@ -123,6 +130,10 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
             open={isChangePasswordDialogOpen}
             onOpenChange={setIsChangePasswordDialogOpen}
             user={user}
+          />
+          <ClearFavoritesDialog
+            open={isClearFavoritesDialogOpen}
+            onOpenChange={setIsClearFavoritesDialogOpen}
           />
         </>
       )}

@@ -149,6 +149,15 @@
             "successTitle": "List Created",
             "successDescription": "The list '{{listName}}' has been successfully created.",
             "errorTitle": "Error Creating List"
+        },
+        "clearAll": {
+            "menuItem": "Clear All Favorites",
+            "title": "Clear All Favorites?",
+            "description": "This action cannot be undone. This will permanently delete all of your journal lists and all of your favorited journals.",
+            "confirmButton": "Yes, clear everything",
+            "successTitle": "Favorites Cleared",
+            "successDescription": "All of your lists and journals have been deleted.",
+            "errorTitle": "Error Clearing Favorites"
         }
     },
     "about": {

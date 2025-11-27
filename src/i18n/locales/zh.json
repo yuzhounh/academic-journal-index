@@ -187,6 +187,15 @@
             "successTitle": "列表已创建",
             "successDescription": "列表 '{{listName}}' 已成功创建。",
             "errorTitle": "创建列表时出错"
+        },
+        "clearAll": {
+            "menuItem": "清空所有收藏",
+            "title": "清空所有收藏？",
+            "description": "此操作无法撤销。这将永久删除您所有的期刊列表和收藏的期刊。",
+            "confirmButton": "是的，全部清空",
+            "successTitle": "收藏已清空",
+            "successDescription": "您所有的列表和期刊均已被删除。",
+            "errorTitle": "清空收藏时出错"
         }
     },
     "auth": {

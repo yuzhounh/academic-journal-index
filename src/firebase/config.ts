@@ -1,8 +1,9 @@
 export const firebaseConfig = {
-  "projectId": "academic-journal-index",
-  "appId": "PENDING_UPDATE_FROM_FIREBASE_CONSOLE",
-  "apiKey": process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  "apiKey": "AIzaSyAK2ypYMOk_ckuFICJIpgEsRVc15g4VHlI",
   "authDomain": "academic-journal-index.firebaseapp.com",
-  "measurementId": "",
-  "messagingSenderId": "PENDING_UPDATE_FROM_FIREBASE_CONSOLE"
+  "projectId": "academic-journal-index",
+  "storageBucket": "academic-journal-index.firebasestorage.app",
+  "messagingSenderId": "201352930588",
+  "appId": "1:201352930588:web:0b466cde9377d49c0bc6d9",
+  "measurementId": ""
 };

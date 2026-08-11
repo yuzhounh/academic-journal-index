@@ -19,7 +19,7 @@ Academic Journal Index (AJI) is a comprehensive platform designed to help resear
 ### 3. AI-Powered Analysis
 - **Intelligent Summaries:** Generate detailed reports covering journal introduction, main publication areas, and its status in the field.
 - **Smart Recommendations:** Get AI-suggested related journals based on field and influence.
-- **Multi-model Support:** Powered by the latest Gemini 2.0 Flash models for fast and accurate insights.
+- **AI-Powered:** Powered by DeepSeek V4 Flash for fast and accurate insights.
 
 ### 4. Personalized Management (Favorites)
 - **Custom Lists:** Create multiple lists to organize your research interests.
@@ -38,7 +38,7 @@ Academic Journal Index (AJI) is a comprehensive platform designed to help resear
 - **Framework:** Next.js 15 (App Router)
 - **UI Components:** Shadcn UI & Tailwind CSS
 - **Backend/Auth:** Firebase (Firestore & Authentication)
-- **AI Integration:** Google Genkit with Gemini 2.0 Flash
+- **AI Integration:** DeepSeek V4 Flash (OpenAI-compatible API)
 - **Language:** TypeScript
 
 ## 📝 License

@@ -1,4 +1,5 @@
 
+
 'use server';
 
 /**
@@ -9,9 +10,8 @@
  * - FindApcOutput - The return type for the findApc function.
  */
 
-import { ai } from '@/ai/genkit';
-import { googleAI } from '@genkit-ai/google-genai';
-import { z } from 'genkit';
+import { z } from 'zod';
+import { deepseekChatJson, parseDeepSeekJson } from '@/ai/deepseek';
 
 const FindApcInputSchema = z.object({
   journalName: z.string().describe('The name of the journal to find the APC for.'),
@@ -24,37 +24,49 @@ const FindApcOutputSchema = z.object({
 });
 export type FindApcOutput = z.infer<typeof FindApcOutputSchema>;
 
-const findApcPrompt = ai.definePrompt({
-    name: 'findApcPrompt',
-    input: { schema: FindApcInputSchema },
-    output: { schema: FindApcOutputSchema },
-    model: googleAI('gemini-2.5-flash'),
-    prompt: `
-      You are an expert academic research assistant.
-      Your task is to find the Article Processing Charge (APC) for a "Regular Paper" or "Research Article" in a specific journal.
-      
-      Journal Name: {{{journalName}}}
-
-      1.  Based on your knowledge, find the most recent APC for a "Regular Paper" or "Research Article" for the journal specified.
-      2.  The APC should be in USD. For example, "$3000".
-      3.  If you cannot find the APC with high confidence, set the "apc" field to "Not found".
-      4.  Always provide a Google search URL for the user to verify the information in the "apcUrl" field. The search query should be " {{{journalName}}} article processing charge ".
-    `,
-});
-
-
 export async function findApc(input: FindApcInput): Promise<FindApcOutput> {
-    return findApcFlow(input);
-}
+  const { journalName } = input;
 
-const findApcFlow = ai.defineFlow(
-  {
-    name: 'findApcFlow',
-    inputSchema: FindApcInputSchema,
-    outputSchema: FindApcOutputSchema,
-  },
-  async (input) => {
-    const { output } = await findApcPrompt(input);
-    return output!;
+  const responseText = await deepseekChatJson([
+    {
+      role: 'system',
+      content:
+        'You are an expert academic research assistant. You always output strictly valid JSON that matches the requested schema. Do not include any text outside the JSON object.',
+    },
+    {
+      role: 'user',
+      content: `
+Your task is to find the Article Processing Charge (APC) for a "Regular Paper" or "Research Article" in a specific journal.
+
+Journal Name: ${journalName}
+
+1. Based on your knowledge, find the most recent APC for a "Regular Paper" or "Research Article" for the journal specified.
+2. The APC should be in USD. For example, "$3000".
+3. If you cannot find the APC with high confidence, set the "apc" field to "Not found".
+4. Always provide a Google search URL for the user to verify the information in the "apcUrl" field. The search query should be "${journalName} article processing charge".
+
+You MUST output a single JSON object with exactly this shape:
+{
+  "apc": "...",
+  "apcUrl": "..."
+}`,
+    },
+  ], { temperature: 0.3 });
+
+  try {
+    const parsed = parseDeepSeekJson(responseText);
+    const validated = FindApcOutputSchema.safeParse(parsed);
+    if (!validated.success) {
+      throw new Error(
+        `DeepSeek response did not match schema: ${JSON.stringify(validated.error.issues.slice(0, 3))}`
+      );
+    }
+    return validated.data;
+  } catch (err: any) {
+    console.error('Failed to parse DeepSeek APC response:', err);
+    return {
+      apc: 'Not found',
+      apcUrl: `https://www.google.com/search?q=${encodeURIComponent(journalName + ' article processing charge')}`,
+    };
   }
-);
+}

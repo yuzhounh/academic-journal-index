@@ -32,7 +32,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <FirebaseClientProvider>
-              <main className="flex-grow">
+              <main className="flex-grow flex justify-center">
                 {children}
               </main>
               <Toaster />

@@ -820,77 +820,75 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
-        <div className={cn(PAGE_CONTAINER, "flex h-16 items-center justify-between")}>
-          <div className="flex items-center gap-4 sm:gap-6">
-            <div className="sm:hidden">
-                <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                    <SheetTrigger asChild>
-                        <Button variant="outline" size="icon">
-                            <Menu className="h-5 w-5" />
-                            <span className="sr-only">Open menu</span>
-                        </Button>
-                    </SheetTrigger>
-                    <SheetContent side="left" className="pt-8">
-                      <div className="px-4">
-                        <SheetHeader>
-                          <SheetTitle className="sr-only">Menu</SheetTitle>
-                          <SheetDescription className="sr-only">
-                            Main navigation menu
-                          </SheetDescription>
-                        </SheetHeader>
-                        <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline mb-6">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground">
-                            <BookOpen className="h-4 w-4" />
-                          </div>
-                          <span>AJI</span>
-                        </a>
-                      </div>
-                      <div className="flex flex-col gap-2 px-4">
-                        {navItems}
-                      </div>
-                    </SheetContent>
-                </Sheet>
-            </div>
-            <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-sm">
-                <BookOpen className="h-4 w-4" />
+      <div className={cn(PAGE_CONTAINER, "flex min-h-screen flex-col")}>
+        <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <div className="sm:hidden">
+                  <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                      <SheetTrigger asChild>
+                          <Button variant="outline" size="icon">
+                              <Menu className="h-5 w-5" />
+                              <span className="sr-only">Open menu</span>
+                          </Button>
+                      </SheetTrigger>
+                      <SheetContent side="left" className="pt-8">
+                        <div className="px-4">
+                          <SheetHeader>
+                            <SheetTitle className="sr-only">Menu</SheetTitle>
+                            <SheetDescription className="sr-only">
+                              Main navigation menu
+                            </SheetDescription>
+                          </SheetHeader>
+                          <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline mb-6">
+                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                              <BookOpen className="h-4 w-4" />
+                            </div>
+                            <span>AJI</span>
+                          </a>
+                        </div>
+                        <div className="flex flex-col gap-2 px-4">
+                          {navItems}
+                        </div>
+                      </SheetContent>
+                  </Sheet>
               </div>
-              <span>AJI</span>
-            </a>
-            {desktopNavItems}
-          </div>
-          
-          <div className="flex items-center justify-end gap-2">
-            <LanguageToggle />
-            <ThemeToggle />
-            <UserAvatar onLoginClick={() => setIsLoginDialogOpen(true)} />
-          </div>
-        </div>
-      </header>
-      <main className="flex-grow pb-24">
-        <div className={PAGE_CONTAINER}>
-            <div className="py-8 md:py-10">
-                {selectedJournal ? (
-                  <JournalDetail
-                    key={selectedJournal.issn}
-                    journal={selectedJournal}
-                    onBack={handleBackFromDetail}
-                    onJournalSelect={handleJournalSelectByName}
-                    isHistoryRoot={journalHistory.length <= 1}
-                  />
-                ) : (
-                  renderContent()
-                )}
+              <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-sm">
+                  <BookOpen className="h-4 w-4" />
+                </div>
+                <span>AJI</span>
+              </a>
+              {desktopNavItems}
             </div>
+            
+            <div className="flex items-center justify-end gap-2">
+              <LanguageToggle />
+              <ThemeToggle />
+              <UserAvatar onLoginClick={() => setIsLoginDialogOpen(true)} />
+            </div>
+          </div>
+        </header>
+        <div className="flex-grow pb-24">
+          <div className="py-8 md:py-10">
+              {selectedJournal ? (
+                <JournalDetail
+                  key={selectedJournal.issn}
+                  journal={selectedJournal}
+                  onBack={handleBackFromDetail}
+                  onJournalSelect={handleJournalSelectByName}
+                  isHistoryRoot={journalHistory.length <= 1}
+                />
+              ) : (
+                renderContent()
+              )}
+          </div>
         </div>
-      </main>
-      {!selectedJournal && <BatchActionBottomBar />}
-      <footer className="border-t">
-        <div className={cn(PAGE_CONTAINER, "py-4 text-center text-sm text-muted-foreground")}>
+        <footer className="border-t py-4 text-center text-sm text-muted-foreground">
           © 2025 Jing Wang. All Rights Reserved.
-        </div>
-      </footer>
+        </footer>
+      </div>
+      {!selectedJournal && <BatchActionBottomBar />}
       <LoginDialog open={isLoginDialogOpen} onOpenChange={setIsLoginDialogOpen} />
     </>
   );

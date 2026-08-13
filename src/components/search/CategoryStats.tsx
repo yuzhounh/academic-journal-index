@@ -1,28 +1,31 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Journal } from "@/data/journals";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { ChevronDown } from "lucide-react";
 import { useTranslation } from "@/i18n/provider";
+import { cn } from "@/lib/utils";
 
 
 interface CategoryStatsProps {
   journals: Journal[];
+  collapsible?: boolean;
+  defaultOpen?: boolean;
 }
-
-const partitionMap: { [key: string]: string } = {
-    "1": "一区",
-    "2": "二区",
-    "3": "三区",
-    "4": "四区",
-};
 
 const partitionColors: { [key: string]: string } = {
   "一区": "hsl(var(--partition-q1))",
@@ -110,7 +113,7 @@ const StatsDetails = ({ title, data, total }: { title: string; data: { name: str
     );
 };
 
-export default function CategoryStats({ journals }: CategoryStatsProps) {
+function useStatsData(journals: Journal[]) {
   const { t, locale } = useTranslation();
   const totalJournals = journals.length;
 
@@ -154,6 +157,13 @@ export default function CategoryStats({ journals }: CategoryStatsProps) {
       .filter(item => item.count > 0);
   }, [journals, t]);
 
+  return { totalJournals, partitionData, authorityData, openAccessData };
+}
+
+function StatsBody({ journals }: { journals: Journal[] }) {
+  const { t } = useTranslation();
+  const { totalJournals, partitionData, authorityData, openAccessData } = useStatsData(journals);
+
   const allStats = [
     { title: t('stats.partitionTitle'), data: partitionData },
     { title: t('stats.authorityTitle'), data: authorityData },
@@ -161,45 +171,96 @@ export default function CategoryStats({ journals }: CategoryStatsProps) {
   ];
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-xl font-headline">{t('stats.title')}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="text-center">
-            <p className="text-base text-muted-foreground">{t('stats.totalJournals')}</p>
-            <p className="text-4xl font-bold">{totalJournals}</p>
-        </div>
+    <CardContent className="space-y-6 pt-0">
+      <div className="text-center">
+          <p className="text-base text-muted-foreground">{t('stats.totalJournals')}</p>
+          <p className="text-4xl font-bold tabular-nums">{totalJournals}</p>
+      </div>
 
-        {/* Mobile Layout: Vertical stacking */}
-        <div className="grid grid-cols-1 gap-y-6 md:hidden">
-          {allStats.map(stat => (
-            <div key={stat.title}>
-              <StatsDetails title={stat.title} data={stat.data} total={totalJournals} />
-              <div className="mt-4 space-y-2">
-                <StatsBarChart data={stat.data} totalJournals={totalJournals} />
-              </div>
+      <div className="grid grid-cols-1 gap-y-6 md:hidden">
+        {allStats.map(stat => (
+          <div key={stat.title}>
+            <StatsDetails title={stat.title} data={stat.data} total={totalJournals} />
+            <div className="mt-4 space-y-2">
+              <StatsBarChart data={stat.data} totalJournals={totalJournals} />
             </div>
-          ))}
-        </div>
-        
-        {/* Desktop Layout: Grid */}
-        <div className="hidden md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-6">
-            <StatsDetails title={t('stats.partitionTitle')} data={partitionData} total={totalJournals} />
-            <StatsDetails title={t('stats.authorityTitle')} data={authorityData} total={totalJournals} />
-            <StatsDetails title={t('stats.oaTitle')} data={openAccessData} total={totalJournals} />
+          </div>
+        ))}
+      </div>
+      
+      <div className="hidden md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-6">
+          <StatsDetails title={t('stats.partitionTitle')} data={partitionData} total={totalJournals} />
+          <StatsDetails title={t('stats.authorityTitle')} data={authorityData} total={totalJournals} />
+          <StatsDetails title={t('stats.oaTitle')} data={openAccessData} total={totalJournals} />
 
-            <div className="space-y-2">
-                <StatsBarChart data={partitionData} totalJournals={totalJournals} />
+          <div className="space-y-2">
+              <StatsBarChart data={partitionData} totalJournals={totalJournals} />
+          </div>
+          <div className="space-y-2">
+              <StatsBarChart data={authorityData} totalJournals={totalJournals} />
+          </div>
+          <div className="space-y-2">
+              <StatsBarChart data={openAccessData} totalJournals={totalJournals} />
+          </div>
+      </div>
+    </CardContent>
+  );
+}
+
+export default function CategoryStats({ journals, collapsible = false, defaultOpen = true }: CategoryStatsProps) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(defaultOpen);
+  const { totalJournals, partitionData, openAccessData } = useStatsData(journals);
+
+  const topPartition = partitionData.reduce(
+    (best, item) => (item.count > best.count ? item : best),
+    { name: "", count: 0, fill: "" }
+  );
+  const oaCount = openAccessData.find((item) => item.name === t('stats.oa.open'))?.count ?? 0;
+  const oaPercent = totalJournals > 0 ? ((oaCount / totalJournals) * 100).toFixed(0) : "0";
+
+  const summaryParts = [
+    t('stats.summaryTotal', { count: totalJournals }),
+    topPartition.name ? t('stats.summaryPartition', { name: topPartition.name, percent: ((topPartition.count / totalJournals) * 100).toFixed(0) }) : null,
+    t('stats.summaryOa', { percent: oaPercent }),
+  ].filter(Boolean);
+
+  if (!collapsible) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-xl font-headline">{t('stats.title')}</CardTitle>
+        </CardHeader>
+        <StatsBody journals={journals} />
+      </Card>
+    );
+  }
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <Card>
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-lg font-headline">{t('stats.title')}</CardTitle>
+              {!open && (
+                <p className="mt-1 text-sm text-muted-foreground truncate">
+                  {summaryParts.join(" · ")}
+                </p>
+              )}
             </div>
-            <div className="space-y-2">
-                <StatsBarChart data={authorityData} totalJournals={totalJournals} />
-            </div>
-            <div className="space-y-2">
-                <StatsBarChart data={openAccessData} totalJournals={totalJournals} />
-            </div>
-        </div>
-      </CardContent>
-    </Card>
+            <CollapsibleTrigger asChild>
+              <Button variant="ghost" size="sm" className="shrink-0 gap-1.5 text-muted-foreground">
+                {open ? t('stats.collapse') : t('stats.expand')}
+                <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+        </CardHeader>
+        <CollapsibleContent>
+          <StatsBody journals={journals} />
+        </CollapsibleContent>
+      </Card>
+    </Collapsible>
   );
 }

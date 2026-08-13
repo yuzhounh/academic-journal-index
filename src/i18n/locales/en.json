@@ -17,10 +17,16 @@
             "title": "Start your search",
             "description": "Enter at least 3 characters to begin searching for journals."
         },
-        "noResults": "No journals found for \"{{searchTerm}}\"."
+        "noResults": "No journals found for \"{{searchTerm}}\".",
+        "examplesLabel": "Try searching",
+        "examples": ["Nature", "Cell", "Lancet", "IEEE"]
     },
     "categories": {
-        "journals": "journals"
+        "journals": "journals",
+        "browseTitle": "Browse by Field",
+        "browseSubtitle": "Explore journals across 20+ major CAS categories.",
+        "filterPlaceholder": "Filter categories...",
+        "noMatch": "No matching categories found."
     },
     "pagination": {
         "previous": "Previous",
@@ -96,7 +102,12 @@
             "closed": "Closed Access"
         },
         "count": "Count",
-        "ratio": "Ratio"
+        "ratio": "Ratio",
+        "expand": "Show details",
+        "collapse": "Hide details",
+        "summaryTotal": "{{count}} journals",
+        "summaryPartition": "{{name}} {{percent}}%",
+        "summaryOa": "OA {{percent}}%"
     },
     "favorites": {
         "loading": "Loading favorites...",

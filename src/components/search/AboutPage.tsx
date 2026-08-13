@@ -61,8 +61,8 @@ export default function AboutPage() {
       {
           icon: Github,
           label: t('about.contact.github'),
-          value: 'yuzhounh/Academic-Journal-Index',
-          href: 'https://github.com/yuzhounh/Academic-Journal-Index'
+          value: 'yuzhounh/academic-journal-index',
+          href: 'https://github.com/yuzhounh/academic-journal-index'
       }
   ]
   
@@ -167,7 +167,7 @@ export default function AboutPage() {
         <CardContent className="space-y-4">
             <p className="text-base text-foreground/80">{t('about.feedback.p1')}</p>
             <Button asChild className="gap-2">
-                <a href="https://github.com/yuzhounh/Academic-Journal-Index/issues" target="_blank" rel="noopener noreferrer">
+                <a href="https://github.com/yuzhounh/academic-journal-index/issues" target="_blank" rel="noopener noreferrer">
                     <Github className="w-5 h-5" />
                     {t('about.feedback.button')}
                 </a>

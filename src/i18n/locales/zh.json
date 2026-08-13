@@ -17,10 +17,16 @@
             "title": "开始搜索",
             "description": "输入至少3个字符以开始搜索期刊。"
         },
-        "noResults": "未找到关于 “{{searchTerm}}” 的期刊。"
+        "noResults": "未找到关于 “{{searchTerm}}” 的期刊。",
+        "examplesLabel": "试试搜索",
+        "examples": ["Nature", "Cell", "Lancet", "IEEE"]
     },
     "categories": {
-        "journals": "本"
+        "journals": "本期刊",
+        "browseTitle": "按学科浏览",
+        "browseSubtitle": "探索 20+ 中科院大类学科分区期刊。",
+        "filterPlaceholder": "筛选学科类别...",
+        "noMatch": "未找到匹配的学科类别。"
     },
     "pagination": {
         "previous": "上一页",
@@ -96,7 +102,12 @@
             "closed": "订阅访问"
         },
         "count": "数量",
-        "ratio": "比例"
+        "ratio": "比例",
+        "expand": "展开详情",
+        "collapse": "收起详情",
+        "summaryTotal": "共 {{count}} 本",
+        "summaryPartition": "{{name}} {{percent}}%",
+        "summaryOa": "OA {{percent}}%"
     },
     "about": {
         "title": "关于学术期刊索引",

@@ -16,19 +16,14 @@ interface JournalListItemProps {
   onSelectionChange?: (selected: boolean) => void;
 }
 
-const getPartitionColorClass = (partition: string): string => {
+const getPartitionBadgeVariant = (partition: string): "level1" | "level2" | "level3" | "level4" | "secondary" => {
   const mainPartition = partition.charAt(0);
   switch (mainPartition) {
-    case "1":
-      return "text-partition-q1";
-    case "2":
-      return "text-partition-q2";
-    case "3":
-      return "text-partition-q3";
-    case "4":
-      return "text-partition-q4";
-    default:
-      return "text-muted-foreground";
+    case "1": return "level1";
+    case "2": return "level2";
+    case "3": return "level3";
+    case "4": return "level4";
+    default: return "secondary";
   }
 };
 
@@ -73,8 +68,6 @@ const formatImpactFactor = (factor: number | string) => {
     return factor;
 };
 
-// This function now adds a hidden placeholder if only ISSN exists
-// to ensure the authority badge aligns correctly.
 const formatIssn = (issn: string) => {
   const hasEissn = issn.includes('/');
   return (
@@ -107,7 +100,6 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isEditing) {
-        // Prevent click from propagating to anything behind the checkbox
         if (e.target instanceof HTMLInputElement) return;
         onSelectionChange?.(!isSelected);
     } else {
@@ -120,7 +112,7 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
       className={cn("cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30", isSelected && "ring-2 ring-primary shadow-card-hover")}
       onClick={handleCardClick}
     >
-      <CardContent className="p-4 md:p-6 flex items-center gap-4">
+      <CardContent className="p-4 md:py-4 md:px-5 flex items-center gap-4">
         {isEditing && (
             <Checkbox
                 checked={isSelected}
@@ -129,33 +121,28 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
                 aria-label={`Select journal ${journal.journalName}`}
             />
         )}
-        <div className="flex flex-col md:grid md:grid-cols-12 md:items-start md:gap-4 w-full">
-            {/* Left side: Title and metadata */}
-            <div className="md:col-span-7">
-              <p className="font-headline text-lg font-semibold">{journal.journalName}</p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-sm text-muted-foreground">
-                <p className="font-mono whitespace-nowrap">{formatIssn(journal.issn)}</p>
-                <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-6 w-full min-w-0">
+            <div className="min-w-0 flex-1">
+              <p className="font-headline text-base md:text-lg font-semibold leading-snug truncate">{journal.journalName}</p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mt-1.5 text-sm text-muted-foreground">
+                <p className="font-code text-xs md:text-sm whitespace-nowrap">{formatIssn(journal.issn)}</p>
+                <div className="flex items-center gap-1.5">
                     <AuthorityBadge level={journal.authorityJournal} />
                     {journal.openAccess === "是" && <Badge variant="openAccess">{t('journal.oa')}</Badge>}
                 </div>
               </div>
             </div>
 
-            {/* Divider for mobile view */}
-            <div className="h-px bg-border my-3 md:hidden"></div>
-
-            {/* Right side: Stats */}
-            <div className="md:col-span-5 w-full flex justify-around md:justify-end items-start gap-4">
-                <div className="text-center md:w-1/2">
-                    <p className="text-xs text-muted-foreground font-semibold">{t('journal.impactFactor')}</p>
-                    <p className="font-medium text-base">{formatImpactFactor(journal.impactFactor)}</p>
+            <div className="flex items-center gap-6 md:gap-8 shrink-0 md:pl-4 md:border-l md:border-border/60">
+                <div className="text-left md:text-right min-w-[72px]">
+                    <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium">{t('journal.impactFactor')}</p>
+                    <p className="font-headline font-bold text-xl md:text-2xl tabular-nums leading-none mt-0.5">{formatImpactFactor(journal.impactFactor)}</p>
                 </div>
-                <div className="text-center md:w-1/2">
-                    <p className="text-xs text-muted-foreground font-semibold mb-1">{t('journal.casPartitionShort')}</p>
-                    <div className={cn("flex items-center justify-center font-semibold text-base", getPartitionColorClass(journal.majorCategoryPartition))}>
-                        <span className="ml-1">{getPartitionText(journal.majorCategoryPartition)}</span>
-                    </div>
+                <div className="text-left md:text-right min-w-[56px]">
+                    <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium mb-1">{t('journal.casPartitionShort')}</p>
+                    <Badge variant={getPartitionBadgeVariant(journal.majorCategoryPartition)} className="text-sm px-2 py-0.5">
+                        {getPartitionText(journal.majorCategoryPartition)}
+                    </Badge>
                 </div>
             </div>
         </div>

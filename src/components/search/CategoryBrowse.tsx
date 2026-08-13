@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useTranslation } from "@/i18n/provider";
 import { getMajorCategoryName } from "@/i18n/categories";
-import { getCategoryGridSpan, getCategoryMeta } from "@/lib/category-meta";
+import { getCategoryMeta } from "@/lib/category-meta";
 import { cn } from "@/lib/utils";
 
 interface CategoryBrowseProps {
@@ -17,8 +17,6 @@ interface CategoryBrowseProps {
 export default function CategoryBrowse({ categories, onCategorySelect }: CategoryBrowseProps) {
   const { t, locale } = useTranslation();
   const [filter, setFilter] = useState("");
-
-  const maxCount = categories[0]?.[1] ?? 0;
 
   const filteredCategories = useMemo(() => {
     if (!filter.trim()) return categories;
@@ -38,7 +36,7 @@ export default function CategoryBrowse({ categories, onCategorySelect }: Categor
         <p className="text-muted-foreground">{t("categories.browseSubtitle")}</p>
       </div>
 
-      <div className="relative max-w-md">
+      <div className="relative w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           type="text"
@@ -55,40 +53,36 @@ export default function CategoryBrowse({ categories, onCategorySelect }: Categor
           {t("categories.noMatch")}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
           {filteredCategories.map(([category, count]) => {
             const meta = getCategoryMeta(category);
             const Icon = meta.icon;
-            const spanClass = getCategoryGridSpan(count, maxCount);
             const name = getMajorCategoryName(category, locale);
 
             return (
               <Card
                 key={category}
-                className={cn(
-                  "cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30 group h-full",
-                  spanClass
-                )}
+                className="cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30 group h-full"
                 onClick={() => onCategorySelect(category)}
               >
-                <CardContent className="flex h-full min-h-[140px] flex-col items-center justify-between p-4 text-center">
-                  <div
-                    className={cn(
-                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105",
-                      meta.bgClass
-                    )}
-                  >
-                    <Icon className={cn("h-5 w-5", meta.accentClass)} />
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={cn(
+                        "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105",
+                        meta.bgClass
+                      )}
+                    >
+                      <Icon className={cn("h-5 w-5", meta.accentClass)} />
+                    </div>
+                    <p
+                      className="font-headline text-base md:text-lg font-semibold leading-snug line-clamp-2 pt-1.5"
+                      title={name}
+                    >
+                      {name}
+                    </p>
                   </div>
-
-                  <p
-                    className="font-headline text-sm font-semibold leading-snug line-clamp-3 min-h-[3.75rem] flex items-center justify-center px-1"
-                    title={name}
-                  >
-                    {name}
-                  </p>
-
-                  <p className="text-xs text-muted-foreground pt-2">
+                  <p className="mt-2 pl-[52px] text-sm text-muted-foreground">
                     <span className="font-semibold tabular-nums text-foreground">{count}</span>{" "}
                     {t("categories.journals")}
                   </p>

@@ -349,7 +349,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
         )}
       </div>
 
-      <div className="relative max-w-2xl mx-auto">
+      <div className="relative w-full">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="text"
@@ -362,8 +362,8 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
       </div>
 
       {showInitialMessage && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="flex flex-col gap-4 w-full">
+          <div className="flex flex-wrap items-center gap-2">
             <span className="text-sm text-muted-foreground">{t('search.examplesLabel')}:</span>
             {SEARCH_EXAMPLES.map((term) => (
               <button
@@ -376,7 +376,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
               </button>
             ))}
           </div>
-          <div className="w-full max-w-lg text-center py-10 px-4 rounded-xl bg-muted/30 ring-1 ring-border/40">
+          <div className="w-full text-center py-10 px-4 rounded-xl bg-muted/30 ring-1 ring-border/40">
               <Search className="mx-auto h-10 w-10 text-muted-foreground/70" />
               <h3 className="mt-3 text-base font-medium text-foreground">{t('search.initial.title')}</h3>
               <p className="mt-1 text-sm text-muted-foreground">

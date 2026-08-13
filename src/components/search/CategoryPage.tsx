@@ -63,6 +63,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { journals as allJournalsData } from "@/data/journals";
 import { cn } from "@/lib/utils";
+import { PAGE_CONTAINER } from "@/lib/layout";
 
 const JOURNALS_PER_PAGE = 20;
 
@@ -550,20 +551,6 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     );
   }
 
-  if (selectedJournal) {
-    return (
-      <div className="py-4 md:py-8">
-        <JournalDetail
-          key={selectedJournal.issn} // Add key to force re-mount and state reset for child components
-          journal={selectedJournal}
-          onBack={handleBackFromDetail}
-          onJournalSelect={handleJournalSelectByName}
-          isHistoryRoot={journalHistory.length <= 1}
-        />
-      </div>
-    );
-  }
-  
   const renderListHeader = () => {
     return (
         <div className="flex items-center gap-4 mb-6">
@@ -834,7 +821,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
-        <div className="max-w-5xl mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8 justify-between">
+        <div className={cn(PAGE_CONTAINER, "flex h-16 items-center justify-between")}>
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="sm:hidden">
                 <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
@@ -882,15 +869,25 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         </div>
       </header>
       <main className="flex-grow pb-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className={PAGE_CONTAINER}>
             <div className="py-8 md:py-10">
-                {renderContent()}
+                {selectedJournal ? (
+                  <JournalDetail
+                    key={selectedJournal.issn}
+                    journal={selectedJournal}
+                    onBack={handleBackFromDetail}
+                    onJournalSelect={handleJournalSelectByName}
+                    isHistoryRoot={journalHistory.length <= 1}
+                  />
+                ) : (
+                  renderContent()
+                )}
             </div>
         </div>
       </main>
-      <BatchActionBottomBar />
+      {!selectedJournal && <BatchActionBottomBar />}
       <footer className="border-t">
-        <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center text-sm text-muted-foreground">
+        <div className={cn(PAGE_CONTAINER, "py-4 text-center text-sm text-muted-foreground")}>
           © 2025 Jing Wang. All Rights Reserved.
         </div>
       </footer>

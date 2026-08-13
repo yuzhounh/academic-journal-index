@@ -66,9 +66,3 @@ export const categoryMetaMap: Record<string, CategoryMeta> = {
 export function getCategoryMeta(category: string): CategoryMeta {
   return categoryMetaMap[category] ?? defaultMeta;
 }
-
-export function getCategoryGridSpan(count: number, maxCount: number): string {
-  if (maxCount <= 0) return "md:col-span-1";
-  if (count >= maxCount * 0.75) return "md:col-span-2 lg:col-span-2";
-  return "md:col-span-1";
-}

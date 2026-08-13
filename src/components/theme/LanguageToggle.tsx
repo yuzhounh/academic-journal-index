@@ -1,36 +1,26 @@
 "use client"
 
 import * as React from "react"
-import { Languages } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { useTranslation } from "@/i18n/provider"
+import { Button } from "@/components/ui/button"
 
 export function LanguageToggle() {
-  const { setLocale } = useTranslation();
+  const { locale, setLocale } = useTranslation()
+
+  const toggleLocale = () => {
+    setLocale(locale === "zh" ? "en" : "zh")
+  }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Languages className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
-          <span className="sr-only">Toggle language</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setLocale("en")}>
-          English
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setLocale("zh")}>
-          中文
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button
+      variant="outline"
+      size="icon"
+      onClick={toggleLocale}
+      aria-label={locale === "zh" ? "Switch to English" : "切换为中文"}
+    >
+      <span className="text-xs font-bold leading-none">
+        {locale === "zh" ? "中" : "EN"}
+      </span>
+    </Button>
   )
 }

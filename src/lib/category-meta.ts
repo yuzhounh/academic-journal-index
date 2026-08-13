@@ -11,6 +11,7 @@ import {
   HeartPulse,
   Landmark,
   Leaf,
+  Library,
   Palette,
   Scale,
   ScrollText,
@@ -29,8 +30,8 @@ export type CategoryMeta = {
 
 const defaultMeta: CategoryMeta = {
   icon: BookOpen,
-  accentClass: "text-primary",
-  bgClass: "bg-primary/10",
+  accentClass: "text-slate-600 dark:text-slate-400",
+  bgClass: "bg-slate-500/10",
 };
 
 export const categoryMetaMap: Record<string, CategoryMeta> = {
@@ -56,7 +57,7 @@ export const categoryMetaMap: Record<string, CategoryMeta> = {
   人文学科: { icon: BookOpen, accentClass: "text-amber-700 dark:text-amber-400", bgClass: "bg-amber-500/10" },
   地球科学与环境生态: { icon: Globe2, accentClass: "text-emerald-600 dark:text-emerald-400", bgClass: "bg-emerald-500/10" },
   交叉学科: { icon: Shapes, accentClass: "text-violet-600 dark:text-violet-400", bgClass: "bg-violet-500/10" },
-  综合性期刊: { icon: BookOpen, accentClass: "text-primary", bgClass: "bg-primary/10" },
+  综合性期刊: { icon: Library, accentClass: "text-indigo-600 dark:text-indigo-400", bgClass: "bg-indigo-500/10" },
   社会学: { icon: Users, accentClass: "text-teal-600 dark:text-teal-400", bgClass: "bg-teal-500/10" },
   文学: { icon: ScrollText, accentClass: "text-rose-600 dark:text-rose-400", bgClass: "bg-rose-500/10" },
   历史学: { icon: Landmark, accentClass: "text-amber-700 dark:text-amber-400", bgClass: "bg-amber-500/10" },

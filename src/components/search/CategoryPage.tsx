@@ -625,7 +625,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
             <div className="animate-in fade-in-50 duration-300">
               {renderListHeader()}
               <div className="mb-6">
-                <CategoryStats journals={journalsToDisplay} collapsible defaultOpen={false} />
+                <CategoryStats journals={journalsToDisplay} collapsible defaultOpen={true} />
               </div>
               {renderActionToolbar()}
               {paginatedJournals.length > 0 ? (
@@ -665,7 +665,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         } else { // categories
           return (
             <div className="animate-in fade-in-50 duration-300 space-y-8">
-              <CategoryStats journals={journals} defaultOpen={true} />
+              <CategoryStats journals={journals} collapsible defaultOpen={true} />
               <CategoryBrowse
                 categories={sortedCategories}
                 onCategorySelect={handleCategorySelect}

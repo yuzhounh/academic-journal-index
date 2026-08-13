@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useTranslation } from "@/i18n/provider";
@@ -55,33 +55,40 @@ export default function CategoryBrowse({ categories, onCategorySelect }: Categor
           {t("categories.noMatch")}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 auto-rows-fr">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
           {filteredCategories.map(([category, count]) => {
             const meta = getCategoryMeta(category);
             const Icon = meta.icon;
             const spanClass = getCategoryGridSpan(count, maxCount);
+            const name = getMajorCategoryName(category, locale);
 
             return (
               <Card
                 key={category}
                 className={cn(
-                  "cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30 flex flex-col group",
+                  "cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30 group h-full",
                   spanClass
                 )}
                 onClick={() => onCategorySelect(category)}
               >
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105", meta.bgClass)}>
-                      <Icon className={cn("h-5 w-5", meta.accentClass)} />
-                    </div>
-                    <CardTitle className="font-headline text-lg leading-snug pt-1">
-                      {getMajorCategoryName(category, locale)}
-                    </CardTitle>
+                <CardContent className="flex h-full min-h-[140px] flex-col items-center justify-between p-4 text-center">
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105",
+                      meta.bgClass
+                    )}
+                  >
+                    <Icon className={cn("h-5 w-5", meta.accentClass)} />
                   </div>
-                </CardHeader>
-                <CardContent className="mt-auto pt-0">
-                  <p className="text-sm text-muted-foreground">
+
+                  <p
+                    className="font-headline text-sm font-semibold leading-snug line-clamp-3 min-h-[3.75rem] flex items-center justify-center px-1"
+                    title={name}
+                  >
+                    {name}
+                  </p>
+
+                  <p className="text-xs text-muted-foreground pt-2">
                     <span className="font-semibold tabular-nums text-foreground">{count}</span>{" "}
                     {t("categories.journals")}
                   </p>

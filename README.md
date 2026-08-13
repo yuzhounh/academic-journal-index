@@ -2,7 +2,7 @@
 
 Academic Journal Index (AJI) is a comprehensive platform designed to help researchers and academics discover, evaluate, and manage academic journals. It provides detailed metrics including Impact Factor, CAS Partitions, and Authority Levels, enhanced by AI-driven analysis.
 
-**Live Demo:** [https://academic-journal-index.vercel.app/](https://academic-journal-index.vercel.app/)
+**Live Site / 在线访问:** [https://academic-journal-index.vercel.app/](https://academic-journal-index.vercel.app/)
 
 ## 🚀 Key Features
 

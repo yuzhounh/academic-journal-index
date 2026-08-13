@@ -15,14 +15,14 @@ const badgeVariants = cva(
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
         outline: "text-foreground",
-        level1: "border-transparent bg-red-500 text-white",
-        level2: "border-transparent bg-orange-500 text-white",
-        level3: "border-transparent bg-yellow-500 text-black",
-        level4: "border-transparent bg-green-500 text-white",
-        authority1: "border-transparent bg-[#f75c2e] text-white",
-        authority2: "border-transparent bg-[#f79410] text-white",
-        authority3: "border-transparent bg-[#22c55e] text-white",
-        openAccess: "border-transparent bg-emerald-500/80 text-emerald-foreground"
+        level1: "border-partition-q1/20 bg-partition-q1/10 text-partition-q1",
+        level2: "border-partition-q2/20 bg-partition-q2/10 text-partition-q2",
+        level3: "border-partition-q3/20 bg-partition-q3/10 text-partition-q3",
+        level4: "border-partition-q4/20 bg-partition-q4/10 text-partition-q4",
+        authority1: "border-authority-l1/20 bg-authority-l1/10 text-authority-l1",
+        authority2: "border-authority-l2/20 bg-authority-l2/10 text-authority-l2",
+        authority3: "border-authority-l3/20 bg-authority-l3/10 text-authority-l3",
+        openAccess: "border-oa-open/20 bg-oa-open/10 text-oa-open",
       },
     },
     defaultVariants: {

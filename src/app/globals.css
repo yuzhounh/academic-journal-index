@@ -2,63 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 @layer base {
   :root {
-    --background: 210 20% 95%;
-    --foreground: 210 10% 23%;
-    --card: 210 20% 100%;
-    --card-foreground: 210 10% 23%;
-    --popover: 210 20% 100%;
-    --popover-foreground: 210 10% 23%;
-    --primary: 210 50% 50%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 210 20% 90%;
-    --secondary-foreground: 210 50% 50%;
-    --muted: 210 20% 90%;
-    --muted-foreground: 210 10% 45%;
-    --accent: 180 60% 40%;
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 214 32% 91%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 173 58% 39%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 20% 85%;
-    --input: 210 20% 88%;
-    --ring: 210 50% 50%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --ring: 221 83% 53%;
+    --radius: 0.75rem;
+
+    /* Semantic metric tokens */
+    --partition-q1: 347 77% 50%;
+    --partition-q2: 25 95% 53%;
+    --partition-q3: 45 93% 47%;
+    --partition-q4: 142 71% 45%;
+    --authority-l1: 14 90% 53%;
+    --authority-l2: 32 95% 52%;
+    --authority-l3: 142 71% 45%;
+    --oa-open: 160 84% 39%;
+    --oa-closed: 25 95% 53%;
   }
+
   .dark {
-    --background: 210 20% 8%;
-    --foreground: 210 20% 95%;
-    --card: 210 20% 12%;
-    --card-foreground: 210 20% 95%;
-    --popover: 210 20% 8%;
-    --popover-foreground: 210 20% 95%;
-    --primary: 210 50% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 20% 15%;
-    --secondary-foreground: 210 20% 95%;
-    --muted: 210 20% 15%;
-    --muted-foreground: 210 20% 65%;
-    --accent: 180 60% 50%;
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 217 33% 17%;
+    --card-foreground: 210 40% 98%;
+    --popover: 217 33% 17%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 47% 11%;
+    --secondary: 217 33% 22%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217 33% 22%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 173 58% 45%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 20% 20%;
-    --input: 210 20% 20%;
-    --ring: 210 50% 60%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 217 91% 60%;
+
+    --partition-q1: 347 77% 58%;
+    --partition-q2: 25 95% 58%;
+    --partition-q3: 45 93% 55%;
+    --partition-q4: 142 71% 52%;
+    --authority-l1: 14 90% 58%;
+    --authority-l2: 32 95% 58%;
+    --authority-l3: 142 71% 52%;
+    --oa-open: 160 84% 45%;
+    --oa-closed: 25 95% 58%;
   }
 }
 
@@ -67,6 +75,6 @@ body {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
   }
 }

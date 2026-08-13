@@ -12,7 +12,7 @@ export default {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
         headline: ['Space Grotesk', 'sans-serif'],
-        code: ['monospace'],
+        code: ['JetBrains Mono', 'monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -55,6 +55,21 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        partition: {
+          q1: 'hsl(var(--partition-q1))',
+          q2: 'hsl(var(--partition-q2))',
+          q3: 'hsl(var(--partition-q3))',
+          q4: 'hsl(var(--partition-q4))',
+        },
+        authority: {
+          l1: 'hsl(var(--authority-l1))',
+          l2: 'hsl(var(--authority-l2))',
+          l3: 'hsl(var(--authority-l3))',
+        },
+        oa: {
+          open: 'hsl(var(--oa-open))',
+          closed: 'hsl(var(--oa-closed))',
+        },
         sidebar: {
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',
@@ -70,6 +85,10 @@ export default {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+      },
+      boxShadow: {
+        card: '0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04)',
+        'card-hover': '0 4px 12px 0 rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04)',
       },
       keyframes: {
         'accordion-down': {

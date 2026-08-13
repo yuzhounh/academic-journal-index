@@ -63,6 +63,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from "@/hooks/use-toast";
 import { journals as allJournalsData } from "@/data/journals";
+import { cn } from "@/lib/utils";
 
 const JOURNALS_PER_PAGE = 20;
 
@@ -670,7 +671,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 {sortedCategories.map(([category, count]) => (
                   <Card
                     key={category}
-                    className="cursor-pointer hover:shadow-lg hover:border-primary transition-all duration-200 flex flex-col"
+                    className="cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30 flex flex-col"
                     onClick={() => handleCategorySelect(category)}
                   >
                     <CardHeader className="flex-grow pb-2">
@@ -697,75 +698,51 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     }
   };
 
+  const navViewItems: { id: 'search' | 'categories' | 'favorites' | 'about'; labelKey: string; icon: React.ElementType }[] = [
+    { id: 'search', labelKey: 'nav.search', icon: SearchIcon },
+    { id: 'categories', labelKey: 'nav.browse', icon: BookOpen },
+    { id: 'favorites', labelKey: 'nav.favorites', icon: Star },
+    { id: 'about', labelKey: 'nav.about', icon: Info },
+  ];
+
   const navItems = (
     <>
-      <Button
-        onClick={() => handleViewChange("search")}
-        variant={view === "search" ? "secondary" : "ghost"}
-        className="w-full justify-start text-base py-6"
-      >
-        <SearchIcon className="mr-3 h-5 w-5" />
-        {t('nav.search')}
-      </Button>
-      <Button
-        onClick={() => handleViewChange("categories")}
-        variant={view === "categories" ? "secondary" : "ghost"}
-        className="w-full justify-start text-base py-6"
-      >
-        <BookOpen className="mr-3 h-5 w-5" />
-        {t('nav.browse')}
-      </Button>
-      <Button 
-        onClick={() => handleViewChange("favorites")}
-        variant={view === "favorites" ? "secondary" : "ghost"}
-        className="w-full justify-start text-base py-6"
-      >
-          <Star className="mr-3 h-5 w-5" />
-          {t('nav.favorites')}
-      </Button>
-      <Button
-          onClick={() => handleViewChange("about")}
-          variant={view === "about" ? "secondary" : "ghost"}
-          className="w-full justify-start text-base py-6"
-      >
-          <Info className="mr-3 h-5 w-5" />
-          {t('nav.about')}
-      </Button>
+      {navViewItems.map(({ id, labelKey, icon: Icon }) => (
+        <Button
+          key={id}
+          onClick={() => handleViewChange(id)}
+          variant={view === id ? "secondary" : "ghost"}
+          className={cn(
+            "w-full justify-start text-base py-6",
+            view === id && "bg-background shadow-sm ring-1 ring-border/50"
+          )}
+        >
+          <Icon className="mr-3 h-5 w-5" />
+          {t(labelKey)}
+        </Button>
+      ))}
     </>
-  )
+  );
 
   const desktopNavItems = (
-    <nav className="hidden sm:flex items-center gap-2">
-      <Button
-        onClick={() => handleViewChange("search")}
-        variant={view === "search" ? "secondary" : "ghost"}
-        size="sm"
-      >
-        {t('nav.search')}
-      </Button>
-      <Button
-        onClick={() => handleViewChange("categories")}
-        variant={view === "categories" ? "secondary" : "ghost"}
-        size="sm"
-      >
-        {t('nav.browse')}
-      </Button>
-      <Button 
-        onClick={() => handleViewChange("favorites")}
-        variant={view === "favorites" ? "secondary" : "ghost"}
-        size="sm"
-      >
-          {t('nav.favorites')}
-      </Button>
-      <Button
-          onClick={() => handleViewChange("about")}
-          variant={view === "about" ? "secondary" : "ghost"}
-          size="sm"
-      >
-          {t('nav.about')}
-      </Button>
+    <nav className="hidden sm:flex items-center p-1 bg-muted/80 rounded-lg ring-1 ring-border/40">
+      {navViewItems.map(({ id, labelKey }) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => handleViewChange(id)}
+          className={cn(
+            "px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200",
+            view === id
+              ? "bg-background text-foreground shadow-sm ring-1 ring-border/50"
+              : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          {t(labelKey)}
+        </button>
+      ))}
     </nav>
-  )
+  );
 
   const BatchActionBottomBar = () => {
     if (!isEditing || !user || selectedJournals.size === 0) return null;
@@ -835,7 +812,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-12 duration-300">
         <div className="max-w-xl mx-auto">
-          <Card className="shadow-2xl">
+          <Card className="shadow-2xl ring-1 ring-border/50 backdrop-blur-sm bg-card/95">
             <CardContent className="p-3 flex items-center justify-between">
               <span className="text-sm font-medium">
                 {t('batchEdit.selected', { count: selectedJournals.size })}
@@ -874,7 +851,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
         <div className="max-w-5xl mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8 justify-between">
           <div className="flex items-center gap-4 sm:gap-6">
             <div className="sm:hidden">
@@ -893,8 +870,10 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                             Main navigation menu
                           </SheetDescription>
                         </SheetHeader>
-                        <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline mb-6">
-                          <BookOpen className="h-5 w-5 text-primary" />
+                        <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline mb-6">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                            <BookOpen className="h-4 w-4" />
+                          </div>
                           <span>AJI</span>
                         </a>
                       </div>
@@ -904,8 +883,10 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                     </SheetContent>
                 </Sheet>
             </div>
-            <a href="/" className="flex items-center gap-2 text-xl font-bold font-headline">
-              <BookOpen className="h-5 w-5 text-primary" />
+            <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-sm">
+                <BookOpen className="h-4 w-4" />
+              </div>
               <span>AJI</span>
             </a>
             {desktopNavItems}

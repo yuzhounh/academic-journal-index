@@ -25,28 +25,28 @@ const partitionMap: { [key: string]: string } = {
 };
 
 const partitionColors: { [key: string]: string } = {
-  "一区": "#ef4444",
-  "二区": "#f97316",
-  "三区": "#eab308",
-  "四区": "#22c55e",
-  "Q1": "#ef4444",
-  "Q2": "#f97316",
-  "Q3": "#eab308",
-  "Q4": "#22c55e",
+  "一区": "hsl(var(--partition-q1))",
+  "二区": "hsl(var(--partition-q2))",
+  "三区": "hsl(var(--partition-q3))",
+  "四区": "hsl(var(--partition-q4))",
+  "Q1": "hsl(var(--partition-q1))",
+  "Q2": "hsl(var(--partition-q2))",
+  "Q3": "hsl(var(--partition-q3))",
+  "Q4": "hsl(var(--partition-q4))",
 };
 
 const authorityColors: { [key: string]: string } = {
-  "一级": "#f75c2e",
-  "二级": "#f79410",
-  "三级": "#22c55e",
-  "Level 1": "#f75c2e",
-  "Level 2": "#f79410",
-  "Level 3": "#22c55e",
+  "一级": "hsl(var(--authority-l1))",
+  "二级": "hsl(var(--authority-l2))",
+  "三级": "hsl(var(--authority-l3))",
+  "Level 1": "hsl(var(--authority-l1))",
+  "Level 2": "hsl(var(--authority-l2))",
+  "Level 3": "hsl(var(--authority-l3))",
 };
 
 const openAccessColors: { [key: string]: string } = {
-    "Closed Access": "#f97316",
-    "Open Access": "#34d399",
+    "Closed Access": "hsl(var(--oa-closed))",
+    "Open Access": "hsl(var(--oa-open))",
 };
 
 const StatsBarChart = ({ data, totalJournals }: { data: { name: string; count: number, fill: string }[]; totalJournals: number }) => {

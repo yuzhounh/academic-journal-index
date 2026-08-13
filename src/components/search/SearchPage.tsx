@@ -290,7 +290,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 p-4 animate-in slide-in-from-bottom-12 duration-300">
         <div className="max-w-xl mx-auto">
-          <Card className="shadow-2xl">
+          <Card className="shadow-2xl ring-1 ring-border/50 backdrop-blur-sm bg-card/95">
             <CardContent className="p-3 flex items-center justify-between">
               <span className="text-sm font-medium">
                 {t('batchEdit.selected', { count: selectedJournals.size })}
@@ -331,7 +331,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
           placeholder={t('search.placeholder')}
           value={searchTerm}
           onChange={handleSearchChange}
-          className="w-full pl-10 h-12 text-lg shadow-md focus-visible:shadow-lg transition-shadow"
+          className="w-full pl-10 h-12 text-lg rounded-xl shadow-card ring-1 ring-border/50 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:shadow-card-hover transition-all duration-200"
           aria-label={t('search.ariaLabel')}
         />
       </div>
@@ -344,7 +344,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
       )}
 
       {showInitialMessage && (
-          <div className="text-center py-20 px-4 border-2 border-dashed rounded-lg">
+          <div className="text-center py-20 px-4 rounded-xl bg-muted/40 ring-1 ring-border/50">
               <Search className="mx-auto h-12 w-12 text-muted-foreground" />
               <h3 className="mt-4 text-lg font-medium text-foreground">{t('search.initial.title')}</h3>
               <p className="mt-1 text-sm text-muted-foreground">

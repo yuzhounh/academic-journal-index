@@ -42,7 +42,7 @@ import { LanguageToggle } from "../theme/LanguageToggle";
 import { useTranslation } from "@/i18n/provider";
 import { getMajorCategoryName } from "@/i18n/categories";
 import { useCollection, WithId } from "@/firebase/firestore/use-collection";
-import { collection, query, writeBatch, doc, getDocs, where, serverTimestamp } from "firebase/firestore";
+import { collection, query, writeBatch, doc, getDocs, where, serverTimestamp, orderBy } from "firebase/firestore";
 import { useMemoFirebase } from "@/firebase/provider";
 import LoginDialog from "../auth/LoginDialog";
 import JournalListItem from "./JournalListItem";
@@ -239,6 +239,18 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       [user, firestore]
   );
   const { data: allFavoriteEntries } = useCollection<FavoriteJournalEntry>(allFavoritesQuery);
+
+  const journalListsQuery = useMemoFirebase(
+      () =>
+        user && firestore
+          ? query(
+              collection(firestore, `users/${user.uid}/journal_lists`),
+              orderBy("name", "asc")
+            )
+          : null,
+      [user, firestore]
+  );
+  const { data: journalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
 
   // For Browse view
   const journalsForCategory = useMemo(() => {
@@ -643,6 +655,8 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         if (view === 'favorites') {
           return <FavoritesContent 
                   allFavorites={allFavoriteEntries} 
+                  journalLists={journalLists}
+                  isLoadingLists={isLoadingLists}
                   onJournalListSelect={handleJournalListSelect} 
                   onFindJournalsClick={() => handleViewChange('search')}
                   onLoginClick={() => setIsLoginDialogOpen(true)}

@@ -4,8 +4,8 @@
 
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useFirebase } from "@/firebase";
-import { useCollection, WithId } from "@/firebase/firestore/use-collection";
-import { collection, query, orderBy, writeBatch, doc, serverTimestamp, addDoc } from "firebase/firestore";
+import { WithId } from "@/firebase/firestore/use-collection";
+import { collection, writeBatch, doc, serverTimestamp, addDoc } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import {
     Card,
@@ -13,10 +13,9 @@ import {
     CardTitle,
     CardContent,
 } from "@/components/ui/card";
-import { useMemoFirebase } from "@/firebase/provider";
 import { Journal } from "@/data/journals";
 import { useTranslation } from "@/i18n/provider";
-import { BookText, FolderOpen, LogIn, Pencil, Trash2, Upload, FolderPlus, Search } from "lucide-react";
+import { BookText, LogIn, Pencil, Trash2, Upload, FolderPlus, Search } from "lucide-react";
 import CategoryStats from "../search/CategoryStats";
 import DeleteJournalListDialog from "./DeleteJournalListDialog";
 import RenameJournalListDialog from "./RenameJournalListDialog";
@@ -38,12 +37,14 @@ type FavoriteJournalEntry = {
 interface FavoritesContentProps {
     onJournalListSelect: (list: WithId<JournalList>) => void;
     allFavorites: WithId<FavoriteJournalEntry>[] | null;
+    journalLists: WithId<JournalList>[] | null;
+    isLoadingLists: boolean;
     onFindJournalsClick: () => void;
     onLoginClick: () => void;
     journals: Journal[];
 }
 
-export default function FavoritesContent({ onJournalListSelect, allFavorites, onFindJournalsClick, onLoginClick, journals }: FavoritesContentProps) {
+export default function FavoritesContent({ onJournalListSelect, allFavorites, journalLists, isLoadingLists, onFindJournalsClick, onLoginClick, journals }: FavoritesContentProps) {
     const { user, isUserLoading, firestore } = useFirebase();
     const { t } = useTranslation();
     const { toast } = useToast();
@@ -51,19 +52,6 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
     const [renameDialogState, setRenameDialogState] = useState<{open: boolean, listId: string, listName: string}>({open: false, listId: '', listName: ''});
     const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    
-    const journalListsQuery = useMemoFirebase(
-        () =>
-          user && firestore
-            ? query(
-                collection(firestore, `users/${user.uid}/journal_lists`),
-                orderBy("name", "asc")
-              )
-            : null,
-        [user, firestore]
-    );
-    
-    const { data: journalLists, isLoading: isLoadingLists } = useCollection<JournalList>(journalListsQuery);
     
     const [journalsForStats, setJournalsForStats] = useState<Journal[]>([]);
 
@@ -186,15 +174,14 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
     };
 
 
-    if (isUserLoading || isLoadingLists) {
-        return (
-          <div className="flex justify-center items-center h-64">
-            <div className="text-lg">{t('favorites.loading')}</div>
-          </div>
-        );
-    }
-    
     if (!user) {
+        if (isUserLoading) {
+            return (
+              <div className="flex justify-center items-center h-64">
+                <div className="text-lg">{t('favorites.loading')}</div>
+              </div>
+            );
+        }
         return (
             <div className="flex flex-col items-center justify-center text-center px-4 py-20 border-2 border-dashed rounded-lg">
                 <h2 className="text-2xl font-bold mb-4">{t('favorites.login.title')}</h2>
@@ -204,6 +191,14 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, on
                     {t('auth.login')}
                 </Button>
             </div>
+        );
+    }
+
+    if (isLoadingLists && journalLists === null) {
+        return (
+          <div className="flex justify-center items-center h-64">
+            <div className="text-lg">{t('favorites.loading')}</div>
+          </div>
         );
     }
     

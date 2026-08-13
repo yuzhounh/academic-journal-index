@@ -20,13 +20,13 @@ const getPartitionColorClass = (partition: string): string => {
   const mainPartition = partition.charAt(0);
   switch (mainPartition) {
     case "1":
-      return "text-red-500";
+      return "text-partition-q1";
     case "2":
-      return "text-orange-500";
+      return "text-partition-q2";
     case "3":
-      return "text-yellow-600";
+      return "text-partition-q3";
     case "4":
-      return "text-green-600";
+      return "text-partition-q4";
     default:
       return "text-muted-foreground";
   }
@@ -117,7 +117,7 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
 
   return (
     <Card
-      className={cn("cursor-pointer hover:shadow-lg hover:border-primary/50 transition-shadow", isSelected && "border-primary shadow-lg")}
+      className={cn("cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30", isSelected && "ring-2 ring-primary shadow-card-hover")}
       onClick={handleCardClick}
     >
       <CardContent className="p-4 md:p-6 flex items-center gap-4">

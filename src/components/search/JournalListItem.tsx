@@ -136,7 +136,7 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
             <div className="flex items-center gap-6 md:gap-8 shrink-0 md:pl-4 md:border-l md:border-border/60">
                 <div className="text-left md:text-right min-w-[72px]">
                     <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium">{t('journal.impactFactor')}</p>
-                    <p className="font-headline font-bold text-xl md:text-2xl tabular-nums leading-none mt-0.5">{formatImpactFactor(journal.impactFactor)}</p>
+                    <p className="font-headline font-semibold text-base tabular-nums leading-none mt-0.5">{formatImpactFactor(journal.impactFactor)}</p>
                 </div>
                 <div className="text-left md:text-right min-w-[56px]">
                     <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium mb-1">{t('journal.casPartitionShort')}</p>

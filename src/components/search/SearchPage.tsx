@@ -388,7 +388,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 
       {filteredJournals.length > 0 && (
         <div className="animate-in fade-in-50 duration-300 space-y-6">
-          <CategoryStats journals={filteredJournals} collapsible defaultOpen={false} />
+          <CategoryStats journals={filteredJournals} collapsible defaultOpen={true} />
           {renderActionToolbar()}
         </div>
       )}

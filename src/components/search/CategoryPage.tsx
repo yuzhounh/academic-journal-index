@@ -63,7 +63,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { journals as allJournalsData } from "@/data/journals";
 import { cn } from "@/lib/utils";
-import { PAGE_CONTAINER } from "@/lib/layout";
 
 const JOURNALS_PER_PAGE = 20;
 
@@ -820,7 +819,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
 
   return (
     <>
-      <div className={cn(PAGE_CONTAINER, "flex min-h-screen flex-col")}>
+      <div className="page-shell flex min-h-screen flex-col">
         <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
           <div className="flex h-16 items-center justify-between">
             <div className="flex items-center gap-4 sm:gap-6">

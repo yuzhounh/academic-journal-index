@@ -26,6 +26,9 @@ import { Checkbox } from "../ui/checkbox";
 import AddToFavoritesDialog from "../favorites/AddToFavoritesDialog";
 import { Card, CardContent } from "../ui/card";
 import { useFirebase } from "@/firebase";
+import { cn } from "@/lib/utils";
+
+const SEARCH_EXAMPLES = ["Nature", "Cell", "Lancet", "IEEE"];
 
 interface SearchPageProps {
   journals: Journal[];
@@ -251,6 +254,14 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 
   const showInitialMessage = searchTerm.length < 3;
   const showNoResultsMessage = searchTerm.length >= 3 && filteredJournals.length === 0;
+  const hasResults = filteredJournals.length > 0;
+
+  const handleExampleClick = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1);
+    setIsEditing(false);
+    setSelectedJournals(new Set());
+  };
 
   const renderActionToolbar = () => {
     if (filteredJournals.length === 0) return null;
@@ -323,34 +334,63 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
 
 
   return (
-    <div className="w-full">
-      <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+    <div className="w-full space-y-6">
+      <div className={cn("text-center transition-all duration-300", hasResults ? "mb-2" : "mb-4")}>
+        <h1 className={cn(
+          "font-headline font-bold tracking-tight transition-all duration-300",
+          hasResults ? "text-2xl md:text-3xl" : "text-4xl md:text-5xl"
+        )}>
+          {t('header.title')}
+        </h1>
+        {!hasResults && (
+          <p className="mt-2 text-lg text-muted-foreground max-w-2xl mx-auto">
+            {t('header.subtitle')}
+          </p>
+        )}
+      </div>
+
+      <div className="relative max-w-2xl mx-auto">
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="text"
           placeholder={t('search.placeholder')}
           value={searchTerm}
           onChange={handleSearchChange}
-          className="w-full pl-10 h-12 text-lg rounded-xl shadow-card ring-1 ring-border/50 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:shadow-card-hover transition-all duration-200"
+          className="w-full pl-12 h-14 text-lg rounded-2xl shadow-card ring-1 ring-border/50 focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:shadow-card-hover transition-all duration-200"
           aria-label={t('search.ariaLabel')}
         />
       </div>
 
-      {filteredJournals.length > 0 && (
-        <div className="mb-8 animate-in fade-in-50 duration-300 space-y-6">
-          <CategoryStats journals={filteredJournals} />
-          {renderActionToolbar()}
-        </div>
-      )}
-
       {showInitialMessage && (
-          <div className="text-center py-20 px-4 rounded-xl bg-muted/40 ring-1 ring-border/50">
-              <Search className="mx-auto h-12 w-12 text-muted-foreground" />
-              <h3 className="mt-4 text-lg font-medium text-foreground">{t('search.initial.title')}</h3>
+        <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <span className="text-sm text-muted-foreground">{t('search.examplesLabel')}:</span>
+            {SEARCH_EXAMPLES.map((term) => (
+              <button
+                key={term}
+                type="button"
+                onClick={() => handleExampleClick(term)}
+                className="rounded-full border border-border/60 bg-muted/40 px-3 py-1 text-sm font-medium text-foreground transition-colors hover:bg-primary/10 hover:border-primary/30 hover:text-primary"
+              >
+                {term}
+              </button>
+            ))}
+          </div>
+          <div className="w-full max-w-lg text-center py-10 px-4 rounded-xl bg-muted/30 ring-1 ring-border/40">
+              <Search className="mx-auto h-10 w-10 text-muted-foreground/70" />
+              <h3 className="mt-3 text-base font-medium text-foreground">{t('search.initial.title')}</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                   {t('search.initial.description')}
               </p>
           </div>
+        </div>
+      )}
+
+      {filteredJournals.length > 0 && (
+        <div className="animate-in fade-in-50 duration-300 space-y-6">
+          <CategoryStats journals={filteredJournals} collapsible defaultOpen={false} />
+          {renderActionToolbar()}
+        </div>
       )}
       {showNoResultsMessage && (
           <div className="text-center py-10">
@@ -359,7 +399,7 @@ function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: Sea
       )}
 
       {paginatedJournals.length > 0 && (
-        <div className="space-y-4 animate-in fade-in-50 duration-300">
+        <div className="space-y-2 animate-in fade-in-50 duration-300">
           {paginatedJournals.map((journal) => {
             const journalId = journal.issn.split('/')[0];
             return (

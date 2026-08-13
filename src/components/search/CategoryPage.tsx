@@ -10,8 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Pagination,
@@ -30,10 +28,11 @@ import {
   SheetDescription,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { ArrowLeft, BookText, BookOpen, Menu, Folder, Download, Pencil, X, Check, Trash2, FolderSync, Heart, Info, Star, Search as SearchIcon } from "lucide-react";
+import { ArrowLeft, BookOpen, Menu, Folder, Download, Pencil, X, Check, Trash2, FolderSync, Heart, Info, Star, Search as SearchIcon } from "lucide-react";
 import JournalDetail from "./JournalDetail";
 import SearchPage from "./SearchPage";
 import CategoryStats from "./CategoryStats";
+import CategoryBrowse from "./CategoryBrowse";
 import UserAvatar from "../auth/UserAvatar";
 import { useFirebase } from "@/firebase";
 import FavoritesContent, { JournalList } from "../favorites/FavoritesContent";
@@ -625,12 +624,12 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           return (
             <div className="animate-in fade-in-50 duration-300">
               {renderListHeader()}
-              <div className="mb-8">
-                <CategoryStats journals={journalsToDisplay} />
+              <div className="mb-6">
+                <CategoryStats journals={journalsToDisplay} collapsible defaultOpen={false} />
               </div>
               {renderActionToolbar()}
               {paginatedJournals.length > 0 ? (
-                <div className="space-y-4">
+                <div className="space-y-2">
                   {paginatedJournals.map((journal) => {
                     const journalId = journal.issn.split('/')[0];
                     return (
@@ -666,28 +665,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         } else { // categories
           return (
             <div className="animate-in fade-in-50 duration-300 space-y-8">
-              <CategoryStats journals={journals} />
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                {sortedCategories.map(([category, count]) => (
-                  <Card
-                    key={category}
-                    className="cursor-pointer transition-all duration-200 hover:shadow-card-hover hover:ring-primary/30 flex flex-col"
-                    onClick={() => handleCategorySelect(category)}
-                  >
-                    <CardHeader className="flex-grow pb-2">
-                      <CardTitle className="font-headline text-xl">
-                        {getMajorCategoryName(category, locale)}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center text-sm text-muted-foreground">
-                        <BookText className="w-4 h-4 mr-2" />
-                        <span>{count} {t('categories.journals')}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+              <CategoryStats journals={journals} defaultOpen={true} />
+              <CategoryBrowse
+                categories={sortedCategories}
+                onCategorySelect={handleCategorySelect}
+              />
             </div>
           );
         }
@@ -901,17 +883,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       </header>
       <main className="flex-grow pb-24">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-12 md:py-16">
-                {journalHistory.length === 0 && (
-                    <div className="flex flex-col items-center text-center mb-8">
-                        <h1 className="font-headline text-4xl md:text-5xl font-bold tracking-tight">
-                        {t('header.title')}
-                        </h1>
-                        <p className="mt-2 text-lg text-muted-foreground max-w-2xl">
-                        {t('header.subtitle')}
-                        </p>
-                    </div>
-                )}
+            <div className="py-8 md:py-10">
                 {renderContent()}
             </div>
         </div>

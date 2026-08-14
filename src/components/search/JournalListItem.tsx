@@ -133,16 +133,20 @@ export default function JournalListItem({ journal, onClick, isEditing, isSelecte
               </div>
             </div>
 
-            <div className="flex items-center gap-6 md:gap-8 shrink-0 md:pl-4 md:border-l md:border-border/60">
-                <div className="text-left md:text-right min-w-[72px]">
-                    <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium">{t('journal.impactFactor')}</p>
-                    <p className="font-headline font-semibold text-base tabular-nums leading-none mt-0.5">{formatImpactFactor(journal.impactFactor)}</p>
+            <div className="flex items-start gap-6 md:gap-8 shrink-0 md:pl-4 md:border-l md:border-border/60">
+                <div className="flex flex-col items-start md:items-end min-w-[72px]">
+                    <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium leading-none h-4 flex items-center">{t('journal.impactFactor')}</p>
+                    <div className="mt-1 h-7 flex items-center">
+                        <p className="font-headline font-semibold text-base tabular-nums leading-none">{formatImpactFactor(journal.impactFactor)}</p>
+                    </div>
                 </div>
-                <div className="text-left md:text-right min-w-[56px]">
-                    <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium mb-1">{t('journal.casPartitionShort')}</p>
-                    <Badge variant={getPartitionBadgeVariant(journal.majorCategoryPartition)} className="text-sm px-2 py-0.5">
-                        {getPartitionText(journal.majorCategoryPartition)}
-                    </Badge>
+                <div className="flex flex-col items-start md:items-end min-w-[56px]">
+                    <p className="text-[10px] md:text-xs uppercase tracking-wide text-muted-foreground font-medium leading-none h-4 flex items-center">{t('journal.casPartitionShort')}</p>
+                    <div className="mt-1 h-7 flex items-center">
+                        <Badge variant={getPartitionBadgeVariant(journal.majorCategoryPartition)} className="text-sm px-2 py-0.5">
+                            {getPartitionText(journal.majorCategoryPartition)}
+                        </Badge>
+                    </div>
                 </div>
             </div>
         </div>

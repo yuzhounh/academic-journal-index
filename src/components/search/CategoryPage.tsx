@@ -5,6 +5,7 @@
 import * as React from "react";
 import { useState, useMemo, useCallback } from "react";
 import type { Journal } from "@/data/journals";
+import { AjiLogo } from "@/components/brand/AjiLogo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -695,7 +696,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           onClick={() => handleViewChange(id)}
           variant={view === id ? "secondary" : "ghost"}
           className={cn(
-            "w-full justify-start text-base py-6",
+            "w-full justify-start text-base py-3 px-3",
             view === id && "bg-background shadow-sm ring-1 ring-border/50"
           )}
         >
@@ -845,32 +846,26 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                               <span className="sr-only">Open menu</span>
                           </Button>
                       </SheetTrigger>
-                      <SheetContent side="left" className="pt-8">
-                        <div className="px-4">
+                      <SheetContent side="left" className="pt-8 w-[52vw] max-w-[220px] p-3 gap-3">
+                        <div className="px-1">
                           <SheetHeader>
                             <SheetTitle className="sr-only">Menu</SheetTitle>
                             <SheetDescription className="sr-only">
                               Main navigation menu
                             </SheetDescription>
                           </SheetHeader>
-                          <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline mb-6">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground">
-                              <BookOpen className="h-4 w-4" />
-                            </div>
-                            <span>AJI</span>
+                          <a href="/" className="mb-4">
+                            <AjiLogo />
                           </a>
                         </div>
-                        <div className="flex flex-col gap-2 px-4">
+                        <div className="flex flex-col gap-1 px-1">
                           {navItems}
                         </div>
                       </SheetContent>
                   </Sheet>
               </div>
-              <a href="/" className="flex items-center gap-2.5 text-xl font-bold font-headline">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-sm">
-                  <BookOpen className="h-4 w-4" />
-                </div>
-                <span>AJI</span>
+              <a href="/" className="flex items-center">
+                <AjiLogo />
               </a>
               {desktopNavItems}
             </div>

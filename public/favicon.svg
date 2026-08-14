@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="aji-gradient" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#0D9488"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="6" fill="url(#aji-gradient)"/>
+  <path d="M8.5 8.5h5.2a2.2 2.2 0 0 1 2.2 2.2v11.1a1.4 1.4 0 0 0-1.4-1.4H8.5V8.5z" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M23.5 8.5h-5.2a2.2 2.2 0 0 0-2.2 2.2v11.1a1.4 1.4 0 0 1 1.4-1.4h6V8.5z" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -13,7 +13,7 @@ export function AjiLogoIcon({ className }: AjiLogoIconProps) {
         className
       )}
     >
-      <BookOpen className="h-5 w-5" strokeWidth={2.25} />
+      <BookOpen className="h-[22px] w-[22px]" strokeWidth={2.1} />
     </div>
   );
 }

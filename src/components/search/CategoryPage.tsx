@@ -696,7 +696,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           onClick={() => handleViewChange(id)}
           variant={view === id ? "secondary" : "ghost"}
           className={cn(
-            "w-full justify-start text-base py-3 px-3",
+            "w-full justify-start text-base py-3 px-1.5",
             view === id && "bg-background shadow-sm ring-1 ring-border/50"
           )}
         >
@@ -846,19 +846,19 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                               <span className="sr-only">Open menu</span>
                           </Button>
                       </SheetTrigger>
-                      <SheetContent side="left" className="pt-8 w-[52vw] max-w-[220px] p-3 gap-3">
-                        <div className="px-1">
+                      <SheetContent side="left" className="pt-8 w-[58vw] max-w-[250px] px-2 py-3 gap-3">
+                        <div>
                           <SheetHeader>
                             <SheetTitle className="sr-only">Menu</SheetTitle>
                             <SheetDescription className="sr-only">
                               Main navigation menu
                             </SheetDescription>
                           </SheetHeader>
-                          <a href="/" className="mb-4">
+                          <a href="/">
                             <AjiLogo />
                           </a>
                         </div>
-                        <div className="flex flex-col gap-1 px-1">
+                        <div className="mt-8 flex flex-col gap-1">
                           {navItems}
                         </div>
                       </SheetContent>

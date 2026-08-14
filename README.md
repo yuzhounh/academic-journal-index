@@ -53,7 +53,7 @@ npm run build:journals -- --download
 
 This will:
 
-1. Download `FQBJCR2025-UTF8.csv` (CAS partition) and `JCR2025-UTF8.csv` (impact factor) into `data/raw/`
+1. Download `FQBJCR2025-UTF8.csv` (CAS partition 2025) and `JCR2024-UTF8.csv` (JCR 2024 impact factor) into `data/raw/`
 2. Merge impact factors by ISSN/eISSN
 3. Compute authority journal levels (Level 1/2/3)
 4. Write `src/data/journals.json.gz` (committed) and `src/data/journals.json` (local only, gitignored)

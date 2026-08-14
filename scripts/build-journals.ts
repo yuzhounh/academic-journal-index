@@ -22,7 +22,7 @@ const SHOWJCR_RAW_BASE =
 
 const RAW_FILES = {
   partition: "FQBJCR2025-UTF8.csv",
-  impactFactor: "JCR2025-UTF8.csv",
+  impactFactor: "JCR2024-UTF8.csv",
 } as const;
 
 type CsvRow = Record<string, string>;
@@ -263,7 +263,7 @@ async function main(): Promise<void> {
 
   let journals: Journal[] = [];
   const partitionYear = 2025;
-  let impactFactorYear = 2025;
+  let impactFactorYear = 2024;
   let source = {
     partition: RAW_FILES.partition,
     impactFactor: RAW_FILES.impactFactor,

@@ -864,7 +864,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                       </SheetContent>
                   </Sheet>
               </div>
-              <a href="/" className="flex items-center">
+              <a href="/" className="hidden sm:flex items-center">
                 <AjiLogo />
               </a>
               {desktopNavItems}

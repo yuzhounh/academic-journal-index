@@ -41,6 +41,25 @@ Academic Journal Index (AJI) is a comprehensive platform designed to help resear
 - **AI Integration:** DeepSeek V4 Flash (OpenAI-compatible API)
 - **Language:** TypeScript
 
+## 📊 Journal Data Pipeline
+
+Journal data is built offline from [ShowJCR](https://github.com/hitfyd/ShowJCR) raw CSV files and stored as `src/data/journals.json.gz` for the website to load at build time.
+
+### Update data (when ShowJCR releases new tables)
+
+```bash
+npm run build:journals -- --download
+```
+
+This will:
+
+1. Download `FQBJCR2025-UTF8.csv` (CAS partition) and `JCR2025-UTF8.csv` (impact factor) into `data/raw/`
+2. Merge impact factors by ISSN/eISSN
+3. Compute authority journal levels (Level 1/2/3)
+4. Write `src/data/journals.json.gz` (committed) and `src/data/journals.json` (local only, gitignored)
+
+Raw CSV files stay in `data/raw/` and are not committed. After regenerating, commit the updated `journals.json.gz` and redeploy.
+
 ## 📝 License
 
 © 2025 Jing Wang. All Rights Reserved. All journal data is based on publicly available information and is intended for reference purposes.

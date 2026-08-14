@@ -34,3 +34,8 @@ pnpm-debug.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# journal data pipeline
+/data/raw/*
+!/data/raw/.gitkeep
+/src/data/journals.json

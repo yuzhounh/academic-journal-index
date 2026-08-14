@@ -85,7 +85,9 @@ function collectMinorCategories(row: CsvRow): Journal["minorCategories"] {
 
 function parseImpactFactor(value: unknown): number | string {
   if (value == null || value === "") return "";
-  const parsed = Number.parseFloat(String(value));
+  const raw = String(value).trim();
+  if (raw.startsWith("<")) return raw;
+  const parsed = Number.parseFloat(raw);
   return Number.isFinite(parsed) ? parsed : "";
 }
 

@@ -8,27 +8,27 @@ import { useTranslation } from '@/i18n/provider';
 
 const links = [
   {
-    title: 'Journal Citation Reports | Clarivate',
+    titleKey: 'about.links.jcr',
     href: 'https://clarivate.com/academia-government/scientific-and-academic-research/research-funding-analytics/journal-citation-reports/',
   },
   {
-    title: '中国科学院文献情报中心期刊分区表',
+    titleKey: 'about.links.cas',
     href: 'https://www.fenqubiao.com/',
   },
   {
-    title: '信阳师范学院权威期刊目录',
+    titleKey: 'about.links.xynu',
     href: 'http://kjc.xynu.edu.cn/info/1004/1251.htm',
   },
   {
-    title: 'LetPub 最新SCI期刊影响因子查询',
+    titleKey: 'about.links.letpub',
     href: 'https://www.letpub.com.cn/index.php?page=journalapp',
   },
   {
-    title: 'hitfyd/ShowJCR: 期刊分区查询小工具',
+    titleKey: 'about.links.showjcr',
     href: 'https://github.com/hitfyd/ShowJCR',
   },
   {
-    title: 'yuzhounh/Authoritative-Journal-Classification: 基于中科院JCR分区表计算权威期刊分级',
+    titleKey: 'about.links.ajc',
     href: 'https://github.com/yuzhounh/Authoritative-Journal-Classification',
   },
 ];
@@ -160,7 +160,7 @@ export default function AboutPage() {
                     <div className="bg-primary/10 p-2 rounded-md">
                         <ExternalLink className="w-5 h-5 text-primary" />
                     </div>
-                    <span className="font-medium text-sm flex-1">{link.title}</span>
+                    <span className="font-medium text-sm flex-1">{t(link.titleKey)}</span>
                   </CardContent>
                 </Card>
               </a>

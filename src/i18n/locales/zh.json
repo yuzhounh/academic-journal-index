@@ -119,6 +119,14 @@
         "dataJcr": "JCR 影响因子 2024 年版（JCR2024）—— 2024 年 6 月 20 日发布（Clarivate 科睿唯安）",
         "dataCas": "中科院期刊分区表 2025 年版（FQBJCR2025）—— 2025 年 3 月 20 日发布（中国科学院文献情报中心）",
         "linksTitle": "相关链接",
+        "links": {
+            "jcr": "期刊引证报告 | 科睿唯安",
+            "cas": "中国科学院文献情报中心期刊分区表",
+            "xynu": "信阳师范学院权威期刊目录",
+            "letpub": "LetPub 最新SCI期刊影响因子查询",
+            "showjcr": "hitfyd/ShowJCR: 期刊分区查询小工具",
+            "ajc": "yuzhounh/Authoritative-Journal-Classification: 基于中科院JCR分区表计算权威期刊分级"
+        },
         "contactTitle": "联系方式",
         "contact": {
             "author": "作者",

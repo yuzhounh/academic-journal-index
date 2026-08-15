@@ -176,6 +176,10 @@
         "p1": "This website, Academic Journal Index (AJI), is a tool designed to help researchers and academics quickly find information about academic journals. You can search for journals by title or browse through different categories.",
         "p2": "The platform provides key metrics such as Impact Factor, CAS Partition (from the Chinese Academy of Sciences), and authority level, helping users to better evaluate and select journals for their publication needs. You can also create an account to save your favorite journals for easy access.",
         "p3": "All journal data is based on publicly available information and is intended for reference purposes.",
+        "dataSourceTitle": "Current Dataset",
+        "dataSourceIntro": "AJI currently uses the following paired datasets:",
+        "dataJcr": "JCR Impact Factor, 2024 edition (JCR2024) — released June 20, 2024 (Clarivate)",
+        "dataCas": "CAS Journal Partition Table, 2025 edition (FQBJCR2025) — released March 20, 2025 (Chinese Academy of Sciences Documentation Information Center)",
         "linksTitle": "Related Links",
         "contactTitle": "Contact",
         "contact": {

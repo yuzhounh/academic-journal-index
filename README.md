@@ -4,6 +4,26 @@ Academic Journal Index (AJI) is a comprehensive platform designed to help resear
 
 **Live Site / 在线访问:** [https://academic-journal-index.vercel.app/](https://academic-journal-index.vercel.app/)
 
+## About / 关于
+
+The current dataset pairs **JCR Impact Factor (2024 edition)** with the **CAS Journal Partition Table (2025 edition)**:
+
+| Data source | Edition | Release date |
+|-------------|---------|--------------|
+| JCR Impact Factor | 2024 edition (`JCR2024`) | **June 20, 2024** (Clarivate) |
+| CAS Partition Table (升级版) | 2025 edition (`FQBJCR2025`) | **March 20, 2025** (中国科学院文献情报中心) |
+
+Raw data is sourced from [ShowJCR](https://github.com/hitfyd/ShowJCR), merged offline by ISSN/eISSN, and loaded at build time from `src/data/journals.json.gz`.
+
+当前数据集采用 **JCR 影响因子 2024 年版** 与 **中科院期刊分区表 2025 年版**：
+
+| 数据源 | 版本 | 发布时间 |
+|--------|------|----------|
+| JCR 影响因子 | 2024 年版（`JCR2024`） | **2024 年 6 月 20 日**（Clarivate 科睿唯安） |
+| 中科院分区表（升级版） | 2025 年版（`FQBJCR2025`） | **2025 年 3 月 20 日**（中国科学院文献情报中心） |
+
+原始数据来自 [ShowJCR](https://github.com/hitfyd/ShowJCR)，离线按 ISSN/eISSN 合并后，由 `src/data/journals.json.gz` 在构建时加载。
+
 ## 🚀 Key Features
 
 ### 1. Advanced Search & Browse

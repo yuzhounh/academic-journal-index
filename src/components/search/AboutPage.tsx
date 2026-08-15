@@ -3,7 +3,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Mail, Github, Users, BookOpen, Search, Book, Heart, Bot, MessageSquare } from 'lucide-react';
+import { ExternalLink, Mail, Github, Users, BookOpen, Search, Book, Heart, Bot, MessageSquare, Sparkles } from 'lucide-react';
 import { useTranslation } from '@/i18n/provider';
 
 const links = [
@@ -26,6 +26,10 @@ const links = [
   {
     title: 'hitfyd/ShowJCR: 期刊分区查询小工具',
     href: 'https://github.com/hitfyd/ShowJCR',
+  },
+  {
+    title: 'yuzhounh/Authoritative-Journal-Classification: 基于中科院JCR分区表计算权威期刊分级',
+    href: 'https://github.com/yuzhounh/Authoritative-Journal-Classification',
   },
 ];
 
@@ -101,6 +105,14 @@ export default function AboutPage() {
         <CardContent className="text-base text-foreground/80 leading-relaxed space-y-4">
           <p>{t('about.p1')}</p>
           <p>{t('about.p2')}</p>
+          <div className="rounded-lg border border-border/60 bg-muted/30 p-4 space-y-2">
+            <p className="font-medium text-foreground">{t('about.dataSourceTitle')}</p>
+            <p>{t('about.dataSourceIntro')}</p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li>{t('about.dataJcr')}</li>
+              <li>{t('about.dataCas')}</li>
+            </ul>
+          </div>
           <p>{t('about.p3')}</p>
         </CardContent>
       </Card>
@@ -108,7 +120,7 @@ export default function AboutPage() {
       <Card>
         <CardHeader>
             <CardTitle className="flex items-center gap-3 font-headline text-2xl">
-                <BookOpen className="text-primary" />
+                <Sparkles className="text-primary" />
                 {t('about.features.title')}
             </CardTitle>
         </CardHeader>
@@ -166,7 +178,7 @@ export default function AboutPage() {
         </CardHeader>
         <CardContent className="space-y-4">
             <p className="text-base text-foreground/80">{t('about.feedback.p1')}</p>
-            <Button asChild className="gap-2">
+            <Button asChild variant="ghost" className="gap-2 bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary">
                 <a href="https://github.com/yuzhounh/academic-journal-index/issues" target="_blank" rel="noopener noreferrer">
                     <Github className="w-5 h-5" />
                     {t('about.feedback.button')}

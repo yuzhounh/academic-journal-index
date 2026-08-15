@@ -181,6 +181,14 @@
         "dataJcr": "JCR Impact Factor, 2024 edition (JCR2024) — released June 20, 2024 (Clarivate)",
         "dataCas": "CAS Journal Partition Table, 2025 edition (FQBJCR2025) — released March 20, 2025 (Chinese Academy of Sciences Documentation Information Center)",
         "linksTitle": "Related Links",
+        "links": {
+            "jcr": "Journal Citation Reports | Clarivate",
+            "cas": "CAS Journal Partition Table | Chinese Academy of Sciences",
+            "xynu": "Authoritative Journal Catalog | Xinyang Normal University",
+            "letpub": "LetPub: Latest SCI Journal Impact Factor Search",
+            "showjcr": "hitfyd/ShowJCR: Journal partition lookup tool",
+            "ajc": "yuzhounh/Authoritative-Journal-Classification: Authority journal classification based on CAS JCR partitions"
+        },
         "contactTitle": "Contact",
         "contact": {
             "author": "Author",

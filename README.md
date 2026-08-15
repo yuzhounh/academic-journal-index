@@ -2,27 +2,37 @@
 
 Academic Journal Index (AJI) is a comprehensive platform designed to help researchers and academics discover, evaluate, and manage academic journals. It provides detailed metrics including Impact Factor, CAS Partitions, and Authority Levels, enhanced by AI-driven analysis.
 
-**Live Site / 在线访问:** [https://academic-journal-index.vercel.app/](https://academic-journal-index.vercel.app/)
+**Live Site:** [https://academic-journal-index.vercel.app/](https://academic-journal-index.vercel.app/)
 
-## About / 关于
+## About
 
 The current dataset pairs **JCR Impact Factor (2024 edition)** with the **CAS Journal Partition Table (2025 edition)**:
 
 | Data source | Edition | Release date |
 |-------------|---------|--------------|
 | JCR Impact Factor | 2024 edition (`JCR2024`) | **June 20, 2024** (Clarivate) |
-| CAS Partition Table (升级版) | 2025 edition (`FQBJCR2025`) | **March 20, 2025** (中国科学院文献情报中心) |
+| CAS Partition Table (Enhanced Edition) | 2025 edition (`FQBJCR2025`) | **March 20, 2025** (Chinese Academy of Sciences Documentation Information Center) |
 
 Raw data is sourced from [ShowJCR](https://github.com/hitfyd/ShowJCR), merged offline by ISSN/eISSN, and loaded at build time from `src/data/journals.json.gz`.
 
-当前数据集采用 **JCR 影响因子 2024 年版** 与 **中科院期刊分区表 2025 年版**：
+## 📊 Journal Data Pipeline
 
-| 数据源 | 版本 | 发布时间 |
-|--------|------|----------|
-| JCR 影响因子 | 2024 年版（`JCR2024`） | **2024 年 6 月 20 日**（Clarivate 科睿唯安） |
-| 中科院分区表（升级版） | 2025 年版（`FQBJCR2025`） | **2025 年 3 月 20 日**（中国科学院文献情报中心） |
+Journal data is built offline from [ShowJCR](https://github.com/hitfyd/ShowJCR) raw CSV files and stored as `src/data/journals.json.gz` for the website to load at build time.
 
-原始数据来自 [ShowJCR](https://github.com/hitfyd/ShowJCR)，离线按 ISSN/eISSN 合并后，由 `src/data/journals.json.gz` 在构建时加载。
+### Update data (when ShowJCR releases new tables)
+
+```bash
+npm run build:journals -- --download
+```
+
+This will:
+
+1. Download `FQBJCR2025-UTF8.csv` (CAS partition 2025) and `JCR2024-UTF8.csv` (JCR 2024 impact factor) into `data/raw/`
+2. Merge impact factors by ISSN/eISSN
+3. Compute authority journal levels (Level 1/2/3)
+4. Write `src/data/journals.json.gz` (committed) and `src/data/journals.json` (local only, gitignored)
+
+Raw CSV files stay in `data/raw/` and are not committed. After regenerating, commit the updated `journals.json.gz` and redeploy.
 
 ## 🚀 Key Features
 
@@ -60,25 +70,6 @@ Raw data is sourced from [ShowJCR](https://github.com/hitfyd/ShowJCR), merged of
 - **Backend/Auth:** Firebase (Firestore & Authentication)
 - **AI Integration:** DeepSeek V4 Flash (OpenAI-compatible API)
 - **Language:** TypeScript
-
-## 📊 Journal Data Pipeline
-
-Journal data is built offline from [ShowJCR](https://github.com/hitfyd/ShowJCR) raw CSV files and stored as `src/data/journals.json.gz` for the website to load at build time.
-
-### Update data (when ShowJCR releases new tables)
-
-```bash
-npm run build:journals -- --download
-```
-
-This will:
-
-1. Download `FQBJCR2025-UTF8.csv` (CAS partition 2025) and `JCR2024-UTF8.csv` (JCR 2024 impact factor) into `data/raw/`
-2. Merge impact factors by ISSN/eISSN
-3. Compute authority journal levels (Level 1/2/3)
-4. Write `src/data/journals.json.gz` (committed) and `src/data/journals.json` (local only, gitignored)
-
-Raw CSV files stay in `data/raw/` and are not committed. After regenerating, commit the updated `journals.json.gz` and redeploy.
 
 ## 📝 License
 

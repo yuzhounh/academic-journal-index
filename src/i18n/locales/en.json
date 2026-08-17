@@ -122,6 +122,9 @@
             "button": "Find Journals to Favorite"
         },
         "listEmpty": "This journal list is empty.",
+        "listCountPartial": "{{available}} of {{total}} journals in dataset",
+        "unavailableInDataset": "{{count}} favorited journals are not in the current dataset (they may have been saved in AJI Editions).",
+        "unavailableInDatasetOnly": "All journals in this list are not in the current dataset.",
         "dialog": {
             "title": "Add to list...",
             "newListPlaceholder": "New list name...",

@@ -8,6 +8,7 @@ import type { Journal } from "@/data/journals";
 import { AjiLogo } from "@/components/brand/AjiLogo";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Card,
   CardContent,
@@ -285,6 +286,10 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         return factorB - factorA;
       });
   }, [favoriteJournalIdsInList, journalMap]);
+
+  const unavailableFavoriteCount = selectedJournalList
+    ? Math.max(0, favoriteJournalIdsInList.length - journalsForList.length)
+    : 0;
 
   const journalsToDisplay = selectedJournalList ? journalsForList : journalsForCategory;
 
@@ -623,6 +628,15 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
           return (
             <div className="animate-in fade-in-50 duration-300">
               {renderListHeader()}
+              {selectedJournalList && unavailableFavoriteCount > 0 && (
+                <Alert className="mb-6">
+                  <AlertDescription>
+                    {journalsForList.length === 0
+                      ? t('favorites.unavailableInDatasetOnly')
+                      : t('favorites.unavailableInDataset', { count: unavailableFavoriteCount })}
+                  </AlertDescription>
+                </Alert>
+              )}
               <div className="mb-6">
                 <CategoryStats journals={journalsToDisplay} collapsible defaultOpen={true} />
               </div>
@@ -645,7 +659,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                 </div>
               ) : (
                 <div className="text-center py-10">
-                  <p className="text-muted-foreground">{t('favorites.listEmpty')}</p>
+                  <p className="text-muted-foreground">
+                    {unavailableFavoriteCount > 0
+                      ? t('favorites.unavailableInDatasetOnly')
+                      : t('favorites.listEmpty')}
+                  </p>
                 </div>
               )}
               {renderPagination()}

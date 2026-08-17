@@ -55,21 +55,29 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, jo
     
     const [journalsForStats, setJournalsForStats] = useState<Journal[]>([]);
 
-    const categorized = useMemo(() => {
-        if (!allFavorites || allFavorites.length === 0) {
-            return {};
+    const journalMapByIssn = useMemo(
+        () => new Map(journals.map((j) => [j.issn.split('/')[0], j])),
+        [journals]
+    );
+
+    const listCounts = useMemo(() => {
+        const total: Record<string, number> = {};
+        const available: Record<string, number> = {};
+
+        if (!allFavorites) {
+            return { total, available };
         }
 
-        const categorizedFavorites: Record<string, number> = {};
-        
-        allFavorites.forEach(fav => {
-            if (fav.listId && fav.listId.trim() !== '') {
-                categorizedFavorites[fav.listId] = (categorizedFavorites[fav.listId] || 0) + 1;
+        allFavorites.forEach((fav) => {
+            if (!fav.listId?.trim()) return;
+            total[fav.listId] = (total[fav.listId] || 0) + 1;
+            if (journalMapByIssn.has(fav.journalId)) {
+                available[fav.listId] = (available[fav.listId] || 0) + 1;
             }
         });
 
-        return categorizedFavorites;
-    }, [allFavorites]);
+        return { total, available };
+    }, [allFavorites, journalMapByIssn]);
     
     useEffect(() => {
         if (!allFavorites) {
@@ -80,17 +88,16 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, jo
         if (allFavorites.length === 0) {
             setJournalsForStats([]);
         } else {
-            const journalMap = new Map(journals.map(j => [j.issn.split('/')[0], j]));
             const uniqueJournalIds = new Set<string>();
             allFavorites.forEach(fav => {
                 uniqueJournalIds.add(fav.journalId);
             });
             const statsJournals = Array.from(uniqueJournalIds)
-                .map(id => journalMap.get(id))
+                .map(id => journalMapByIssn.get(id))
                 .filter((j): j is Journal => !!j);
             setJournalsForStats(statsJournals);
         }
-    }, [allFavorites, journals]);
+    }, [allFavorites, journalMapByIssn]);
 
 
     const handleDeleteClick = (e: React.MouseEvent, list: WithId<JournalList>) => {
@@ -127,7 +134,6 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, jo
                 }
 
                 try {
-                    const journalMapByIssn = new Map(journals.map(j => [j.issn.split('/')[0], j]));
                     const validJournalIds = Array.from(journalIssns).filter(issn => journalMapByIssn.has(issn));
                     
                     const listRef = await addDoc(collection(firestore, `users/${user.uid}/journal_lists`), {
@@ -262,7 +268,14 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, jo
                                     <div className="flex items-center text-sm text-muted-foreground">
                                     <BookText className="w-4 h-4 mr-2" />
                                     <span>
-                                        {categorized[list.id] || 0} {t('categories.journals')}
+                                        {(() => {
+                                            const total = listCounts.total[list.id] || 0;
+                                            const available = listCounts.available[list.id] || 0;
+                                            if (total > available && available > 0) {
+                                                return t('favorites.listCountPartial', { available, total });
+                                            }
+                                            return `${available || total} ${t('categories.journals')}`;
+                                        })()}
                                     </span>
                                     </div>
                                 </CardContent>

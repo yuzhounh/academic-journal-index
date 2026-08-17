@@ -172,6 +172,9 @@
             "button": "查找期刊进行收藏"
         },
         "listEmpty": "该期刊列表为空。",
+        "listCountPartial": "当前数据集 {{available}}/{{total}} 本",
+        "unavailableInDataset": "有 {{count}} 本收藏的期刊不在当前数据集中（可能来自 AJI Editions）。",
+        "unavailableInDatasetOnly": "该列表中的期刊均不在当前数据集中。",
         "dialog": {
             "title": "添加到列表...",
             "newListPlaceholder": "新列表名称...",

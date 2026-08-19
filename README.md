@@ -1,8 +1,16 @@
-# Academic Journal Index (AJI)
+<p align="center">
+  <img src="public/favicon.svg" width="112" alt="Academic Journal Index icon" />
+</p>
+
+<h1 align="center">Academic Journal Index (AJI)</h1>
+
+<p align="center"><strong>Discover, compare, and organize academic journals.</strong></p>
+
+<p align="center">
+  <a href="https://academic-journal-index.vercel.app/">Open the live site</a>
+</p>
 
 Academic Journal Index (AJI) is a comprehensive platform designed to help researchers and academics discover, evaluate, and manage academic journals. It provides detailed metrics including Impact Factor, CAS Partitions, and Authority Levels, enhanced by AI-driven analysis.
-
-**Live Site:** [https://academic-journal-index.vercel.app/](https://academic-journal-index.vercel.app/)
 
 ## About
 
@@ -73,4 +81,4 @@ Raw CSV files stay in `data/raw/` and are not committed. After regenerating, com
 
 ## 📝 License
 
-© 2025 Jing Wang. All Rights Reserved. All journal data is based on publicly available information and is intended for reference purposes.
+This project is released under the [MIT License](LICENSE). Journal data is based on publicly available information and is intended for reference purposes.

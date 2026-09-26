@@ -7,19 +7,19 @@
 <p align="center"><strong>Discover, compare, and organize academic journals.</strong></p>
 
 <p align="center">
-  <a href="https://academic-journal-index.vercel.app/">Open the live site</a>
+  <a href="https://academic-journal-index.vercel.app/">Open the live site</a> · <a href="LICENSE">MIT License</a>
 </p>
 
 Academic Journal Index (AJI) is a comprehensive platform designed to help researchers and academics discover, evaluate, and manage academic journals. It provides detailed metrics including Impact Factor, CAS Partitions, and Authority Levels, enhanced by AI-driven analysis.
 
 ## About
 
-The current dataset pairs **JCR Impact Factor (2024 edition)** with the **CAS Journal Partition Table (2025 edition)**:
+The current dataset pairs **IF(2024)** from ShowJCR's `JCR2024-UTF8.csv` with the **CAS Journal Partition Table 2025**. The filename records the impact-factor data year; it is distinct from the Clarivate JCR release-year label used by [AJI Editions](https://github.com/yuzhounh/aji-editions).
 
-| Data source | Edition | Release date |
-|-------------|---------|--------------|
-| JCR Impact Factor | 2024 edition (`JCR2024`) | **June 20, 2024** (Clarivate) |
-| CAS Partition Table (Enhanced Edition) | 2025 edition (`FQBJCR2025`) | **March 20, 2025** (Chinese Academy of Sciences Documentation Information Center) |
+| Data source | Tracked file | Meaning |
+|-------------|--------------|---------|
+| JCR impact factor | `JCR2024-UTF8.csv` | IF(2024), released with Clarivate JCR 2025 |
+| CAS partition table | `FQBJCR2025-UTF8.csv` | CAS 2025 enhanced edition, released March 20, 2025 |
 
 Raw data is sourced from [ShowJCR](https://github.com/hitfyd/ShowJCR), merged offline by ISSN/eISSN, and loaded at build time from `src/data/journals.json.gz`.
 
@@ -35,7 +35,7 @@ npm run build:journals -- --download
 
 This will:
 
-1. Download `FQBJCR2025-UTF8.csv` (CAS partition 2025) and `JCR2024-UTF8.csv` (JCR 2024 impact factor) into `data/raw/`
+1. Download `FQBJCR2025-UTF8.csv` (CAS partition 2025) and `JCR2024-UTF8.csv` (IF(2024) data) into `data/raw/`
 2. Merge impact factors by ISSN/eISSN
 3. Compute authority journal levels (Level 1/2/3)
 4. Write `src/data/journals.json.gz` (committed) and `src/data/journals.json` (local only, gitignored)
@@ -70,6 +70,22 @@ Raw CSV files stay in `data/raw/` and are not committed. After regenerating, com
 - **Responsive Design:** Optimized for desktop, tablet, and mobile devices.
 - **Dark Mode:** Built-in theme support for comfortable viewing in any environment.
 - **Secure Auth:** Easy sign-in with Google or Email.
+
+## Local Development
+
+```bash
+git clone https://github.com/yuzhounh/academic-journal-index.git
+cd academic-journal-index
+npm ci
+npm run dev
+```
+
+The development server uses the repository's existing Firebase and AI configuration. Do not commit secrets; use local environment variables and Firebase project settings.
+
+## Related Projects
+
+- [aji-editions](https://github.com/yuzhounh/aji-editions): multi-year AJI comparison interface.
+- [Authoritative-Journal-Classification](https://github.com/yuzhounh/Authoritative-Journal-Classification): standalone implementation of the authority-level rules used by the data pipeline.
 
 ## 🛠️ Tech Stack
 

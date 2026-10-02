@@ -105,7 +105,7 @@ Vercel builds the complete Next.js application from `main`. Netlify uses `netlif
 
 Cloudflare Pages retains its existing domain as a gateway to the Vercel runtime, including Server Actions. Run `npm run pack:pages`, then `wrangler pages deploy .pages --project-name academic-journal-index --branch main`. The gateway forwards cache headers and does not contain secrets. Deploy Vercel first.
 
-Firebase Hosting is an entry-point redirect to Vercel because its existing project has no billing enabled. Run `firebase deploy --only hosting --project academic-journal-index`; this command does not deploy Firestore rules or functions. GitHub Pages is currently disabled for this repository.
+Firebase Hosting is an entry-point redirect to Vercel because its existing project has no billing enabled. Run `firebase deploy --only hosting --project academic-journal-index`; this command does not deploy Firestore rules or functions.
 
 ## Related Projects
 
@@ -119,6 +119,16 @@ Firebase Hosting is an entry-point redirect to Vercel because its existing proje
 - **Backend/Auth:** Firebase (Firestore & Authentication)
 - **AI Integration:** DeepSeek V4 Flash (OpenAI-compatible API)
 - **Language:** TypeScript
+
+## Hosting
+
+Vercel and Netlify run the complete Next.js application, including server summaries. Vercel uses `npm run build`; Netlify uses the same command with its Next.js adapter and `.next/` output.
+
+```bash
+npm run build:landing
+```
+
+This prepares `dist_pages/` as the GitHub Pages entry, redirecting to `https://academic-journal-index.vercel.app` while preserving paths, query parameters, and fragments. The Pages workflow publishes this generated package. Cloudflare uses the gateway described above; Firebase uses HTTP redirects. These entry points depend on Vercel's complete runtime.
 
 ## 📝 License
 

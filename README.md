@@ -1,18 +1,19 @@
 <p align="center">
-  <img src="public/favicon.svg" width="112" alt="Academic Journal Index icon" />
+  <img src="public/favicon.svg" width="112" alt="Academic Journal Index logo">
 </p>
 
-<h1 align="center">Academic Journal Index (AJI)</h1>
+<h1 align="center">Academic Journal Index</h1>
 
 <p align="center"><strong>Discover, compare, and organize academic journals.</strong></p>
 
 <p align="center">
-  <a href="https://academic-journal-index.pages.dev/"><img src="https://img.shields.io/badge/Online-Cloudflare_Pages-F38020?logo=cloudflare" alt="Cloudflare Pages online"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-f59e0b.svg" alt="License: MIT"></a>
+  <a href="https://academic-journal-index.pages.dev/"><img src="https://img.shields.io/badge/Website-Cloudflare%20Pages-f38020?style=flat&amp;logo=cloudflare&amp;logoColor=white" alt="Website: Cloudflare Pages"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-f59e0b?style=flat" alt="License: MIT"></a>
+  <img src="https://img.shields.io/badge/Next.js-React-222222?style=flat&amp;logo=nextdotjs&amp;logoColor=white" alt="Next.js: React">
 </p>
 
 <p align="center">
-  <a href="https://academic-journal-index.pages.dev/">Open the live site</a> · <a href="LICENSE">MIT License</a>
+  <a href="https://academic-journal-index.pages.dev/">Live site</a> · <a href="https://github.com/yuzhounh/academic-journal-index/releases/latest">Latest release</a> · <a href="#local-development">Get started</a> · <a href="LICENSE">License</a>
 </p>
 
 Academic Journal Index (AJI) is a comprehensive platform designed to help researchers and academics discover, evaluate, and manage academic journals. It provides detailed metrics including Impact Factor, CAS Partitions, and Authority Levels, enhanced by AI-driven analysis.
@@ -130,6 +131,6 @@ npm run build:landing
 
 This prepares `dist_pages/` as the GitHub Pages entry, redirecting to `https://academic-journal-index.vercel.app` while preserving paths, query parameters, and fragments. The Pages workflow publishes this generated package. Cloudflare uses the gateway described above; Firebase uses HTTP redirects. These entry points depend on Vercel's complete runtime.
 
-## 📝 License
+## License
 
 This project is released under the [MIT License](LICENSE). Journal data is based on publicly available information and is intended for reference purposes.

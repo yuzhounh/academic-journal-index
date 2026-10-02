@@ -1,5 +1,6 @@
 
 "use client";
+import { getLegacyFavoriteId } from "@aji/core";
 
 import { useState, useEffect } from "react";
 import { useFirebase } from "@/firebase";
@@ -61,7 +62,7 @@ export default function AddToFavoritesDialog({
 
   const isBatchOperation = batchJournals.length > 0;
   const journalsToProcess = isBatchOperation ? batchJournals : [journal];
-  const journalIdsToProcess = journalsToProcess.map(j => j.issn.split('/')[0]);
+  const journalIdsToProcess = journalsToProcess.map(j => getLegacyFavoriteId(j.issn));
 
   const journalListsQuery = useMemoFirebase(
     () =>
@@ -80,7 +81,7 @@ export default function AddToFavoritesDialog({
       user && firestore && !isBatchOperation
         ? query(
             collection(firestore, `users/${user.uid}/favorite_journals`),
-            where("journalId", "==", journal.issn.split('/')[0])
+            where("journalId", "==", getLegacyFavoriteId(journal.issn))
           )
         : null,
     [user, firestore, journal, isBatchOperation]

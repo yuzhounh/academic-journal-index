@@ -8,6 +8,7 @@
     "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
     "build:journals": "tsx scripts/build-journals.ts",
     "build": "next build",
+    "build:landing": "node scripts/build-landing.mjs",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"

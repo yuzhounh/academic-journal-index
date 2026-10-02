@@ -100,6 +100,16 @@ The development server uses the repository's existing Firebase and AI configurat
 - **AI Integration:** DeepSeek V4 Flash (OpenAI-compatible API)
 - **Language:** TypeScript
 
+## Hosting
+
+Vercel and Netlify run the complete Next.js application, including server summaries. Vercel uses `npm run build`; Netlify uses the same command with its Next.js adapter and `.next/` output.
+
+```bash
+npm run build:landing
+```
+
+This prepares `dist_pages/` as an entry page for GitHub Pages, Firebase Hosting, and Cloudflare Pages. These static entries redirect to `https://academic-journal-index.vercel.app`, preserving paths, query parameters, and fragments. They depend on the full Next.js site rather than pretending to be independent static exports. The Pages workflow and Firebase Hosting configuration use this generated package; Firestore configuration is retained separately.
+
 ## 📝 License
 
 This project is released under the [MIT License](LICENSE). Journal data is based on publicly available information and is intended for reference purposes.

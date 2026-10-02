@@ -9,6 +9,7 @@
     "build:journals": "tsx scripts/build-journals.ts",
     "build": "next build",
     "pack:pages": "node scripts/pack-pages.mjs https://academic-journal-index.vercel.app",
+    "build:landing": "node scripts/build-landing.mjs",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",

@@ -61,9 +61,11 @@ Raw CSV files stay in `data/raw/` and are not committed. After regenerating, com
 - **Open Access Info:** Identify OA journals and quickly access Article Processing Charge (APC) information via integrated Google Search.
 
 ### 3. AI-Powered Analysis
-- **Intelligent Summaries:** Generate detailed reports covering journal introduction, main publication areas, and its status in the field.
+- **Intelligent Summaries:** Read pre-generated bilingual reports covering journal introduction, main publication areas, and its status in the field.
 - **Smart Recommendations:** Get AI-suggested related journals based on field and influence.
-- **AI-Powered:** Powered by DeepSeek V4 Flash for fast and accurate insights.
+- **Offline Data:** Uses the existing 23,561-journal summary dataset from AJI Editions (updated 2026-08-16 UTC). Viewing summaries never calls a model API and needs no model key. Missing summaries display an explicit unavailable message.
+
+The shared dataset is stored in `src/data/summaries.json.gz` (SHA-256 `f0036aa006ae7d414c56df38bcf9cbe799d0b120f41a20d66e749301b76f6a22`). The server reads by ISSN and language, filters related journals against this edition, and bundles the data via Next.js file tracing. Client caches separate Chinese and English summaries. This is pre-generated content, not a promise of current journal metrics.
 
 ### 4. Personalized Management (Favorites)
 - **Custom Lists:** Create multiple lists to organize your research interests.
@@ -118,7 +120,7 @@ Firebase Hosting is an entry-point redirect to Vercel because its existing proje
 - **Framework:** Next.js 15 (App Router)
 - **UI Components:** Shadcn UI & Tailwind CSS
 - **Backend/Auth:** Firebase (Firestore & Authentication)
-- **AI Integration:** DeepSeek V4 Flash (OpenAI-compatible API)
+- **AI Summaries:** Pre-generated bilingual data shared with AJI Editions
 - **Language:** TypeScript
 
 ## Hosting

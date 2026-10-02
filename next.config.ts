@@ -1,6 +1,9 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
+  outputFileTracingIncludes: {
+    '/*': ['./src/data/journals.json.gz', './src/data/summaries.json.gz'],
+  },
   experimental: {
     serverActions: {
       allowedOrigins: ['academic-journal-index.pages.dev'],

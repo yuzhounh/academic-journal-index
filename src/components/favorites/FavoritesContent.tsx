@@ -1,6 +1,7 @@
 
 
 "use client";
+import { getLegacyFavoriteId } from "@aji/core";
 
 import { useMemo, useState, useRef, useEffect } from "react";
 import { useFirebase } from "@/firebase";
@@ -56,7 +57,7 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, jo
     const [journalsForStats, setJournalsForStats] = useState<Journal[]>([]);
 
     const journalMapByIssn = useMemo(
-        () => new Map(journals.map((j) => [j.issn.split('/')[0], j])),
+        () => new Map(journals.map((j) => [getLegacyFavoriteId(j.issn), j])),
         [journals]
     );
 
@@ -125,7 +126,7 @@ export default function FavoritesContent({ onJournalListSelect, allFavorites, jo
             skipEmptyLines: true,
             complete: async (results) => {
                 const importedJournals = results.data as { "ISSN/EISSN": string }[];
-                const journalIssns = new Set(importedJournals.map(j => j["ISSN/EISSN"]?.split('/')[0]).filter(Boolean));
+                const journalIssns = new Set(importedJournals.map(j => getLegacyFavoriteId(j["ISSN/EISSN"] ?? '')).filter(Boolean));
 
                 let listName = file.name.replace(/\.csv$/, '').replace(/_/g, ' ');
                 const existingNames = new Set((journalLists || []).map(l => l.name));

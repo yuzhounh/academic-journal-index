@@ -87,6 +87,26 @@ npm run dev
 
 The development server uses the repository's existing Firebase and AI configuration. Do not commit secrets; use local environment variables and Firebase project settings.
 
+### Build and validation
+
+```bash
+npm run check  # TypeScript, ESLint, and shared-rule tests
+npm run build
+npm start
+```
+
+Production builds enforce TypeScript and ESLint checks. GitHub Actions runs the same checks and build on pushes and pull requests using Node.js 22.
+
+ISSN parsing and the legacy favorites-ID rule come from the versioned local `@aji/core` package in `vendor/aji-core/`, shared with AJI Editions. Standalone clones do not require another checkout. See [the core maintenance instructions](vendor/aji-core/README.md) when updating those rules. Existing favorites IDs retain their original first-ISSN-part format.
+
+### Production deployment
+
+Vercel builds the complete Next.js application from `main`. Netlify uses `netlify.toml` and its automatically managed Next.js adapter; deploy with `netlify deploy --prod --context production --site academic-journal-index`.
+
+Cloudflare Pages retains its existing domain as a gateway to the Vercel runtime, including Server Actions. Run `npm run pack:pages`, then `wrangler pages deploy .pages --project-name academic-journal-index --branch main`. The gateway forwards cache headers and does not contain secrets. Deploy Vercel first.
+
+Firebase Hosting is an entry-point redirect to Vercel because its existing project has no billing enabled. Run `firebase deploy --only hosting --project academic-journal-index`; this command does not deploy Firestore rules or functions. GitHub Pages is currently disabled for this repository.
+
 ## Related Projects
 
 - [aji-editions](https://github.com/yuzhounh/aji-editions): multi-year AJI comparison interface.

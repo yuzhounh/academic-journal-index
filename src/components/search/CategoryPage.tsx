@@ -3,6 +3,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useState, useMemo, useCallback } from "react";
 import type { Journal } from "@/data/journals";
 import { AjiLogo } from "@/components/brand/AjiLogo";
@@ -795,7 +796,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                     <AlertDialogHeader>
                         <AlertDialogTitle>{title}</AlertDialogTitle>
                         <AlertDialogDescription>
-                        {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name })}
+                        {t('batchEdit.remove.confirmDescription', { listName: selectedJournalList?.name ?? '' })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -872,9 +873,9 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                               Main navigation menu
                             </SheetDescription>
                           </SheetHeader>
-                          <a href="/">
+                          <Link href="/">
                             <AjiLogo />
-                          </a>
+                          </Link>
                         </div>
                         <div className="mt-8 flex flex-col gap-1">
                           {navItems}
@@ -882,9 +883,9 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                       </SheetContent>
                   </Sheet>
               </div>
-              <a href="/" className="hidden sm:flex items-center">
+              <Link href="/" className="hidden sm:flex items-center">
                 <AjiLogo />
-              </a>
+              </Link>
               {desktopNavItems}
             </div>
             

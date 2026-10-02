@@ -1,4 +1,12 @@
 {
+  "hosting": {
+    "site": "academic-journal-index",
+    "public": "deploy/firebase",
+    "redirects": [
+      { "source": "/", "destination": "https://academic-journal-index.vercel.app/", "type": 302 },
+      { "source": "/:path*", "destination": "https://academic-journal-index.vercel.app/:path", "type": 302 }
+    ]
+  },
   "firestore": [
     {
       "database": "ai-studio-academicjournali-346789f8-f2d1-4924-813d-95393c434b5a",

@@ -11,6 +11,7 @@ import path from "path";
 import zlib from "zlib";
 import Papa from "papaparse";
 import type { Journal, JournalDataset } from "../src/data/types";
+import { normalizeIssnPart, splitIssnParts } from "@aji/core";
 
 const ROOT = path.resolve(__dirname, "..");
 const RAW_DIR = path.join(ROOT, "data", "raw");
@@ -65,8 +66,8 @@ function calculateAuthorityLevel(
 }
 
 function splitIssn(value: string): { issn: string; eissn: string } {
-  const [issn = "", eissn = ""] = value.split("/");
-  return { issn: issn.trim(), eissn: eissn.trim() };
+  const { print, electronic } = splitIssnParts(value);
+  return { issn: print, eissn: electronic };
 }
 
 function collectMinorCategories(row: CsvRow): Journal["minorCategories"] {
@@ -130,8 +131,8 @@ function buildImpactFactorMap(jcrRows: CsvRow[]): Map<string, number | string> {
     const impactFactor = parseImpactFactor(row[ifColumn]);
     if (impactFactor === "") continue;
 
-    const issn = row.ISSN?.trim();
-    const eissn = row.eISSN?.trim();
+    const issn = normalizeIssnPart(row.ISSN);
+    const eissn = normalizeIssnPart(row.eISSN);
 
     if (issn) map.set(issn, impactFactor);
     if (eissn) map.set(eissn, impactFactor);
@@ -266,7 +267,7 @@ async function main(): Promise<void> {
   let journals: Journal[] = [];
   const partitionYear = 2025;
   let impactFactorYear = 2024;
-  let source = {
+  let source: JournalDataset["source"] = {
     partition: RAW_FILES.partition,
     impactFactor: RAW_FILES.impactFactor,
   };

@@ -1,5 +1,6 @@
 
 "use client";
+import { getLegacyFavoriteId } from "@aji/core";
 
 import { useState, useEffect } from "react";
 import type { Journal } from "@/data/journals";
@@ -115,7 +116,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
   const { t, locale } = useTranslation();
   const [isFavoritesDialogOpen, setIsFavoritesDialogOpen] = useState(false);
 
-  const journalId = journal.issn.split('/')[0];
+  const journalId = getLegacyFavoriteId(journal.issn);
   const summaryInfo = summaryCache[journal.issn];
 
   const favoritesQuery = useMemoFirebase(

@@ -14,7 +14,7 @@ export async function getSummary(
   locale: 'en' | 'zh'
 ): Promise<JournalSummaryInfo> {
   const summary = await summarizeJournalInfo({
-    journalName: journal.journalName,
+    issn: journal.issn,
     locale: locale,
   });
 

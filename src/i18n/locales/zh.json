@@ -51,11 +51,12 @@
         "casPartitionShort": "中科院分区",
         "casDescription": "中国科学院期刊分区。",
         "aiSummary": "AI 智能分析",
-        "aiDisclaimer": "AI 生成的分析，请核实关键信息。",
+        "aiDisclaimer": "读取离线预生成的 AI 分析，请核实关键信息。",
         "relatedJournals": "相关期刊",
         "relatedDisclaimer": "AI 建议的相似期刊。",
-        "summaryError": "生成 AI 智能分析失败。",
-        "generateAnalysis": "生成分析"
+        "summaryError": "读取已有分析失败，请稍后重试。",
+        "summaryUnavailable": "该期刊暂未收录预生成的分析。",
+        "generateAnalysis": "查看分析"
     },
     "cas": {
         "authorityLevel": "权威级别",
@@ -150,7 +151,7 @@
             },
             "ai": {
                 "title": "AI智能分析",
-                "p1": "在每个期刊的详情页上，点击“生成分析”按钮。我们的AI助手将提供该期刊的摘要并推荐相关的出版物。"
+                "p1": "在期刊详情页点击“查看分析”，即可读取已生成的期刊摘要和相关推荐。查看时不会调用 AI 模型。"
             }
         },
         "feedback": {

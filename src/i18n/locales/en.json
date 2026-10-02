@@ -51,11 +51,12 @@
         "casPartitionShort": "CAS Partition",
         "casDescription": "Chinese Academy of Sciences (CAS) journal ranking.",
         "aiSummary": "AI-Powered Analysis",
-        "aiDisclaimer": "AI-generated analysis. Please verify critical information.",
+        "aiDisclaimer": "Pre-generated AI analysis, loaded from stored data. Please verify critical information.",
         "relatedJournals": "Related Journals",
         "relatedDisclaimer": "Similar journals suggested by AI.",
-        "summaryError": "Failed to generate AI-powered analysis.",
-        "generateAnalysis": "Generate Analysis"
+        "summaryError": "Failed to load the stored analysis. Please try again later.",
+        "summaryUnavailable": "No pre-generated analysis is available for this journal yet.",
+        "generateAnalysis": "View Analysis"
     },
     "cas": {
         "authorityLevel": "Authority Level",
@@ -215,7 +216,7 @@
             },
             "ai": {
                 "title": "AI-Powered Analysis",
-                "p1": "On each journal's detail page, click the 'Generate Analysis' button. Our AI assistant will provide a summary of the journal and suggest related publications."
+                "p1": "On each journal's detail page, click 'View Analysis' to read its pre-generated summary and related journals. Viewing an analysis does not call an AI model."
             }
         },
         "feedback": {

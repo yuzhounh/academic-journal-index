@@ -117,7 +117,8 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
   const [isFavoritesDialogOpen, setIsFavoritesDialogOpen] = useState(false);
 
   const journalId = getLegacyFavoriteId(journal.issn);
-  const summaryInfo = summaryCache[journal.issn];
+  const summaryKey = `${journal.issn}:${locale}`;
+  const summaryInfo = summaryCache[summaryKey];
 
   const favoritesQuery = useMemoFirebase(
     () =>
@@ -137,16 +138,17 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
   useEffect(() => {
     // When the journal changes, check if we have a cached summary.
     // If we do, automatically show the analysis section.
-    if (summaryCache[journal.issn]) {
+    setError(null);
+    if (summaryCache[summaryKey]) {
       setShowAiAnalysis(true);
     } else {
       setShowAiAnalysis(false);
     }
-  }, [journal, summaryCache]);
+  }, [summaryKey, summaryCache]);
 
   const handleGenerateSummary = async () => {
     if (!journal) return;
-    if (summaryCache[journal.issn]) {
+    if (summaryCache[summaryKey]) {
       setShowAiAnalysis(true);
       return;
     }
@@ -156,7 +158,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
     setError(null);
     try {
       const result: JournalSummaryInfo = await getSummary(journal, locale);
-      setSummaryCache(prev => ({...prev, [journal.issn]: result }));
+      setSummaryCache(prev => ({...prev, [summaryKey]: result }));
     } catch (e) {
       setError(t('journal.summaryError'));
       console.error(e);
@@ -274,7 +276,9 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
                   )}
                   {error && <p className="text-destructive">{error}</p>}
                   {!isLoading && !error && summaryInfo?.summary && (
-                    <ContentBlockRenderer blocks={summaryInfo.summary} />
+                    summaryInfo.summary.length
+                      ? <ContentBlockRenderer blocks={summaryInfo.summary} />
+                      : <p className="text-muted-foreground">{t('journal.summaryUnavailable')}</p>
                   )}
               </CardContent>
             )}

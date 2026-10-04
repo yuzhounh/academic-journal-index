@@ -211,7 +211,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
       </div>
 
       <div className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="journal-detail-grid grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Card className="lg:col-span-1">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl font-headline">
@@ -230,7 +230,7 @@ export default function JournalDetail({ journal, onBack, onJournalSelect, isHist
                 </CardContent>
             </Card>
             
-            <Card className="lg:col-span-2">
+            <Card className="journal-detail-partition lg:col-span-2">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2 text-xl font-headline">
                         <Award className="text-primary"/>

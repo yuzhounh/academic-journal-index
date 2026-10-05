@@ -713,10 +713,12 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
         <Button
           key={id}
           onClick={() => handleViewChange(id)}
-          variant={view === id ? "secondary" : "ghost"}
+          variant="ghost"
           className={cn(
-            "w-full justify-start text-base py-3 px-1.5",
-            view === id && "bg-background shadow-sm ring-1 ring-border/50"
+            "w-full justify-start text-base py-2.5 px-3 rounded-lg transition-colors",
+            view === id
+              ? "bg-muted font-semibold text-primary"
+              : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
           )}
         >
           <Icon className="mr-3 h-5 w-5" />
@@ -727,7 +729,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
   );
 
   const desktopNavItems = (
-    <nav className="journal-desktop-nav hidden sm:flex items-center p-1 bg-muted/80 rounded-lg ring-1 ring-border/40">
+    <nav className="journal-desktop-nav hidden min-[820px]:flex items-center p-1 bg-muted/80 rounded-lg ring-1 ring-border/40">
       {navViewItems.map(({ id, labelKey }) => (
         <button
           key={id}
@@ -856,43 +858,64 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       <div className="page-shell flex min-h-screen flex-col">
         <header className="journal-header sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
           <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-4 sm:gap-6">
-              <div className="journal-menu-trigger sm:hidden">
-                  <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                      <SheetTrigger asChild>
-                          <Button variant="outline" size="icon">
-                              <Menu className="h-5 w-5" />
-                              <span className="sr-only">Open menu</span>
-                          </Button>
-                      </SheetTrigger>
-                      <SheetContent side="left" className="journal-navigation-sheet pt-8 w-[58vw] max-w-[250px] px-2 py-3 gap-3">
-                        <div>
-                          <SheetHeader>
-                            <SheetTitle className="sr-only">Menu</SheetTitle>
-                            <SheetDescription className="sr-only">
-                              Main navigation menu
-                            </SheetDescription>
-                          </SheetHeader>
-                          <Link href="/">
-                            <AjiLogo />
-                          </Link>
-                        </div>
-                        <div className="mt-8 flex flex-col gap-1">
-                          {navItems}
-                        </div>
-                      </SheetContent>
-                  </Sheet>
-              </div>
-              <Link href="/" className="journal-header-brand hidden sm:flex items-center">
+              <Link href="/" className="journal-header-brand flex items-center">
                 <AjiLogo />
               </Link>
               {desktopNavItems}
             </div>
-            
-            <div className="flex items-center justify-end gap-2">
+
+            {/* Desktop Header Actions */}
+            <div className="hidden min-[820px]:flex items-center justify-end gap-2">
               <LanguageToggle />
               <ThemeToggle />
               <UserAvatar onLoginClick={() => setIsLoginDialogOpen(true)} />
+            </div>
+
+            {/* Mobile Top-Right Hamburger Menu */}
+            <div className="min-[820px]:hidden flex items-center">
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="icon" aria-label="打开菜单">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-[72vw] max-w-[248px] rounded-l-2xl p-5 flex flex-col justify-between overflow-y-auto">
+                  <div className="flex flex-col gap-4">
+                    <SheetHeader className="text-left pb-2 border-b">
+                      <SheetTitle className="text-base font-semibold flex items-center gap-2">
+                        <AjiLogo />
+                      </SheetTitle>
+                      <SheetDescription className="sr-only">
+                        Main navigation and preferences menu
+                      </SheetDescription>
+                    </SheetHeader>
+
+                    {/* Navigation Items */}
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <span className="text-xs font-medium text-muted-foreground">页面导航</span>
+                      <div className="flex flex-col gap-1">
+                        {navItems}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bottom Settings (Theme, Language, User Account) */}
+                  <div className="pt-4 border-t flex flex-col gap-3 mt-6">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">语言 / Language</span>
+                      <LanguageToggle />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">外观主题</span>
+                      <ThemeToggle />
+                    </div>
+                    <div className="pt-2 border-t flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">账户与同步</span>
+                      <UserAvatar onLoginClick={() => { setMobileMenuOpen(false); setIsLoginDialogOpen(true); }} />
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </header>

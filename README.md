@@ -20,7 +20,7 @@ Academic Journal Index (AJI) is a comprehensive platform designed to help resear
 
 ## About
 
-Current release: **6.2.3**. Journal summaries read the existing bilingual offline dataset; no live model request is used. See [release notes](https://github.com/yuzhounh/academic-journal-index/releases/tag/v6.2.3).
+Current release: **6.2.4**. Journal summaries read the existing bilingual offline dataset; no live model request is used. See [release notes](https://github.com/yuzhounh/academic-journal-index/releases/tag/v6.2.4).
 
 The current dataset pairs **IF(2024)** from ShowJCR's `JCR2024-UTF8.csv` with the **CAS Journal Partition Table 2025**. The filename records the impact-factor data year; it is distinct from the Clarivate JCR release-year label used by [AJI Editions](https://github.com/yuzhounh/aji-editions).
 

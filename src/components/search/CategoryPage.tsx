@@ -859,6 +859,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
       <div className="page-shell flex min-h-screen flex-col">
         <header className="journal-header sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/70 shadow-sm">
           <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center gap-6">
               <Link href="/" className="journal-header-brand flex items-center">
                 <AjiLogo />
               </Link>

@@ -51,7 +51,7 @@ import { useMemoFirebase } from "@/firebase/provider";
 import LoginDialog from "../auth/LoginDialog";
 import JournalListItem from "./JournalListItem";
 import { useIsMobile } from "@/hooks/use-mobile";
-import Papa from "papaparse";
+import { triggerCsvDownload } from "@/lib/csv-download";
 import { Checkbox } from "../ui/checkbox";
 import AddToFavoritesDialog from "../favorites/AddToFavoritesDialog";
 import {
@@ -178,18 +178,6 @@ type FavoriteJournalEntry = {
   journalId: string;
   listId?: string;
 };
-
-const triggerCsvDownload = (data: (string | number)[][], filename: string) => {
-  const csvContent = "data:text/csv;charset=utf-8," + Papa.unparse(data);
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", filename);
-  document.body.appendChild(link); // Required for FF
-  link.click();
-  document.body.removeChild(link);
-};
-
 
 export default function CategoryPage({ journals }: CategoryPageProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);

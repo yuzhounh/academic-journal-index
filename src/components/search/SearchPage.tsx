@@ -20,7 +20,7 @@ import CategoryStats from "./CategoryStats";
 import { useTranslation } from "@/i18n/provider";
 import JournalListItem from "./JournalListItem";
 import { useIsMobile } from "@/hooks/use-is-mobile";
-import Papa from "papaparse";
+import { triggerCsvDownload } from "@/lib/csv-download";
 import { Button } from "../ui/button";
 import { Checkbox } from "../ui/checkbox";
 import AddToFavoritesDialog from "../favorites/AddToFavoritesDialog";
@@ -131,18 +131,6 @@ const getPaginationItems = (
 
   return uniquePages;
 };
-
-const triggerCsvDownload = (data: (string | number)[][], filename: string) => {
-  const csvContent = "data:text/csv;charset=utf-8," + Papa.unparse(data);
-  const encodedUri = encodeURI(csvContent);
-  const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", filename);
-  document.body.appendChild(link); // Required for FF
-  link.click();
-  document.body.removeChild(link);
-};
-
 
 function SearchClient({ journals, onJournalSelect, initialSearchTerm = "" }: SearchPageProps) {
   const [searchTerm, setSearchTerm] = useState(initialSearchTerm);

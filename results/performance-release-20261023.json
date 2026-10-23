@@ -7,10 +7,10 @@
   "CI": {
     "conclusion": "success",
     "tests": 10,
-    "application": 39888159967,
-    "pages": 39888159981
+    "application": 39891602150,
+    "pages": 39891602147
   },
-  "vercel": "dpl_FoeuJq6bDpuigM3uB9kgTSgHGgKh",
+  "vercel": "dpl_GaLFgi7afoZ3ooDDvgVbUCY1qdSA",
   "cloudflare": "9b195cb7",
   "firebase": "academic-journal-index",
   "dataVerification": "results/summary-shards-verification.json",
@@ -44,5 +44,6 @@
     "favorites ID core"
   ],
   "netlify": "deferred, no calls",
-  "standaloneExeApk": "not applicable"
+  "standaloneExeApk": "not applicable",
+  "sourceWithBuildHelper": "a822d927dec01bbec769d125fe4f416edf14c7fa"
 }

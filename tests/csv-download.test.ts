@@ -13,8 +13,8 @@ test("CSV download retains Unicode, hash marks, quoted/newline cells and filenam
     createElement: () => link, body: { appendChild() {}, removeChild() { removed = true; } },
   } });
   t.after(() => { if (original) Object.defineProperty(globalThis, "document", original); else Reflect.deleteProperty(globalThis, "document"); });
-  t.mock.method(URL, "createObjectURL", value => { assert.ok(value instanceof Blob); captured = value; return "blob:fixture"; });
-  t.mock.method(URL, "revokeObjectURL", value => { assert.equal(value, "blob:fixture"); assert.ok(clicked); revoked = true; });
+  t.mock.method(URL, "createObjectURL", (value: unknown) => { assert.ok(value instanceof Blob); captured = value; return "blob:fixture"; });
+  t.mock.method(URL, "revokeObjectURL", (value: string) => { assert.equal(value, "blob:fixture"); assert.ok(clicked); revoked = true; });
   const rows = [["Title", "Description"], ["中文#Journal", 'quote " and\nnew line']];
   // This is the former data-URI bug: encodeURI leaves a fragment outside the payload.
   assert.ok(new URL("data:text/csv," + encodeURI(Papa.unparse(rows))).hash);

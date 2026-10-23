@@ -1,0 +1,8 @@
+{
+  "date": "2026-10-23T10:48:39.3811918+08:00",
+  "documentationOnlyExit": 0,
+  "applicationChangesExit": 1,
+  "fixtures": "Two actual public GitHub comparison responses, retrieved with gh",
+  "network": "Local Node fetch crashed in Windows libuv; real network path not locally verified; safe fallback builds",
+  "gitMetadataUploaded": false
+}

@@ -1,0 +1,14 @@
+{
+  "sourceSha256": "f0036aa006ae7d414c56df38bcf9cbe799d0b120f41a20d66e749301b76f6a22",
+  "originalCompressedBytes": 23027113,
+  "originalJsonBytes": 93890331,
+  "entries": 23561,
+  "buckets": 256,
+  "largestCompressedBucketBytes": 130710,
+  "largestJsonBucketBytes": 465803,
+  "decodedCacheLimit": 8,
+  "allBilingualContentAndRelatedRecordsEqual": true,
+  "modelCalls": 0,
+  "journalTableSha256": "81b5ff7b7ba43dd5499a5fce4c415a79b66bf30a359ebc8923dc401fa22d1686",
+  "verifiedAt": "2026-10-23T01:50:03.527Z"
+}

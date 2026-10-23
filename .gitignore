@@ -47,3 +47,7 @@ next-env.d.ts
 /data/raw/*
 !/data/raw/.gitkeep
 /src/data/journals.json
+/src/data/summaries/manifest.json
+/src/data/summaries/shards/
+/src/data/summaries/.pack-key
+/tmp/

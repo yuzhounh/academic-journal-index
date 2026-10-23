@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-23T10:37:19.6226958+08:00",
+  "version": "6.2.5",
+  "source": "b04204a9c88f0da76867638d754c488b24922f20",
+  "sourcePushed": true,
+  "publicReleaseUnchanged": "v6.2.4",
+  "CI": {
+    "conclusion": "success",
+    "tests": 10,
+    "application": 39888159967,
+    "pages": 39888159981
+  },
+  "vercel": "dpl_FoeuJq6bDpuigM3uB9kgTSgHGgKh",
+  "cloudflare": "9b195cb7",
+  "firebase": "academic-journal-index",
+  "dataVerification": "results/summary-shards-verification.json",
+  "webVerification": "results/web-release-6.2.5.json",
+  "browser": {
+    "mobileMenuAndDetail": true,
+    "CSVRows": 76,
+    "EnglishSummary": true,
+    "viewportReset": true,
+    "documentClientWidth": 375,
+    "screenshot": "results/mobile-summary-6.2.5.png",
+    "temporaryTabsClosed": true,
+    "nativeControl": "automatic policy stopped; current Chrome URL could not be identified confidently",
+    "CSVsha256": "8DE703BC4FACEA140EA5EA8586677199CE0B11C15DD58EC67B93E265C16742D1",
+    "ChineseSummary": true,
+    "accountVerification": "pending: signed-in state not observed after Google callback",
+    "results": 76,
+    "documentScrollWidth": 375,
+    "IABconsoleErrorsOrWarnings": 0,
+    "search": "Nature",
+    "mobileViewportRequested": 390,
+    "helperProcessExitConfirmed": false,
+    "controlRuntimeReset": true
+  },
+  "protectedInputsUnchanged": [
+    "journal table",
+    "original summaries gzip",
+    "Firebase configuration",
+    "Firestore rules/indexes",
+    "authentication components",
+    "favorites ID core"
+  ],
+  "netlify": "deferred, no calls",
+  "standaloneExeApk": "not applicable"
+}

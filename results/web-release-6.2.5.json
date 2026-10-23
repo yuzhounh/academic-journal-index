@@ -1,0 +1,69 @@
+{
+  "version": "6.2.5",
+  "source": "b04204a9c88f0da76867638d754c488b24922f20",
+  "vercel": "dpl_FoeuJq6bDpuigM3uB9kgTSgHGgKh",
+  "cloudflare": "9b195cb7",
+  "pagesCI": 39888159981,
+  "applicationCI": 39888159967,
+  "sites": [
+    {
+      "platform": "Vercel",
+      "base": "https://academic-journal-index.vercel.app",
+      "assets": [
+        {
+          "path": "/",
+          "bytes": 10694451,
+          "sha256": "A13A80B82F448ED8905FDE876FF0F41812BFAE251B95776DBA62951E2AEFBC6F"
+        },
+        {
+          "path": "/_next/static/chunks/4bd1b696-f503210d87a3e69c.js",
+          "bytes": 168413,
+          "sha256": "D3AF05C384C63430CAD3FFA0806EDD3184264656ADA2BF566642F0BC84DBEA38"
+        },
+        {
+          "path": "/_next/static/css/eb6fcad130b85470.css",
+          "bytes": 67859,
+          "sha256": "510316C8072182BE23C0994E068A7A62A13EB7DC859B5610E8D844A55E52ACE9"
+        },
+        {
+          "path": "favicon.svg",
+          "bytes": 765,
+          "sha256": "4572B04D851C3F6E71BFA7D501694883E225378F81DEAFE9F9005FC850BC440C"
+        }
+      ],
+      "nextRuntime": true
+    },
+    {
+      "platform": "Cloudflare",
+      "base": "https://academic-journal-index.pages.dev",
+      "assets": [
+        {
+          "path": "/",
+          "bytes": 10694451,
+          "sha256": "A13A80B82F448ED8905FDE876FF0F41812BFAE251B95776DBA62951E2AEFBC6F"
+        },
+        {
+          "path": "/_next/static/chunks/4bd1b696-f503210d87a3e69c.js",
+          "bytes": 168413,
+          "sha256": "D3AF05C384C63430CAD3FFA0806EDD3184264656ADA2BF566642F0BC84DBEA38"
+        },
+        {
+          "path": "/_next/static/css/eb6fcad130b85470.css",
+          "bytes": 67859,
+          "sha256": "510316C8072182BE23C0994E068A7A62A13EB7DC859B5610E8D844A55E52ACE9"
+        },
+        {
+          "path": "favicon.svg",
+          "bytes": 765,
+          "sha256": "4572B04D851C3F6E71BFA7D501694883E225378F81DEAFE9F9005FC850BC440C"
+        }
+      ],
+      "nextRuntime": true
+    }
+  ],
+  "pagesSourceMatched": true,
+  "pagesBytesMatched": true,
+  "firebase302PreservesQuery": true,
+  "netlify": "deferred; no calls",
+  "verifiedAt": "2026-10-23T10:20:28.1992168+08:00"
+}

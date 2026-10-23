@@ -20,7 +20,7 @@ Academic Journal Index (AJI) is a comprehensive platform designed to help resear
 
 ## About
 
-Current release: **6.2.4**. Journal summaries read the existing bilingual offline dataset; no live model request is used. See [release notes](https://github.com/yuzhounh/academic-journal-index/releases/tag/v6.2.4).
+Current daily version: **6.2.5**. Journal summaries read one ISSN bucket from the existing bilingual offline dataset, with eight decoded buckets cached; no live model request is used. See [maintenance status](docs/maintenance_status.md). The public [6.2.4 Release](https://github.com/yuzhounh/academic-journal-index/releases/tag/v6.2.4) is maintained separately.
 
 The current dataset pairs **IF(2024)** from ShowJCR's `JCR2024-UTF8.csv` with the **CAS Journal Partition Table 2025**. The filename records the impact-factor data year; it is distinct from the Clarivate JCR release-year label used by [AJI Editions](https://github.com/yuzhounh/aji-editions).
 
@@ -67,7 +67,7 @@ Raw CSV files stay in `data/raw/` and are not committed. After regenerating, com
 - **Smart Recommendations:** Get AI-suggested related journals based on field and influence.
 - **Offline Data:** Uses the existing 23,561-journal summary dataset from AJI Editions (updated 2026-08-16 UTC). Viewing summaries never calls a model API and needs no model key. Missing summaries display an explicit unavailable message.
 
-The shared dataset is stored in `src/data/summaries.json.gz` (SHA-256 `f0036aa006ae7d414c56df38bcf9cbe799d0b120f41a20d66e749301b76f6a22`). The server reads by ISSN and language, filters related journals against this edition, and bundles the data via Next.js file tracing. Client caches separate Chinese and English summaries. This is pre-generated content, not a promise of current journal metrics.
+The shared dataset is stored unchanged in `src/data/summaries.json.gz` (SHA-256 `f0036aa006ae7d414c56df38bcf9cbe799d0b120f41a20d66e749301b76f6a22`). Development, tests and builds prepare 256 server-only ISSN buckets, reusing an already verified package when source/packer fingerprints and bucket hashes match. A lookup decompresses only its bucket; the server retains at most eight decoded buckets and filters related journals against this edition. Next.js file tracing includes the manifest and bucket files. Client caches separate Chinese and English summaries. Missing/invalid identifiers retain their existing behavior. This is pre-generated content, not a promise of current journal metrics.
 
 ### 4. Personalized Management (Favorites)
 - **Custom Lists:** Create multiple lists to organize your research interests.

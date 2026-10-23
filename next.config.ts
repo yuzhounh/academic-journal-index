@@ -2,9 +2,10 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
-    '/*': ['./src/data/journals.json.gz', './src/data/summaries.json.gz'],
+    '/**/*': ['./src/data/journals.json.gz', './src/data/summaries/manifest.json', './src/data/summaries/shards/*.json.gz'],
   },
   experimental: {
+    cpus: 2,
     serverActions: {
       allowedOrigins: ['academic-journal-index.pages.dev'],
     },

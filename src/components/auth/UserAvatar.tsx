@@ -16,6 +16,8 @@ import { signOut } from "firebase/auth";
 import { LogIn, LogOut, Mail, KeyRound, User as UserIcon, Image as ImageIcon, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "@/i18n/provider";
+import { LanguageToggle } from "@/components/theme/LanguageToggle";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import ChangeEmailDialog from "./ChangeEmailDialog";
 import ChangePasswordDialog from "./ChangePasswordDialog";
 import ChangeNicknameDialog from "./ChangeNicknameDialog";
@@ -44,69 +46,70 @@ export default function UserAvatar({ onLoginClick }: UserAvatarProps) {
     }
   };
 
-  if (!user) {
-    return (
-      <Button variant="outline" size="sm" onClick={onLoginClick}>
-        <LogIn className="mr-2 h-4 w-4" />
-        {t('auth.login')}
-      </Button>
-    );
-  }
-
-  const getInitial = () => {
-    if (user.displayName) {
-      return user.displayName.charAt(0).toUpperCase();
-    }
-    if (user.email) {
-      return user.email.charAt(0).toUpperCase();
-    }
-    return "?";
-  };
-  const userInitial = getInitial();
+  const userInitial = (user?.displayName || user?.email || "?").charAt(0).toUpperCase();
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button onClick={() => setIsChangeAvatarDialogOpen(true)} aria-label={t('auth.changeAvatar.title')}>
-            <Avatar className="cursor-pointer h-9 w-9">
-              <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'User'} />
-              <AvatarFallback>{userInitial}</AvatarFallback>
+          <Button variant="ghost" size="icon" className="rounded-full p-0" aria-label={t('auth.accountMenu')}>
+            <Avatar className="h-9 w-9">
+              <AvatarImage src={user?.photoURL ?? undefined} alt="" />
+              <AvatarFallback>{user ? userInitial : <UserIcon aria-hidden="true" />}</AvatarFallback>
             </Avatar>
-          </button>
+          </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          collisionPadding={8}
+          className="w-60 max-w-[var(--radix-dropdown-menu-content-available-width)] max-h-[var(--radix-dropdown-menu-content-available-height)] overflow-y-auto rounded-xl"
+        >
           <DropdownMenuLabel>
-              <p className="font-medium">{user.displayName || "User"}</p>
-              <p className="text-xs text-muted-foreground font-normal truncate">{user.email}</p>
+            <p className="truncate font-medium">{user ? user.displayName || user.email : t('preferences.guest')}</p>
+            {user?.displayName && user.email && (
+              <p className="truncate text-xs font-normal text-muted-foreground">{user.email}</p>
+            )}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-           <DropdownMenuItem onClick={() => setIsChangeAvatarDialogOpen(true)} className="cursor-pointer">
-            <ImageIcon className="mr-2 h-4 w-4" />
-            <span>{t('auth.changeAvatar.menuItem')}</span>
-          </DropdownMenuItem>
-           <DropdownMenuItem onClick={() => setIsChangeNicknameDialogOpen(true)} className="cursor-pointer">
-            <UserIcon className="mr-2 h-4 w-4" />
-            <span>{t('auth.changeNickname.menuItem')}</span>
-          </DropdownMenuItem>
-           <DropdownMenuItem onClick={() => setIsChangeEmailDialogOpen(true)} className="cursor-pointer">
-            <Mail className="mr-2 h-4 w-4" />
-            <span>{t('auth.changeEmail.menuItem')}</span>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsChangePasswordDialogOpen(true)} className="cursor-pointer">
-            <KeyRound className="mr-2 h-4 w-4" />
-            <span>{t('auth.changePassword.menuItem')}</span>
-          </DropdownMenuItem>
+          <LanguageToggle />
+          <ThemeToggle />
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => setIsClearFavoritesDialogOpen(true)} className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
-            <Trash2 className="mr-2 h-4 w-4" />
-            <span>{t('favorites.clearAll.menuItem')}</span>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>{t('auth.logout')}</span>
-          </DropdownMenuItem>
+          {user ? (
+            <>
+              <DropdownMenuItem onClick={() => setIsChangeAvatarDialogOpen(true)} className="min-h-10 cursor-pointer">
+                <ImageIcon className="mr-2 h-4 w-4" />
+                <span>{t('auth.changeAvatar.menuItem')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsChangeNicknameDialogOpen(true)} className="min-h-10 cursor-pointer">
+                <UserIcon className="mr-2 h-4 w-4" />
+                <span>{t('auth.changeNickname.menuItem')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsChangeEmailDialogOpen(true)} className="min-h-10 cursor-pointer">
+                <Mail className="mr-2 h-4 w-4" />
+                <span>{t('auth.changeEmail.menuItem')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsChangePasswordDialogOpen(true)} className="min-h-10 cursor-pointer">
+                <KeyRound className="mr-2 h-4 w-4" />
+                <span>{t('auth.changePassword.menuItem')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setIsClearFavoritesDialogOpen(true)} className="min-h-10 cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10">
+                <Trash2 className="mr-2 h-4 w-4" />
+                <span>{t('favorites.clearAll.menuItem')}</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleSignOut} className="min-h-10 cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>{t('auth.logout')}</span>
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <DropdownMenuItem onSelect={onLoginClick} className="min-h-10 cursor-pointer">
+              <LogIn className="mr-2 h-4 w-4" />
+              <span>{t('auth.login')}</span>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       {user && (

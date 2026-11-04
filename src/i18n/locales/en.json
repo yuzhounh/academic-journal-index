@@ -225,7 +225,15 @@
             "button": "Open a GitHub Issue"
         }
     },
+    "preferences": {
+        "language": "Language",
+        "theme": "Appearance",
+        "light": "Light",
+        "dark": "Dark",
+        "guest": "Guest"
+    },
     "auth": {
+        "accountMenu": "Account menu",
         "welcomeBack": "Welcome Back",
         "createAccount": "Create an Account",
         "signInToFavorites": "Sign in to access your favorites.",

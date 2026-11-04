@@ -225,7 +225,15 @@
             "errorTitle": "清空收藏时出错"
         }
     },
+    "preferences": {
+        "language": "界面语言",
+        "theme": "外观主题",
+        "light": "浅色",
+        "dark": "深色",
+        "guest": "访客"
+    },
     "auth": {
+        "accountMenu": "账户菜单",
         "welcomeBack": "欢迎回来",
         "createAccount": "创建账户",
         "signInToFavorites": "登录以访问您的收藏。",

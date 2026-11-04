@@ -41,8 +41,6 @@ import UserAvatar from "../auth/UserAvatar";
 import { useFirebase } from "@/firebase";
 import FavoritesContent, { JournalList } from "../favorites/FavoritesContent";
 import AboutPage from "./AboutPage";
-import { ThemeToggle } from "../theme/ThemeToggle";
-import { LanguageToggle } from "../theme/LanguageToggle";
 import { useTranslation } from "@/i18n/provider";
 import { getMajorCategoryName } from "@/i18n/categories";
 import { useCollection, WithId } from "@/firebase/firestore/use-collection";
@@ -854,18 +852,11 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
               {desktopNavItems}
             </div>
 
-            {/* Desktop Header Actions */}
-            <div className="hidden min-[820px]:flex items-center justify-end gap-2">
-              <LanguageToggle />
-              <ThemeToggle />
+            <div className="flex items-center justify-end gap-2">
               <UserAvatar onLoginClick={() => setIsLoginDialogOpen(true)} />
-            </div>
-
-            {/* Mobile Top-Right Hamburger Menu */}
-            <div className="min-[820px]:hidden flex items-center">
               <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                 <SheetTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="打开菜单">
+                  <Button variant="outline" size="icon" className="min-[820px]:hidden" aria-label="打开菜单">
                     <Menu className="h-5 w-5" />
                   </Button>
                 </SheetTrigger>
@@ -881,7 +872,7 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                         </Button>
                       </SheetClose>
                       <SheetDescription className="sr-only">
-                        Main navigation and preferences menu
+                        Main navigation menu
                       </SheetDescription>
                     </SheetHeader>
 
@@ -891,22 +882,6 @@ export default function CategoryPage({ journals }: CategoryPageProps) {
                       <div className="flex flex-col gap-1">
                         {navItems}
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Bottom Settings (Theme, Language, User Account) */}
-                  <div className="pt-4 border-t flex flex-col gap-3 mt-6">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">语言 / Language</span>
-                      <LanguageToggle />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">外观主题</span>
-                      <ThemeToggle />
-                    </div>
-                    <div className="pt-2 border-t flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">账户与同步</span>
-                      <UserAvatar onLoginClick={() => { setMobileMenuOpen(false); setIsLoginDialogOpen(true); }} />
                     </div>
                   </div>
                 </SheetContent>
